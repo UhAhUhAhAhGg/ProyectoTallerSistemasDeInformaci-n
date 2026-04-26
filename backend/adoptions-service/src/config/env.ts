@@ -11,6 +11,7 @@ export const ENV = {
     password: process.env.DB_PASSWORD || 'password',
   },
   SERVICES: {
+    pets: process.env.PETS_SERVICE_URL || 'http://localhost:3002',
     auth: process.env.AUTH_SERVICE_URL || 'http://localhost:3001',
     notifications: process.env.NOTIFICATIONS_SERVICE_URL || 'http://localhost:3005',
   },
