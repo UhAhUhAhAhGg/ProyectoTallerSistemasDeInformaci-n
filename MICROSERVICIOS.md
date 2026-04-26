@@ -17,10 +17,11 @@ proyecto/
 │   │   ├── .env
 │   │   └── package.json
 │   │
-│   ├── users-service/         # (Para agregar después)
+│   ├── admin-prof-service/    # Servicio de Administración y Perfiles
 │   │   ├── src/
 │   │   ├── .env
-│   │   └── package.json
+│   │   ├── package.json
+│   │   └── tsconfig.json
 │   │
 │   └── shared/                # (OPCIONAL) Código compartido
 │       ├── constants.js
@@ -149,32 +150,49 @@ export const authService = {
 
 ---
 
-## 🚀 Agregar Nuevos Servicios
+## 🚀 Servicios Implementados
 
-### 1. Crear estructura del nuevo servicio
+### ✅ Servicios Actuales
+
+1. **auth-service** (Puerto 3001)
+   - Autenticación de usuarios
+   - JavaScript (Node.js + Express)
+
+2. **admin-prof-service** (Puerto 3002)
+   - Gestión de perfiles de usuarios
+   - Administración de usuarios y roles
+   - TypeScript (Node.js + Express)
+
+### 🔧 Agregar un Nuevo Servicio
+
+Si necesitas crear un nuevo microservicio:
+
+#### 1. Crear estructura
 
 ```bash
 # Desde la carpeta proyecto:
-mkdir -p backend/users-service/src/{controllers,routes}
+mkdir -p backend/nuevo-servicio/src/{config,domain,middlewares,utils}
 ```
 
-### 2. Crear package.json del nuevo servicio
+#### 2. Configurar TypeScript
 
 ```bash
-cd backend/users-service
+cd backend/nuevo-servicio
 npm init -y
 npm install express cors dotenv
-npm install --save-dev nodemon
+npm install --save-dev typescript @types/express @types/node ts-node
+npx tsc --init
 ```
 
-### 3. Actualizar el package.json raíz
+#### 3. Actualizar scripts en package.json raíz
 
 ```json
 {
   "scripts": {
-    "dev": "concurrently \"npm run dev:auth\" \"npm run dev:users\" \"npm run dev:frontend\"",
+    "dev": "concurrently \"npm run dev:auth\" \"npm run dev:admin-prof\" \"npm run dev:nuevo\" \"npm run dev:frontend\"",
     "dev:auth": "cd backend/auth-service && npm run dev",
-    "dev:users": "cd backend/users-service && npm run dev",
+    "dev:admin-prof": "cd backend/admin-prof-service && npm run dev",
+    "dev:nuevo": "cd backend/nuevo-servicio && npm run dev",
     "dev:frontend": "cd frontend && npm run dev"
   }
 }
@@ -192,11 +210,12 @@ DB_URL=mongodb://localhost/auth
 JWT_SECRET=tu-secreto-aqui
 ```
 
-### backend/users-service/.env
+### backend/admin-prof-service/.env
 ```
 PORT=3002
 NODE_ENV=development
-DB_URL=mongodb://localhost/users
+LOG_LEVEL=info
+JWT_SECRET=tu-secreto-aqui (para futura integración con auth-service)
 AUTH_SERVICE_URL=http://localhost:3001
 ```
 
