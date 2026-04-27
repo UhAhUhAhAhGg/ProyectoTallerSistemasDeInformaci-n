@@ -1,0 +1,165 @@
+.page {
+  background-color: #f6f0ea;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+/* HEADER */
+.header {
+  background-color: #000;
+  color: #fff;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 24px;
+  color: #f1c7da;
+}
+
+.nav {
+  display: flex;
+  gap: 28px;
+  font-size: 14px;
+}
+
+.nav span {
+  color: #c9c9c9;
+}
+
+.nav .active {
+  color: #ebb3cf;
+  font-weight: 700;
+}
+
+/* LAYOUT */
+.container {
+  display: flex;
+}
+
+.content {
+  flex: 1;
+  padding: 20px 24px;
+}
+
+/* TITLES */
+.title {
+  font-size: 26px;
+  margin: 0;
+  color: #1f1f1f;
+}
+
+.subtitle {
+  margin-top: 6px;
+  color: #8e8a87;
+  font-size: 14px;
+}
+
+/* SEARCH */
+.topbar {
+  margin-top: 14px;
+  display: flex;
+  gap: 14px;
+}
+
+.search {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid #e7dfd9;
+}
+
+.ai-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  background-color: #f1d6e3;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* FILTER INFO */
+.filters-info {
+  margin-top: 12px;
+  background-color: #fbf8f6;
+  border: 1px solid #e9e1db;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  background-color: #efd7e2;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+/* GRID */
+.grid {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+/* CARD */
+.card {
+  background-color: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #eadfd8;
+}
+
+.card-image {
+  height: 120px;
+  background-color: #dfe8e3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 54px;
+  position: relative;
+}
+
+.match {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #3f3a40;
+  color: #fff;
+  padding: 5px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+
+.card-body {
+  padding: 14px;
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.card p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #777;
+}
+
+.btn {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background-color: #e5bfd2;
+  font-weight: bold;
+  cursor: pointer;
+}
