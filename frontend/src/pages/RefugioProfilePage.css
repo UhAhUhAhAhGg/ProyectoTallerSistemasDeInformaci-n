@@ -1,0 +1,171 @@
+/* filepath: src/pages/RefugioProfilePage.css */
+.rp-wrapper {
+  min-height: 100vh;
+  background: #faf8f5;
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.rp-container {
+  padding: 40px 20px;
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+  flex: 1;
+}
+
+.rp-card {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.07);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+/* Breadcrumb */
+.rp-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 28px;
+}
+.rp-breadcrumb button {
+  background: none; border: none; color: #d4a853;
+  cursor: pointer; font-size: 13px; padding: 0;
+  font-family: 'DM Sans', sans-serif;
+}
+.rp-breadcrumb button:hover { text-decoration: underline; }
+.rp-breadcrumb span:last-child { color: #555; }
+
+/* Header */
+.rp-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.rp-header-icon {
+  font-size: 40px;
+  width: 64px; height: 64px;
+  background: #faf8f5;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+.rp-header h1 {
+  font-family: 'Fraunces', serif;
+  font-size: 24px; font-weight: 900;
+  color: #1a1a1a; margin: 0 0 6px; letter-spacing: -0.4px;
+}
+.rp-header p { color: #888; font-size: 14px; margin: 0; }
+
+/* Forms */
+.error-banner {
+  background: #fee; border: 1px solid #fcc;
+  color: #c33; padding: 12px; border-radius: 10px;
+  margin-bottom: 20px; text-align: center; font-size: 14px;
+}
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group { margin-bottom: 18px; }
+
+.form-group label {
+  display: block; margin-bottom: 7px;
+  color: #333; font-weight: 500; font-size: 14px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%; padding: 12px 14px;
+  border: 2px solid #e8e8e8; border-radius: 10px;
+  font-size: 14px; transition: border-color 0.2s;
+  box-sizing: border-box; font-family: 'DM Sans', sans-serif;
+  background: #fafafa; color: #1a1a1a;
+}
+.form-group input:focus, .form-group textarea:focus {
+  outline: none; border-color: #d4a853; background: white;
+}
+.form-group input.error { border-color: #e53e3e; }
+.error-text { display: block; color: #e53e3e; font-size: 12px; margin-top: 4px; }
+
+.rp-form-actions {
+  display: flex; gap: 12px; margin-top: 8px; justify-content: flex-end;
+}
+
+/* Buttons */
+.rp-btn {
+  padding: 12px 28px; border-radius: 10px;
+  font-size: 15px; font-weight: 600;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s; border: none;
+}
+.rp-btn.primary { background: #1a1a1a; color: white; }
+.rp-btn.primary:hover:not(:disabled) { background: #333; transform: translateY(-1px); }
+.rp-btn.primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.rp-btn.secondary {
+  background: transparent; color: #555;
+  border: 2px solid #e0e0e0;
+}
+.rp-btn.secondary:hover { background: #f5f5f5; border-color: #ccc; }
+
+.rp-btn-group {
+  display: flex; gap: 12px; justify-content: center;
+  margin-top: 28px; flex-wrap: wrap;
+}
+
+/* Status messages */
+.rp-status-msg {
+  text-align: center; padding: 20px 0;
+}
+.rp-status-icon {
+  width: 80px; height: 80px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; margin: 0 auto 24px; font-weight: 700;
+}
+.rp-status-icon.success { background: #e8f5e9; color: #2e7d32; }
+.rp-status-icon.error { background: #fdecea; color: #c62828; }
+.rp-status-icon.pending { background: #fffbeb; color: #b45309; }
+
+.rp-status-msg h2 {
+  font-family: 'Fraunces', serif; font-size: 26px;
+  font-weight: 900; color: #1a1a1a; margin: 0 0 12px; letter-spacing: -0.4px;
+}
+.rp-status-msg p { color: #666; font-size: 15px; margin-bottom: 8px; }
+.rp-info-text { font-size: 13px !important; color: #999 !important; }
+
+/* Datos card */
+.rp-datos-card {
+  margin: 24px 0;
+  padding: 20px;
+  background: #faf8f5;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.06);
+  text-align: left;
+}
+.rp-datos-card h3 {
+  font-size: 14px; font-weight: 600; color: #888;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin: 0 0 14px;
+}
+.rp-dato-row {
+  display: flex; justify-content: space-between;
+  align-items: center; padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  font-size: 14px;
+}
+.rp-dato-row:last-child { border-bottom: none; }
+.rp-dato-row span { color: #888; }
+.rp-dato-row strong { color: #1a1a1a; }
+
+.loading { text-align: center; padding: 60px; color: #888; }
+
+@media (max-width: 600px) {
+  .rp-card { padding: 24px 16px; }
+  .form-row { grid-template-columns: 1fr; }
+  .rp-form-actions { flex-direction: column-reverse; }
+  .rp-btn { width: 100%; text-align: center; }
+}

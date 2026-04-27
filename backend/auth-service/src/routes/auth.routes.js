@@ -1,7 +1,8 @@
+//backend/auth-service/src/routes/auth.routes.js
 const express = require("express");
 const {
   login,
-  register,
+  registro,
   logout,
   getCurrentUser
 } = require("../controllers/auth.controller");
@@ -16,7 +17,7 @@ const router = express.Router();
 router.post("/login", login);
 
 // POST /api/auth/register
-router.post("/register", register);
+router.post("/register", registro);
 
 // POST /api/auth/logout
 router.post("/logout", logout);

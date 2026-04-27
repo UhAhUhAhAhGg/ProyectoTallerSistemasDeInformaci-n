@@ -1,168 +1,131 @@
-const User = require("../models/User");
-const { isValidEmail, isValidPassword } = require("../utils/validators");
+// filepath: src/controllers/auth.controller.js
+const { validarContrasena, registrarUsuario, loginUsuario, obtenerUsuarioActual } = require('../services/auth.service');
 
 /**
- * Login - Autentica un usuario
- * POST /api/auth/login
- */
-const login = (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    // Validaciones
-    if (!email || !password) {
-      return res.status(400).json({
-        error: "Email y contraseña son requeridos"
-      });
-    }
-
-    if (!isValidEmail(email)) {
-      return res.status(400).json({
-        error: "Email inválido"
-      });
-    }
-
-    // Buscar usuario (aquí irá lógica de BD)
-    const user = User.findByEmail(email);
-    if (!user) {
-      return res.status(401).json({
-        error: "Usuario o contraseña incorrectos"
-      });
-    }
-
-    // TODO: Comparar contraseña con hash (bcrypt)
-    if (user.password !== password) {
-      return res.status(401).json({
-        error: "Usuario o contraseña incorrectos"
-      });
-    }
-
-    // Respuesta exitosa
-    res.json({
-      success: true,
-      message: "Login exitoso",
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name
-      },
-      token: "jwt-token-aqui" // TODO: Generar JWT
-    });
-  } catch (error) {
-    res.status(500).json({
-      error: "Error en el servidor",
-      message: error.message
-    });
-  }
-};
-
-/**
- * Register - Registra un nuevo usuario
+ * Registro de usuario general
  * POST /api/auth/register
  */
-const register = (req, res) => {
-  try {
-    const { email, password, name } = req.body;
+async function registro(req, res) {
+  const { correo, contrasena, confirmar_contrasena, rol, nombre, apellido } = req.body;
 
-    // Validaciones
-    if (!email || !password || !name) {
-      return res.status(400).json({
-        error: "Email, contraseña y nombre son requeridos"
-      });
-    }
-
-    if (!isValidEmail(email)) {
-      return res.status(400).json({
-        error: "Email inválido"
-      });
-    }
-
-    if (!isValidPassword(password)) {
-      return res.status(400).json({
-        error: "Contraseña debe tener al menos 6 caracteres"
-      });
-    }
-
-    // Verificar si el usuario ya existe
-    const existingUser = User.findByEmail(email);
-    if (existingUser) {
-      return res.status(409).json({
-        error: "El email ya está registrado"
-      });
-    }
-
-    // TODO: Hash de contraseña (bcrypt)
-    // const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Crear nuevo usuario
-    const newUser = User.create({
-      email,
-      password, // TODO: usar hashedPassword
-      name
+  // Validar campos requeridos
+  if (!correo || !contrasena || !confirmar_contrasena || !rol) {
+    return res.status(400).json({
+      success: false,
+      mensaje: 'Todos los campos son requeridos'
     });
+  }
 
+  // Validar rol
+  if (rol !== 'adoptante' && rol !== 'refugio') {
+    return res.status(400).json({
+      success: false,
+      mensaje: 'El rol debe ser adoptante o refugio'
+    });
+  }
+
+  // Validar contraseña
+  if (!validarContrasena(contrasena)) {
+    return res.status(400).json({
+      success: false,
+      mensaje: 'La contraseña debe tener mínimo 12 caracteres, una mayúscula, un número y un carácter especial'
+    });
+  }
+
+  // Validar que contraseñas coincidan
+  if (contrasena !== confirmar_contrasena) {
+    return res.status(400).json({
+      success: false,
+      mensaje: 'Las contraseñas no coinciden'
+    });
+  }
+
+  try {
+    const resultado = await registrarUsuario({ correo, contrasena, rol, nombre, apellido });
     res.status(201).json({
       success: true,
-      message: "Usuario registrado exitosamente",
-      user: {
-        id: newUser.id,
-        email: newUser.email,
-        name: newUser.name
-      }
+      mensaje: 'Usuario registrado exitosamente',
+      data: resultado
     });
   } catch (error) {
-    res.status(500).json({
-      error: "Error en el servidor",
-      message: error.message
+    res.status(400).json({
+      success: false,
+      mensaje: error.message
     });
   }
-};
+}
 
 /**
- * Logout - Cierra la sesión
- * POST /api/auth/logout
+ * Login de usuario
+ * POST /api/auth/login
  */
-const logout = (req, res) => {
+async function login(req, res) {
+  const { correo, contrasena } = req.body;
+
+  if (!correo || !contrasena) {
+    return res.status(400).json({
+      success: false,
+      mensaje: 'Correo y contraseña son requeridos'
+    });
+  }
+
   try {
-    // TODO: Invalidar token si usas JWT
+    const resultado = await loginUsuario(correo, contrasena);
     res.json({
       success: true,
-      message: "Sesión cerrada"
+      mensaje: 'Login exitoso',
+      data: resultado
     });
   } catch (error) {
-    res.status(500).json({
-      error: "Error en el servidor",
-      message: error.message
+    res.status(401).json({
+      success: false,
+      mensaje: error.message
     });
   }
-};
+}
 
 /**
- * Get current user - Obtiene datos del usuario actual
+ * Obtener usuario actual
  * GET /api/auth/me
  */
-const getCurrentUser = (req, res) => {
-  try {
-    // TODO: Obtener de token JWT
-    res.json({
-      success: true,
-      user: {
-        id: 1,
-        email: "user@example.com",
-        name: "John Doe"
-      }
-    });
-  } catch (error) {
-    res.status(500).json({
-      error: "Error en el servidor",
-      message: error.message
+async function getCurrentUser(req, res) {
+  const id_usuario = req.usuario?.id;
+  
+  if (!id_usuario) {
+    return res.status(401).json({
+      success: false,
+      mensaje: 'No autorizado'
     });
   }
-};
+
+  try {
+    const usuario = await obtenerUsuarioActual(id_usuario);
+    res.json({
+      success: true,
+      data: usuario
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      mensaje: error.message
+    });
+  }
+}
+
+/**
+ * Logout (placeholder - JWT es stateless)
+ * POST /api/auth/logout
+ */
+function logout(req, res) {
+  res.json({
+    success: true,
+    mensaje: 'Logout exitoso'
+  });
+}
 
 module.exports = {
+  registro,
   login,
-  register,
   logout,
   getCurrentUser
 };

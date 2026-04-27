@@ -56,6 +56,18 @@ app.get("/health", (req, res) => {
 // Rutas de autenticación
 app.use("/api/auth", authRoutes);
 
+// Rutas de perfil adoptante
+const perfilRoutes = require("./routes/perfil.routes");
+app.use("/api/perfil-adoptante", perfilRoutes);
+
+// Rutas de refugio
+const refugioRoutes = require("./routes/refugio.routes");
+app.use("/api/refugios", refugioRoutes);
+
+// Rutas de notificaciones
+const notificacionRoutes = require("./routes/notificacion.routes");
+app.use("/api/notificaciones", notificacionRoutes);
+
 // 404 Handler (debe ser el último)
 app.use((req, res) => {
   res.status(404).json({ 
