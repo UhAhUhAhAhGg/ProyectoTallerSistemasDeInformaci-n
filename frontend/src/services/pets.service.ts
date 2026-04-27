@@ -1,27 +1,134 @@
-import type {Pet, PetFilters } from '../types/pet';
+const BASE = import.meta.env.VITE_PETS_API_URL || 'http://localhost:3003';
 
-const API_URL = 'http://localhost:3000/api';
+export interface PetFilters {
+  especie?: string;
+  raza?: string;
+  edad?: string;
+  refugioId?: number | string;
+}
 
-export async function getPets(filters: PetFilters): Promise<Pet[]> {
+export async function getPets(filters: PetFilters = {}) {
   const params = new URLSearchParams();
+  if (filters.especie)   params.append('especie', filters.especie);
+  if (filters.raza)      params.append('raza', filters.raza);
+  if (filters.edad)      params.append('edad', filters.edad);
+  if (filters.refugioId) params.append('refugioId', String(filters.refugioId));
 
-  if (filters.especie) params.append('especie', filters.especie);
-  if (filters.tamano) params.append('tamano', filters.tamano);
-  if (filters.edad) params.append('edad', filters.edad);
-  if (filters.zonaGeografica) params.append('zonaGeografica', filters.zonaGeografica);
-  if (filters.refugioId) params.append('refugioId', filters.refugioId);
-
-  const response = await fetch(`${API_URL}/pets?${params.toString()}`);
-
-  if (!response.ok) {
-    throw new Error('Error al obtener mascotas');
-  }
-
-  return response.json();
+  const res = await fetch(`${BASE}/catalogo?${params}`);
+  if (!res.ok) throw new Error('Error al obtener mascotas');
+  const json = await res.json();
+  return json.data ?? [];
 }
 
 export async function getRefugios() {
-  const response = await fetch(`${API_URL}/refugios`);
-  if (!response.ok) throw new Error('Error al obtener refugios');
-  return response.json();
+  const res = await fetch(`${BASE}/catalogo/refugios`);
+  if (!res.ok) throw new Error('Error al obtener refugios');
+  const json = await res.json();
+  return json.data ?? [];
+}
+
+export async function getEspecies() {
+  const res = await fetch(`${BASE}/animales/especies`);
+  if (!res.ok) throw new Error('Error al obtener especies');
+  const json = await res.json();
+  return json.data ?? [];
+}
+
+export async function getRazas(id_espe?: number) {
+  const url = id_espe ? `${BASE}/animales/razas?id_espe=${id_espe}` : `${BASE}/animales/razas`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Error al obtener razas');
+  const json = await res.json();
+  return json.data ?? [];
+}
+
+function authHeaders() {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
+export async function getAnimalesRefugio() {
+  const res = await fetch(`${BASE}/animales`, { headers: authHeaders() });
+  if (!res.ok) throw new Error('Error al obtener animales');
+  const json = await res.json();
+  return json.data ?? [];
+}
+
+export async function crearAnimal(data: Record<string, unknown>) {
+  const res = await fetch(`${BASE}/animales`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Error al crear animal');
+  }
+  return res.json();
+}
+
+export async function actualizarAnimal(id: number, data: Record<string, unknown>) {
+  const res = await fetch(`${BASE}/animales/${id}`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Error al actualizar animal');
+  }
+  return res.json();
+}
+
+export async function eliminarAnimal(id: number) {
+  const res = await fetch(`${BASE}/animales/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new Error('Error al eliminar animal');
+  return res.json();
+}
+
+// ── Publicaciones ──────────────────────────────────────────────────────────
+
+export async function getPublicaciones() {
+  const res = await fetch(`${BASE}/publicaciones`, { headers: authHeaders() });
+  if (!res.ok) throw new Error('Error al obtener publicaciones');
+  const json = await res.json();
+  return json.data ?? [];
+}
+
+export async function crearPublicacion(data: Record<string, unknown>) {
+  const res = await fetch(`${BASE}/publicaciones`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Error al crear publicación');
+  }
+  return res.json();
+}
+
+export async function actualizarPublicacion(id: number, data: Record<string, unknown>) {
+  const res = await fetch(`${BASE}/publicaciones/${id}`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Error al actualizar publicación');
+  return res.json();
+}
+
+export async function eliminarPublicacion(id: number) {
+  const res = await fetch(`${BASE}/publicaciones/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new Error('Error al eliminar publicación');
+  return res.json();
 }

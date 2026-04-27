@@ -30,14 +30,12 @@ async function registrarUsuario(datos) {
   const id_rol = rol === 'adoptante' ? 2 : 3;
 
   // Estado inicial según rol
-  // adoptante → 'incompleto' hasta que complete perfil
-  // refugio   → 'incompleto' hasta que complete perfil organizacional
   const est_usuario = 'incompleto';
 
   // Hashear contraseña
   const hash = await bcrypt.hash(contrasena, 12);
 
-  // INSERT solo con campos obligatorios, los opcionales quedan null
+  // INSERT solo con campos obligatorios
   const result = await pool.query(
     `INSERT INTO USUARIOS 
       (id_rol, corr_usuario, contra_usuario, nom_usuario, apell_usuario, est_usuario)
@@ -48,12 +46,12 @@ async function registrarUsuario(datos) {
 
   const usuario = result.rows[0];
 
-  // JWT con id, rol y estado para que el frontend sepa a dónde redirigir
   const token = jwt.sign(
     {
       id: usuario.id_usuario,
       rol: rol,
-      est: usuario.est_usuario
+      est: usuario.est_usuario,
+      id_refug: null  // recién registrado, aún no tiene refugio
     },
     process.env.JWT_SECRET || 'default-secret-key',
     { expiresIn: '7d' }
@@ -94,12 +92,25 @@ async function loginUsuario(correo, contrasena) {
 
   const nombreRol = usuario.nom_rol.toLowerCase();
 
+  // Si es refugio, buscar su id_refug para incluirlo en el token
+  let id_refug = null;
+  if (nombreRol === 'refugio') {
+    const refResult = await pool.query(
+      'SELECT id_refug FROM REFUGIOS WHERE id_usuario = $1',
+      [usuario.id_usuario]
+    );
+    if (refResult.rowCount > 0) {
+      id_refug = refResult.rows[0].id_refug;
+    }
+  }
+
   const token = jwt.sign(
     {
       id: usuario.id_usuario,
       rol: nombreRol,
       id_rol: usuario.id_rol,
-      est: usuario.est_usuario
+      est: usuario.est_usuario,
+      id_refug  // null si es adoptante/admin, número si es refugio
     },
     process.env.JWT_SECRET || 'default-secret-key',
     { expiresIn: '7d' }
