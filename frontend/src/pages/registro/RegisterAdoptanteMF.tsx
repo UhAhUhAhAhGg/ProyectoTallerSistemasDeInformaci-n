@@ -58,33 +58,39 @@ export default function RegisterAdoptanteMF({ onSuccess, onSwitchToRefugio }: Pr
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
-    setLoading(true);
-    try {
-      const res = await authService.register({
-        correo: form.correo,
-        contrasena: form.contrasena,
-        confirmar_contrasena: form.confirmacion,
-        rol: 'adoptante',
-        nombre: form.nombre,
-        apellido: form.apellido,
-      });
-      if (res.success) {
-        localStorage.setItem('token', res.data.token);
-        localStorage.setItem('rol', res.data.rol);
-        localStorage.setItem('userId', res.data.id_usuario);
-        localStorage.setItem('nombre', form.nombre);
-        localStorage.setItem('est_usuario', res.data.est_usuario || 'incompleto');
-        onSuccess?.();
-        navigate('/completar-perfil/adoptante');
-      }
-    } catch (err: any) {
-      setErrors({ general: err.response?.data?.mensaje || 'Error al registrar' });
-    } finally {
-      setLoading(false);
+  e.preventDefault();
+  if (!validate()) return;
+  setLoading(true);
+  try {
+    console.log('[REGISTER] Enviando datos...');
+    const res = await authService.register({
+      correo: form.correo,
+      contrasena: form.contrasena,
+      confirmar_contrasena: form.confirmacion,
+      rol: 'adoptante',
+      nombre: form.nombre,
+      apellido: form.apellido,
+    });
+    console.log('[REGISTER] Respuesta:', res);
+    console.log('[REGISTER] res.success:', res.success);
+    console.log('[REGISTER] res.data:', res.data);
+    
+    if (res.success) {
+      console.log('[REGISTER] Token:', res.data.token);
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('rol', res.data.rol);
+      onSuccess?.();
+      navigate('/completar-perfil/adoptante');
+    } else {
+      console.log('[REGISTER] success es false, no navega');
     }
-  };
+  } catch (err: any) {
+    console.error('[REGISTER] Error catch:', err.response?.data);
+    setErrors({ general: err.response?.data?.mensaje || 'Error al registrar' });
+  } finally {
+    setLoading(false);
+  }
+};
 
   const allMet = pwReqs.length && pwReqs.upper && pwReqs.num && pwReqs.special;
 

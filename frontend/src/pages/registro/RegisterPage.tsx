@@ -8,9 +8,9 @@ type Rol = "adoptante" | "refugio" | null;
 const RegisterPage: React.FC = () => {
   const [rolSeleccionado, setRolSeleccionado] = useState<Rol>(null);
 
-  const handleSuccess = () => {
-    window.location.href = "/login";
-  };
+  // Cada MF maneja su propia navegación post-registro (navigate interno),
+  // por eso onSuccess no necesita redirigir — evita conflicto de navegaciones.
+  const handleSuccess = () => {};
 
   const handleSwitch = (nuevoRol: Rol) => {
     setRolSeleccionado(nuevoRol);
@@ -20,7 +20,6 @@ const RegisterPage: React.FC = () => {
     return (
       <RegisterAdoptanteMF
         onSuccess={handleSuccess}
-        onCancel={() => setRolSeleccionado(null)}
         onSwitchToRefugio={() => handleSwitch("refugio")}
       />
     );
@@ -30,7 +29,6 @@ const RegisterPage: React.FC = () => {
     return (
       <RegisterRefugioMF
         onSuccess={handleSuccess}
-        onCancel={() => setRolSeleccionado(null)}
         onSwitchToAdoptante={() => handleSwitch("adoptante")}
       />
     );

@@ -12,7 +12,8 @@ async function registro(req, res) {
   if (!correo || !contrasena || !confirmar_contrasena || !rol) {
     return res.status(400).json({
       success: false,
-      mensaje: 'Todos los campos son requeridos'
+      mensaje: 'Todos los campos son requeridos',
+      campos_recibidos: { correo: !!correo, contrasena: !!contrasena, confirmar_contrasena: !!confirmar_contrasena, rol: !!rol }
     });
   }
 
@@ -20,7 +21,7 @@ async function registro(req, res) {
   if (rol !== 'adoptante' && rol !== 'refugio') {
     return res.status(400).json({
       success: false,
-      mensaje: 'El rol debe ser adoptante o refugio'
+      mensaje: `Rol inválido recibido: "${rol}". Debe ser 'adoptante' o 'refugio'`
     });
   }
 
@@ -28,7 +29,7 @@ async function registro(req, res) {
   if (!validarContrasena(contrasena)) {
     return res.status(400).json({
       success: false,
-      mensaje: 'La contraseña debe tener mínimo 12 caracteres, una mayúscula, un número y un carácter especial'
+      mensaje: 'La contraseña debe tener mínimo 12 caracteres, una mayúscula, un número y un carácter especial (!@#$%^&*)'
     });
   }
 
@@ -48,6 +49,8 @@ async function registro(req, res) {
       data: resultado
     });
   } catch (error) {
+    // Exponer el mensaje real del error (incluye errores de PostgreSQL)
+    console.error('[REGISTER] Error:', error.message);
     res.status(400).json({
       success: false,
       mensaje: error.message
@@ -90,7 +93,7 @@ async function login(req, res) {
  */
 async function getCurrentUser(req, res) {
   const id_usuario = req.usuario?.id;
-  
+
   if (!id_usuario) {
     return res.status(401).json({
       success: false,
@@ -113,7 +116,7 @@ async function getCurrentUser(req, res) {
 }
 
 /**
- * Logout (placeholder - JWT es stateless)
+ * Logout (JWT es stateless)
  * POST /api/auth/logout
  */
 function logout(req, res) {
@@ -123,9 +126,4 @@ function logout(req, res) {
   });
 }
 
-module.exports = {
-  registro,
-  login,
-  logout,
-  getCurrentUser
-};
+module.exports = { registro, login, logout, getCurrentUser };

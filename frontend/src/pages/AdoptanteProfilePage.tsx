@@ -1,4 +1,3 @@
-// filepath: src/pages/AdoptanteProfilePage.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { perfilService } from '../services/api';

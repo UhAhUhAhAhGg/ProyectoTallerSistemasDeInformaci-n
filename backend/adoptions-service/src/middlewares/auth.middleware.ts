@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { forbidden } from '../utils/response.helper';
 
 export interface GatewayUser {
   id: number;
-  role: 'superadmin' | 'admin' | 'worker' | 'adoptante';
+  role: 'administrador' | 'adoptante' | 'refugio';
   refugioId: number | null;
 }
 
@@ -15,30 +14,42 @@ declare global {
   }
 }
 
+/**
+ * Extrae el usuario del JWT en el header Authorization.
+ * Compatible con el token generado por auth-service.
+ */
 export const extractUser = (req: Request, res: Response, next: NextFunction): void => {
-  const id = req.headers['x-user-id'];
-  const role = req.headers['x-user-role'];
-  const refugioId = req.headers['x-shelter-id'];
+  const authHeader = req.headers.authorization;
 
-  if (!id || !role) {
-    forbidden(res, 'Faltan headers de autenticación');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    res.status(403).json({ success: false, message: 'Faltan headers de autenticación' });
     return;
   }
 
-  req.user = {
-    id: Number(id),
-    role: role as GatewayUser['role'],
-    refugioId: refugioId ? Number(refugioId) : null,
-  };
+  try {
+    const token = authHeader.split(' ')[1];
+    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
 
-  next();
+    req.user = {
+      id:        payload.id,
+      role:      payload.rol,        // auth-service firma con "rol"
+      refugioId: payload.id_refug ?? null,
+    };
+
+    next();
+  } catch {
+    res.status(401).json({ success: false, message: 'Token inválido' });
+  }
 };
 
 export const requireRole = (...roles: GatewayUser['role'][]) =>
   (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user || !roles.includes(req.user.role)) {
-      forbidden(res, 'No tienes permiso para esta acción');
+      res.status(403).json({ success: false, message: 'No tienes permiso para esta acción' });
       return;
     }
     next();
   };
+
+export const forbidden = (res: Response, message = 'No autorizado') =>
+  res.status(403).json({ success: false, message, data: null });

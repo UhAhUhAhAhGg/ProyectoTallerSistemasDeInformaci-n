@@ -31,24 +31,24 @@ router.get(
 );
 
 // ─── HU-19 ────────────────────────────────────────────────────────────────────
-// GET /solicitudes/refugio — admin/worker ve solicitudes de su refugio
+// GET /solicitudes/refugio — admin/refugio ve solicitudes de su refugio
 router.get(
   '/refugio',
-  requireRole('admin', 'worker'),
+  requireRole('administrador', 'refugio'),
   ctrl.getSolicitudesRefugio,
 );
 
 // GET /solicitudes/refugio/:id — detalle de una solicitud en el refugio
 router.get(
   '/refugio/:id',
-  requireRole('admin', 'worker'),
+  requireRole('administrador', 'refugio'),
   ctrl.getSolicitudDetalleRefugio,
 );
 
 // PATCH /solicitudes/refugio/:id/estado — aprobar / rechazar / en revisión / en espera
 router.patch(
   '/refugio/:id/estado',
-  requireRole('admin', 'worker'),
+  requireRole('administrador', 'refugio'),
   ctrl.cambiarEstado,
 );
 
