@@ -20,34 +20,30 @@ const NOTIF_MAP: Record<number, TipoNotificacion> = {
 // ─────────────────────────────────────────────
 export const enviarSolicitud = async (
   id_usuario: number,
-  dto: CreateSolicitudDto
+  dto: CreateSolicitudDto,
+  token: string
 ): Promise<SolicitudAdopcion> => {
 
-  // 1. Verificar que la publicación existe y está disponible (REST → pets-service)
-  const publicacion = await getPublicacionDisponible(dto.id_publi);
+  const publicacion = await getPublicacionDisponible(dto.id_publi, token);
   if (!publicacion) {
     throw new Error('La publicación no existe o la mascota ya no está disponible para adopción');
   }
 
-  // 2. Evitar solicitud duplicada activa del mismo adoptante
   const duplicada = await repo.findSolicitudActivaDuplicada(id_usuario, dto.id_publi);
   if (duplicada) {
     throw new Error('Ya tienes una solicitud activa para esta mascota');
   }
 
-  // 3. Crear solicitud con estado ENVIADA
   const solicitud = await repo.createSolicitud(id_usuario, dto);
 
-  // 4. Registrar primer historial (0 → ENVIADA)
   await histRepo.createHistorial({
     id_soli:           solicitud.id_soli,
-    id_est_anterior:   EstadoId.ENVIADA,   // primer estado, no hay anterior real
+    id_est_anterior:   EstadoId.ENVIADA,
     id_est_nuevo:      EstadoId.ENVIADA,
     motivo:            'Solicitud enviada por adoptante',
     id_usuario_accion: id_usuario,
   });
 
-  // 5. Notificar al adoptante (HU-21)
   await notificarAdoptante({
     id_usuario,
     tipo:    'solicitud_enviada',

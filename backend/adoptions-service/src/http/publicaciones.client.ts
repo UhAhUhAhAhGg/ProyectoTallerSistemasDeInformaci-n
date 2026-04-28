@@ -2,23 +2,24 @@ import axios from 'axios';
 import { ENV } from '../config/env';
 
 interface Publicacion {
-  id_publi:   number;
-  id_refug:   number;
-  est_publi:  boolean;  // true = activa
-  est_adop:   boolean;  // false = disponible para adopción
+  id_publi:  number;
+  id_refug:  number;
+  est_publi: boolean;
+  est_adop:  boolean;
 }
 
-// Verifica que la publicación existe, está activa y disponible
 export const getPublicacionDisponible = async (
-  id_publi: number
+  id_publi: number,
+  token: string
 ): Promise<Publicacion | null> => {
   try {
     const { data } = await axios.get(
-      `${ENV.SERVICES.pets}/publicaciones/${id_publi}`
+      `${ENV.SERVICES.pets}/publicaciones/${id_publi}`,
+      { headers: { Authorization: `Bearer ${token}` } }
     );
     const pub: Publicacion = data.data;
 
-    if (!pub.est_publi || pub.est_adop) return null;  // inactiva o ya adoptada
+    if (!pub || !pub.est_publi || pub.est_adop) return null;
 
     return pub;
   } catch {

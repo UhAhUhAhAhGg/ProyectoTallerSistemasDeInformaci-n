@@ -38,20 +38,21 @@ export default function LoginPage() {
         const est = response.data.est_usuario;
 
         switch (rol) {
-          case 'administrador':
-            navigate('/admin/dashboard');
-            break;
-          case 'adoptante':
-            if (est === 'incompleto') navigate('/completar-perfil/adoptante');
-            else navigate('/dashboard/adoptante');
-            break;
-          case 'refugio':
-            if (est === 'incompleto') navigate('/completar-perfil/refugio');
-            else navigate('/'); // ← Pendiente/activo/rechazado van al inicio
-            break;
-          default:
-            navigate('/');
-        }
+  case 'administrador':
+    navigate('/admin/dashboard');
+    break;
+  case 'adoptante':
+    if (est === 'incompleto') navigate('/completar-perfil/adoptante');
+    else navigate('/dashboard/adoptante');
+    break;
+  case 'refugio':
+    if (est === 'incompleto')      navigate('/completar-perfil/refugio');
+    else if (est === 'rechazado')  navigate('/dashboard/refugio'); // verá la pantalla "rechazada"
+    else                            navigate('/dashboard/refugio'); // pendiente o activo
+    break;
+  default:
+    navigate('/');
+}
       }
     } catch (error: any) {
       setError(error.response?.data?.mensaje || 'Error al iniciar sesión');

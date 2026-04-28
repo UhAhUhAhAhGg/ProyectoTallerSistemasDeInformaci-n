@@ -1,19 +1,19 @@
 export type EstadoSolicitud = 'enviada' | 'en_revision' | 'aprobada' | 'rechazada' | 'en_espera';
 
-export interface Solicitud {
-  id_soli: number;
-  id_publ: number;
-  id_adop: number;
-  est_soli: EstadoSolicitud;
-  fec_soli: string;
-  mot_soli?: string; // motivo decisión refugio
-  nom_animal?: string;
-  nom_adop?: string;
-  foto_animal?: string;
+export interface NuevaSolicitud {
+  id_publi:    number;
+  decrip_soli: string;
 }
 
-export interface NuevaSolicitud {
-  id_publ: number;
-  id_adop: number;
-  mot_soli?: string; // mensaje inicial del adoptante
+export interface Solicitud {
+  id_soli:      number;
+  id_publi:     number;
+  id_usuario:   number;
+  id_est:       number;
+  decrip_soli:  string;
+  fech_soli:    string;
+  mot_soli?:    string;
+  nom_animal?:  string;
+  nom_adop?:    string;
+  foto_animal?: string;
 }

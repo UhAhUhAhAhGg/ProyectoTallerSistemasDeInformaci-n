@@ -66,29 +66,36 @@ export default function RefugioProfilePage() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-    setLoading(true);
-    setGuardadoOk(false);
-    try {
-      const response = await api.post('/refugios/datos', {
-        nom_refug: formData.nom_refug,
-        dir_refug: formData.dir_refug,
-        telf_refug: formData.telf_refug,
-        licencia_refug: formData.licencia_refug,
-        descripcion: formData.descripcion,
-      });
-      if (response.data.success) {
-        setGuardadoOk(true);
-        localStorage.setItem('est_usuario', 'pendiente');
-        setEstadoRefugio('pendiente');
+  e.preventDefault();
+  if (!validateForm()) return;
+  setLoading(true);
+  setGuardadoOk(false);
+  try {
+    const response = await api.post('/refugios/datos', {
+      nom_refug: formData.nom_refug,
+      dir_refug: formData.dir_refug,
+      telf_refug: formData.telf_refug,
+      licencia_refug: formData.licencia_refug,
+      descripcion: formData.descripcion,
+    });
+
+    if (response.data.success) {
+      setGuardadoOk(true);
+      localStorage.setItem('est_usuario', 'pendiente');
+
+      // ✅ Refrescar token con el nuevo id_refug
+      if (response.data.data?.token) {
+        localStorage.setItem('token', response.data.data.token);
       }
-    } catch (error: any) {
-      setErrors({ general: error.response?.data?.mensaje || 'Error al guardar datos' });
-    } finally {
-      setLoading(false);
+
+      setEstadoRefugio('pendiente');
     }
-  };
+  } catch (error: any) {
+    setErrors({ general: error.response?.data?.mensaje || 'Error al guardar datos' });
+  } finally {
+    setLoading(false);
+  }
+};
 
   // ── Cargando ─────────────────────────────────────────────────────────────────
   if (loadingDatos) {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
+import Navbar from './Navbar';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -35,34 +36,7 @@ export default function HomePage() {
   return (
     <div className="hp-root">
       {/* NAV */}
-      <nav className="hp-nav">
-        <div className="hp-nav-brand">
-          <span className="hp-paw">🐾</span>
-          <span className="hp-brand-name">PetMatch</span>
-        </div>
-        <div className="hp-nav-links">
-          <a href="#como" className="hp-nav-link">¿Cómo funciona?</a>
-          <a href="#refugios" className="hp-nav-link">Refugios</a>
-        </div>
-        <div className="hp-nav-actions">
-          {userName ? (
-            <>
-              <span className="hp-greeting">Hola, <strong>{userName}</strong></span>
-              {isPendiente ? (
-                <span className="hp-badge-pending">Solicitud en espera</span>
-              ) : (
-                <button className="hp-btn hp-btn-outline" onClick={handleDashboard}>Mi Panel</button>
-              )}
-              <button className="hp-btn hp-btn-ghost" onClick={handleLogout}>Salir</button>
-            </>
-          ) : (
-            <>
-              <button className="hp-btn hp-btn-outline" onClick={() => navigate('/login')}>Iniciar sesión</button>
-              <button className="hp-btn hp-btn-primary" onClick={() => navigate('/register')}>Registrarse</button>
-            </>
-          )}
-        </div>
-      </nav>
+      <Navbar />
 
       {/* HERO */}
       <section className="hp-hero">

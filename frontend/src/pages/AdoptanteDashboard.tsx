@@ -1,4 +1,4 @@
-// filepath: src/pages/AdoptanteDashboard.tsx
+// filepath: frontend/src/pages/AdoptanteDashboard.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
@@ -8,21 +8,19 @@ const ADMIN_EMAIL = 'admin@petmatch.com';
 
 export default function AdoptanteDashboard() {
   const navigate = useNavigate();
-  const [nombre, setNombre] = useState<string | null>(null);
+  const [nombre, setNombre]         = useState<string | null>(null);
   const [estUsuario, setEstUsuario] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]       = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const rol = localStorage.getItem('rol');
+    const rol   = localStorage.getItem('rol');
 
-    // Si no hay token o no es adoptante, redirige
     if (!token || rol !== 'adoptante') {
       navigate('/login');
       return;
     }
 
-    // Leer datos del JWT para saber si es refugio rechazado
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       setEstUsuario(payload.est || localStorage.getItem('est_usuario'));
@@ -34,11 +32,6 @@ export default function AdoptanteDashboard() {
     setLoading(false);
   }, []);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate('/');
-  };
-
   if (loading) {
     return (
       <div className="ad-wrapper">
@@ -48,7 +41,7 @@ export default function AdoptanteDashboard() {
     );
   }
 
-  // Refugio rechazado que fue degradado a rol adoptante
+  // Refugio rechazado degradado a adoptante
   if (estUsuario === 'rechazado') {
     return (
       <div className="ad-wrapper">
@@ -73,22 +66,13 @@ export default function AdoptanteDashboard() {
                 </a>
               </div>
             </div>
-
-            <div className="ad-btn-group">
-              <button className="ad-btn secondary" onClick={() => navigate('/')}>
-                🏠 Volver al inicio
-              </button>
-              <button className="ad-btn ghost" onClick={handleLogout}>
-                Cerrar sesión
-              </button>
-            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  // Adoptante normal con perfil completo
+  // Adoptante normal
   return (
     <div className="ad-wrapper">
       <Navbar />
@@ -97,10 +81,6 @@ export default function AdoptanteDashboard() {
           <div>
             <h1>¡Hola, {nombre || 'Adoptante'}! 🐾</h1>
             <p>Encuentra tu compañero ideal y gestiona tus solicitudes desde aquí.</p>
-          </div>
-          <div className="ad-welcome-actions">
-            <button className="ad-btn secondary sm" onClick={() => navigate('/')}>🏠 Inicio</button>
-            <button className="ad-btn ghost sm" onClick={handleLogout}>Salir</button>
           </div>
         </div>
 
@@ -113,6 +93,7 @@ export default function AdoptanteDashboard() {
             </div>
             <span className="ad-option-arrow">→</span>
           </div>
+
           <div className="ad-option" onClick={() => navigate('/mis-solicitudes')}>
             <div className="ad-option-icon">📋</div>
             <div className="ad-option-info">
@@ -121,6 +102,7 @@ export default function AdoptanteDashboard() {
             </div>
             <span className="ad-option-arrow">→</span>
           </div>
+
           <div className="ad-option" onClick={() => navigate('/completar-perfil/adoptante')}>
             <div className="ad-option-icon">👤</div>
             <div className="ad-option-info">
@@ -129,6 +111,7 @@ export default function AdoptanteDashboard() {
             </div>
             <span className="ad-option-arrow">→</span>
           </div>
+
           <div className="ad-option" onClick={() => navigate('/notificaciones')}>
             <div className="ad-option-icon">🔔</div>
             <div className="ad-option-info">

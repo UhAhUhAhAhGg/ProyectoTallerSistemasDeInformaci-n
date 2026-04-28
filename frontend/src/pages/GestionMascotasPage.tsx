@@ -153,11 +153,14 @@ export default function GestionMascotasPage() {
 
         // 2) crear publicación automáticamente para que aparezca en el listado
         if (id_mascot) {
-          await crearPublicacion({ id_mascot }).catch(() => {
-            // Si falla la publicación no bloqueamos — la mascota ya se creó
-            console.warn('No se pudo crear la publicación automática');
-          });
-        }
+  await crearPublicacion({
+    id_mascot,
+    arch_publi:   form.img_mascot,            // misma imagen base64
+    decrip_publi: form.descrip_mascot.trim(), // misma descripción
+  }).catch((err) => {
+    console.warn('No se pudo crear la publicación automática:', err);
+  });
+}
       }
 
       setShowModal(false);

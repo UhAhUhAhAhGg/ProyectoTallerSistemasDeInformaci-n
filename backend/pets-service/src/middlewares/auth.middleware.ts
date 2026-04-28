@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 
 export interface GatewayUser {
   id: number;
@@ -14,9 +15,10 @@ declare global {
   }
 }
 
+const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-key';
+
 /**
- * Extrae el usuario del JWT directamente desde el header Authorization.
- * En producción esto lo haría un API Gateway; aquí lo decodificamos nosotros.
+ * Verifica el JWT firmado por auth-service y carga el usuario en req.user.
  */
 export const extractUser = (req: Request, res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
@@ -28,16 +30,25 @@ export const extractUser = (req: Request, res: Response, next: NextFunction): vo
 
   try {
     const token = authHeader.split(' ')[1];
-    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+    const payload = jwt.verify(token, JWT_SECRET) as {
+      id: number;
+      rol: GatewayUser['rol'];
+      id_refug?: number | null;
+    };
 
     req.user = {
-      id: payload.id,
-      rol: payload.rol,
+      id:       payload.id,
+      rol:      payload.rol,
       id_refug: payload.id_refug ?? null,
     };
+
     next();
-  } catch {
-    res.status(401).json({ success: false, message: 'Token inválido' });
+  } catch (err) {
+    const message =
+      err instanceof jwt.TokenExpiredError ? 'Token expirado' :
+      err instanceof jwt.JsonWebTokenError ? 'Token inválido' :
+      'No autorizado';
+    res.status(401).json({ success: false, message });
   }
 };
 

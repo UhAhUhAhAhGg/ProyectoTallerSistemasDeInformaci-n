@@ -33,14 +33,16 @@ export const findSolicitudesByAdoptante = async (
 };
 
 // HU-19: solicitudes recibidas en el refugio (por id_refug en la publicación)
-export const findSolicitudesByRefugio = async (
-  id_refug: number
-): Promise<SolicitudAdopcion[]> => {
+export const findSolicitudesByRefugio = async (id_refug: number): Promise<SolicitudAdopcion[]> => {
   const { rows } = await pool.query(
-    `SELECT s.*, e.nom_est, p.id_refug
+    `SELECT s.*, e.nom_est, p.id_refug,
+            m.nom_mascot,
+            u.nom_usuario, u.apell_usuario, u.corr_usuario
      FROM SOLI_ADOP s
-     JOIN ESTAD_SOLI e  ON e.id_est   = s.id_est
+     JOIN ESTAD_SOLI e   ON e.id_est   = s.id_est
      JOIN PUBLICACIONES p ON p.id_publi = s.id_publi
+     JOIN MASCOTAS m     ON m.id_mascot = p.id_mascot
+     JOIN USUARIOS u     ON u.id_usuario = s.id_usuario
      WHERE p.id_refug = $1
      ORDER BY s.fech_soli DESC`,
     [id_refug]

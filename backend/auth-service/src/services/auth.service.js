@@ -90,6 +90,15 @@ async function loginUsuario(correo, contrasena) {
     throw new Error('Usuario o contraseña incorrectos');
   }
 
+  // ✅ NUEVO: bloqueo de cuenta por administrador
+  if (usuario.est_usuario === 'bloqueado') {
+    throw new Error('Tu cuenta ha sido bloqueada por un administrador. Contacta a admin@petmatch.com');
+  }
+
+  if (usuario.est_usuario === 'rechazado') {
+     throw new Error('Tu solicitud fue rechazada. Contacta al administrador.');
+ }
+
   const nombreRol = usuario.nom_rol.toLowerCase();
 
   // Si es refugio, buscar su id_refug para incluirlo en el token

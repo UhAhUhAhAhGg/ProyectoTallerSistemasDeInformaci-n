@@ -1,6 +1,6 @@
 import type { Solicitud, NuevaSolicitud, EstadoSolicitud } from './solicitud.types';
 
-const BASE = import.meta.env.VITE_SOLICITUDES_API_URL ?? 'http://localhost:3004/api';
+const BASE = import.meta.env.VITE_ADOPTIONS_API_URL ?? 'http://localhost:3004';
 
 const headers = () => ({
   'Content-Type': 'application/json',

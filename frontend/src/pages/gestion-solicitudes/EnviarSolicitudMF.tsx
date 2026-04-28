@@ -4,14 +4,13 @@ import type { NuevaSolicitud } from './shared/solicitud.types';
 
 interface Props {
   id_publ: number;
-  id_adop: number;
   nom_animal: string;
   onEnviada?: () => void;
   onCancelar?: () => void;
 }
 
 export default function EnviarSolicitudMF({
-  id_publ, id_adop, nom_animal, onEnviada, onCancelar,
+  id_publ, nom_animal, onEnviada, onCancelar,
 }: Props) {
   const [mensaje, setMensaje] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,20 +18,21 @@ export default function EnviarSolicitudMF({
   const [enviada, setEnviada] = useState(false);
 
   const handleEnviar = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const data: NuevaSolicitud = { id_publ, id_adop };
-      if (mensaje.trim()) data.mot_soli = mensaje.trim();
-      await solicitudService.enviar(data);
-      setEnviada(true);
-      onEnviada?.();
-    } catch {
-      setError('No se pudo enviar la solicitud. Intenta de nuevo.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  setError('');
+  try {
+    await solicitudService.enviar({
+      id_publi: id_publ,
+      decrip_soli: mensaje.trim() || 'Solicitud de adopción',
+    });
+    setEnviada(true);
+    onEnviada?.();
+  } catch {
+    setError('No se pudo enviar la solicitud. Intenta de nuevo.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (enviada) return (
     <div style={{ padding: 24, textAlign: 'center', color: 'green' }}>
