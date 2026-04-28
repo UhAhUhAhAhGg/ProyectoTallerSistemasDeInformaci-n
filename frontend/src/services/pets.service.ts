@@ -34,20 +34,28 @@ export async function getEspecies() {
   return json.data ?? [];
 }
 
+/** Razas filtradas por especie. Pasa id_espe para obtener solo las de esa especie. */
 export async function getRazas(id_espe?: number) {
-  const url = id_espe ? `${BASE}/animales/razas?id_espe=${id_espe}` : `${BASE}/animales/razas`;
+  const url = id_espe
+    ? `${BASE}/animales/razas?id_espe=${id_espe}`
+    : `${BASE}/animales/razas`;
   const res = await fetch(url);
   if (!res.ok) throw new Error('Error al obtener razas');
   const json = await res.json();
   return json.data ?? [];
 }
 
-function authHeaders() {
+function authHeaders(contentType = 'application/json') {
   const token = localStorage.getItem('token');
   return {
-    'Content-Type': 'application/json',
+    'Content-Type': contentType,
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
+}
+
+function authHeadersNoContent(): HeadersInit | undefined {
+  const token = localStorage.getItem('token');
+  return token ? { Authorization: `Bearer ${token}` } : undefined;
 }
 
 export async function getAnimalesRefugio() {
@@ -55,6 +63,19 @@ export async function getAnimalesRefugio() {
   if (!res.ok) throw new Error('Error al obtener animales');
   const json = await res.json();
   return json.data ?? [];
+}
+
+/**
+ * Convierte un File a base64 data URL para enviarlo como JSON.
+ * No requiere multer en el backend.
+ */
+export function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = () => resolve(reader.result as string);
+    reader.onerror = () => reject(new Error('Error al leer el archivo'));
+    reader.readAsDataURL(file);
+  });
 }
 
 export async function crearAnimal(data: Record<string, unknown>) {
@@ -86,7 +107,7 @@ export async function actualizarAnimal(id: number, data: Record<string, unknown>
 export async function eliminarAnimal(id: number) {
   const res = await fetch(`${BASE}/animales/${id}`, {
     method: 'DELETE',
-    headers: authHeaders(),
+    headers: authHeadersNoContent(),
   });
   if (!res.ok) throw new Error('Error al eliminar animal');
   return res.json();
@@ -127,7 +148,7 @@ export async function actualizarPublicacion(id: number, data: Record<string, unk
 export async function eliminarPublicacion(id: number) {
   const res = await fetch(`${BASE}/publicaciones/${id}`, {
     method: 'DELETE',
-    headers: authHeaders(),
+    headers: authHeadersNoContent(),
   });
   if (!res.ok) throw new Error('Error al eliminar publicación');
   return res.json();

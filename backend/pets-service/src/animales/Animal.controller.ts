@@ -2,20 +2,29 @@ import { Request, Response } from 'express';
 import * as repo from '../animales/Animal.repository';
 import { ok, created, badRequest, notFound, serverError } from '../utils/response.helper';
 
-// HU-07: registrar mascota
+// HU-07: registrar mascota — fenac_mascot es opcional (default = hoy)
 export const registrarAnimal = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id_raza, nom_mascot, edad_mascot, fenac_mascot,
-            descrip_mascot, gen_mascot, esterilizado, img_mascot } = req.body;
+    const {
+      id_raza, nom_mascot, edad_mascot,
+      descrip_mascot, gen_mascot, esterilizado, img_mascot,
+      fenac_mascot,   // opcional
+    } = req.body;
 
-    if (!id_raza || !nom_mascot || !edad_mascot || !fenac_mascot || !descrip_mascot || !img_mascot) {
-      badRequest(res, 'Faltan campos requeridos'); return;
+    if (!id_raza || !nom_mascot || edad_mascot === undefined || !descrip_mascot || !img_mascot) {
+      badRequest(res, 'Faltan campos requeridos: id_raza, nom_mascot, edad_mascot, descrip_mascot, img_mascot');
+      return;
     }
 
     const animal = await repo.createAnimal({
-      id_raza, nom_mascot, edad_mascot, fenac_mascot,
-      descrip_mascot, gen_mascot: gen_mascot ?? true,
-      esterilizado: esterilizado ?? false, img_mascot,
+      id_raza:        Number(id_raza),
+      nom_mascot,
+      edad_mascot:    Number(edad_mascot),
+      fenac_mascot:   fenac_mascot || new Date().toISOString().slice(0, 10),
+      descrip_mascot,
+      gen_mascot:     gen_mascot ?? true,
+      esterilizado:   esterilizado ?? false,
+      img_mascot,
     });
     created(res, animal, 'Mascota registrada exitosamente');
   } catch (err) {
@@ -30,7 +39,7 @@ export const editarAnimal = async (req: Request, res: Response): Promise<void> =
     const animal = await repo.updateAnimal(id, req.body);
     if (!animal) { notFound(res, 'Mascota no encontrada'); return; }
     ok(res, animal, 'Mascota actualizada');
-  } catch (err) {
+  } catch {
     serverError(res);
   }
 };
@@ -58,9 +67,12 @@ export const obtenerAnimal = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// Catálogo: razas y especies
-export const listarRazas = async (_req: Request, res: Response): Promise<void> => {
-  try { ok(res, await repo.findAllRazas()); } catch { serverError(res); }
+// Catálogo: razas (filtra por ?id_espe=X) y especies
+export const listarRazas = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const id_espe = req.query.id_espe ? Number(req.query.id_espe) : undefined;
+    ok(res, await repo.findAllRazas(id_espe));
+  } catch { serverError(res); }
 };
 
 export const listarEspecies = async (_req: Request, res: Response): Promise<void> => {

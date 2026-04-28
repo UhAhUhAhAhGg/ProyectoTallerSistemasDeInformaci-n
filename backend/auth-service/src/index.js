@@ -68,6 +68,9 @@ app.use("/api/refugios", refugioRoutes);
 const notificacionRoutes = require("./routes/notificacion.routes");
 app.use("/api/notificaciones", notificacionRoutes);
 
+const adminRoutes = require("./routes/admin.routes");
+app.use("/api/admin", adminRoutes);
+
 // 404 Handler (debe ser el último)
 app.use((req, res) => {
   res.status(404).json({ 

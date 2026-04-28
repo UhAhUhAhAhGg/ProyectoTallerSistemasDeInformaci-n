@@ -14,7 +14,8 @@ interface Props {
   onClose?: () => void;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
+// ✅ Sin /api al final — las rutas ya lo incluyen
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
 
 const ROL_LABEL: Record<string, string> = {
   adoptante: "Adoptante",
@@ -42,12 +43,14 @@ const GestionUsuariosMF: React.FC<Props> = ({ onClose }) => {
   const fetchUsuarios = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/admin/usuarios`, {
+      // ✅ API_BASE ya tiene /api, así que la ruta es /admin/usuarios
+      const res = await fetch(`${API_BASE}/admin/usuarios`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(`Error ${res.status}`);
       const data = await res.json();
-      setUsuarios(data);
+      // El backend devuelve array directo (sin wrapper success/data)
+      setUsuarios(Array.isArray(data) ? data : data.data ?? []);
     } catch {
       setMensaje({ texto: "No se pudieron cargar los usuarios.", tipo: "error" });
     } finally {
@@ -64,7 +67,8 @@ const GestionUsuariosMF: React.FC<Props> = ({ onClose }) => {
     setProcesando(usuario.id);
     setMensaje(null);
     try {
-      const res = await fetch(`${API_BASE}/api/admin/usuarios/${usuario.id}/estado`, {
+      // ✅ PUT /api/admin/usuarios/:id/estado
+      const res = await fetch(`${API_BASE}/admin/usuarios/${usuario.id}/estado`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -134,60 +138,42 @@ const GestionUsuariosMF: React.FC<Props> = ({ onClose }) => {
 
       {/* Filtros */}
       <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.25rem", flexWrap: "wrap", alignItems: "center" }}>
-        {/* Búsqueda */}
         <input
           type="text"
           placeholder="🔍 Buscar por nombre o correo..."
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
           style={{
-            flex: 1,
-            minWidth: "200px",
-            padding: "0.5rem 0.85rem",
-            borderRadius: "8px",
-            border: "1px solid #d1d5db",
-            fontSize: "0.85rem",
-            outline: "none",
+            flex: 1, minWidth: "200px", padding: "0.5rem 0.85rem",
+            borderRadius: "8px", border: "1px solid #d1d5db",
+            fontSize: "0.85rem", outline: "none",
           }}
         />
-
-        {/* Rol */}
         <select
           value={filtroRol}
           onChange={(e) => setFiltroRol(e.target.value)}
-          style={{
-            padding: "0.5rem 0.85rem",
-            borderRadius: "8px",
-            border: "1px solid #d1d5db",
-            fontSize: "0.85rem",
-            background: "#fff",
-            cursor: "pointer",
-          }}
+          style={{ padding: "0.5rem 0.85rem", borderRadius: "8px", border: "1px solid #d1d5db", fontSize: "0.85rem", background: "#fff", cursor: "pointer" }}
         >
           <option value="todos">Todos los roles</option>
           <option value="adoptante">Adoptantes</option>
           <option value="refugio">Refugios</option>
           <option value="administrador">Admins</option>
         </select>
-
-        {/* Estado */}
         <select
           value={filtroEstado}
           onChange={(e) => setFiltroEstado(e.target.value)}
-          style={{
-            padding: "0.5rem 0.85rem",
-            borderRadius: "8px",
-            border: "1px solid #d1d5db",
-            fontSize: "0.85rem",
-            background: "#fff",
-            cursor: "pointer",
-          }}
+          style={{ padding: "0.5rem 0.85rem", borderRadius: "8px", border: "1px solid #d1d5db", fontSize: "0.85rem", background: "#fff", cursor: "pointer" }}
         >
           <option value="todos">Todos los estados</option>
           <option value="activo">Activos</option>
           <option value="bloqueado">Bloqueados</option>
         </select>
-
+        <button
+          onClick={fetchUsuarios}
+          style={{ padding: "0.5rem 0.85rem", borderRadius: "8px", border: "1px solid #d1d5db", background: "#fff", cursor: "pointer", fontSize: "0.85rem" }}
+        >
+          🔄
+        </button>
         <span style={{ fontSize: "0.8rem", color: "#9ca3af", whiteSpace: "nowrap" }}>
           {usuariosFiltrados.length} usuario(s)
         </span>
@@ -220,15 +206,10 @@ const GestionUsuariosMF: React.FC<Props> = ({ onClose }) => {
               {/* Avatar + Info */}
               <div style={{ display: "flex", alignItems: "center", gap: "0.85rem", flex: 1 }}>
                 <div style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "50%",
+                  width: "40px", height: "40px", borderRadius: "50%",
                   background: ROL_COLOR[usuario.rol] + "22",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "1rem",
-                  flexShrink: 0,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "1rem", flexShrink: 0,
                 }}>
                   {usuario.rol === "adoptante" ? "👤" : usuario.rol === "refugio" ? "🏠" : "⚙️"}
                 </div>
@@ -238,23 +219,15 @@ const GestionUsuariosMF: React.FC<Props> = ({ onClose }) => {
                       {usuario.nombre} {usuario.apellido || ""}
                     </span>
                     <span style={{
-                      fontSize: "0.7rem",
-                      padding: "0.1rem 0.55rem",
-                      borderRadius: "10px",
-                      background: ROL_COLOR[usuario.rol] + "22",
-                      color: ROL_COLOR[usuario.rol],
-                      fontWeight: 600,
+                      fontSize: "0.7rem", padding: "0.1rem 0.55rem", borderRadius: "10px",
+                      background: ROL_COLOR[usuario.rol] + "22", color: ROL_COLOR[usuario.rol], fontWeight: 600,
                     }}>
                       {ROL_LABEL[usuario.rol]}
                     </span>
                     {!usuario.activo && (
                       <span style={{
-                        fontSize: "0.7rem",
-                        padding: "0.1rem 0.55rem",
-                        borderRadius: "10px",
-                        background: "#fee2e2",
-                        color: "#dc2626",
-                        fontWeight: 600,
+                        fontSize: "0.7rem", padding: "0.1rem 0.55rem", borderRadius: "10px",
+                        background: "#fee2e2", color: "#dc2626", fontWeight: 600,
                       }}>
                         🔒 Bloqueado
                       </span>
@@ -264,35 +237,26 @@ const GestionUsuariosMF: React.FC<Props> = ({ onClose }) => {
                     {usuario.correo}
                   </div>
                   <div style={{ fontSize: "0.72rem", color: "#d1d5db", marginTop: "0.15rem" }}>
-                    Registrado: {new Date(usuario.fechaRegistro).toLocaleDateString("es-BO")}
+                    Registrado: {usuario.fechaRegistro ? new Date(usuario.fechaRegistro).toLocaleDateString("es-BO") : "—"}
                   </div>
                 </div>
               </div>
 
-              {/* Acción - No permitir bloquear admins */}
+              {/* Acción — no permitir bloquear admins */}
               {usuario.rol !== "administrador" && (
                 <button
                   disabled={procesando === usuario.id}
                   onClick={() => toggleEstado(usuario)}
                   style={{
-                    padding: "0.45rem 1rem",
-                    borderRadius: "8px",
-                    border: "none",
+                    padding: "0.45rem 1rem", borderRadius: "8px", border: "none",
                     background: usuario.activo ? "#ef4444" : "#10b981",
-                    color: "#fff",
-                    fontWeight: 600,
-                    fontSize: "0.82rem",
+                    color: "#fff", fontWeight: 600, fontSize: "0.82rem",
                     cursor: procesando === usuario.id ? "not-allowed" : "pointer",
                     opacity: procesando === usuario.id ? 0.6 : 1,
-                    flexShrink: 0,
-                    minWidth: "100px",
+                    flexShrink: 0, minWidth: "100px",
                   }}
                 >
-                  {procesando === usuario.id
-                    ? "..."
-                    : usuario.activo
-                    ? "🔒 Bloquear"
-                    : "🔓 Reactivar"}
+                  {procesando === usuario.id ? "..." : usuario.activo ? "🔒 Bloquear" : "🔓 Reactivar"}
                 </button>
               )}
             </div>

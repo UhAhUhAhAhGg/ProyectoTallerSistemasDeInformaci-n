@@ -14,7 +14,8 @@ interface Props {
   onClose?: () => void;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
+// ✅ Apunta al auth-service en :3001
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
 
 const ValidarRefugiosMF: React.FC<Props> = ({ onClose }) => {
   const [refugios, setRefugios] = useState<Refugio[]>([]);
@@ -28,13 +29,28 @@ const ValidarRefugiosMF: React.FC<Props> = ({ onClose }) => {
   const fetchRefugios = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/admin/refugios`, {
+      // ✅ Ruta correcta del backend: /api/refugios/admin/solicitudes
+      // Pero trae solo pendientes — para ver todos necesitamos adaptarlo
+      const res = await fetch(`${API_BASE}/refugios/admin/solicitudes`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Error al obtener refugios");
       const data = await res.json();
-      setRefugios(data);
-    } catch (err) {
+      const raw: any[] = data.data ?? data;
+
+      // Mapear los campos del backend a la interfaz del componente
+      setRefugios(
+        raw.map((r: any) => ({
+          id: String(r.id_refug),
+          nombre: r.nom_refug,
+          correo: r.corr_usuario,
+          telefono: r.telf_refug,
+          direccion: r.dir_refug,
+          fechaRegistro: r.fecha_solicitud,
+          estado: r.est_aprobacion as "pendiente" | "aprobado" | "rechazado",
+        }))
+      );
+    } catch {
       setMensaje({ texto: "No se pudieron cargar los refugios.", tipo: "error" });
     } finally {
       setLoading(false);
@@ -49,8 +65,9 @@ const ValidarRefugiosMF: React.FC<Props> = ({ onClose }) => {
     setProcesando(id);
     setMensaje(null);
     try {
-      const res = await fetch(`${API_BASE}/api/admin/refugios/${id}/estado`, {
-        method: "PUT",
+      // ✅ Ruta correcta: PATCH /api/refugios/admin/refugio/:id/estado
+      const res = await fetch(`${API_BASE}/refugios/admin/refugio/${id}/estado`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -58,6 +75,7 @@ const ValidarRefugiosMF: React.FC<Props> = ({ onClose }) => {
         body: JSON.stringify({ estado }),
       });
       if (!res.ok) throw new Error();
+      // Actualizar estado local sin recargar todo
       setRefugios((prev) =>
         prev.map((r) => (r.id === id ? { ...r, estado } : r))
       );
@@ -131,8 +149,7 @@ const ValidarRefugiosMF: React.FC<Props> = ({ onClose }) => {
               transition: "all 0.15s",
             }}
           >
-            {estado.charAt(0).toUpperCase() + estado.slice(1)}
-            {" "}
+            {estado.charAt(0).toUpperCase() + estado.slice(1)}{" "}
             <span style={{
               background: "rgba(255,255,255,0.3)",
               borderRadius: "10px",
@@ -143,6 +160,12 @@ const ValidarRefugiosMF: React.FC<Props> = ({ onClose }) => {
             </span>
           </button>
         ))}
+        <button
+          onClick={fetchRefugios}
+          style={{ marginLeft: "auto", padding: "0.4rem 0.85rem", borderRadius: "8px", border: "1px solid #d1d5db", background: "#fff", cursor: "pointer", fontSize: "0.82rem", color: "#374151" }}
+        >
+          🔄 Actualizar
+        </button>
       </div>
 
       {/* Lista */}
@@ -195,11 +218,11 @@ const ValidarRefugiosMF: React.FC<Props> = ({ onClose }) => {
                   </div>
                 )}
                 <div style={{ fontSize: "0.75rem", color: "#d1d5db", marginTop: "0.35rem" }}>
-                  Registrado: {new Date(refugio.fechaRegistro).toLocaleDateString("es-BO")}
+                  Registrado: {refugio.fechaRegistro ? new Date(refugio.fechaRegistro).toLocaleDateString("es-BO") : "—"}
                 </div>
               </div>
 
-              {/* Acciones */}
+              {/* Acciones — solo para pendientes */}
               {refugio.estado === "pendiente" && (
                 <div style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
                   <button
@@ -213,7 +236,7 @@ const ValidarRefugiosMF: React.FC<Props> = ({ onClose }) => {
                       color: "#fff",
                       fontWeight: 600,
                       fontSize: "0.82rem",
-                      cursor: "pointer",
+                      cursor: procesando === refugio.id ? "not-allowed" : "pointer",
                       opacity: procesando === refugio.id ? 0.6 : 1,
                     }}
                   >
@@ -230,7 +253,7 @@ const ValidarRefugiosMF: React.FC<Props> = ({ onClose }) => {
                       color: "#fff",
                       fontWeight: 600,
                       fontSize: "0.82rem",
-                      cursor: "pointer",
+                      cursor: procesando === refugio.id ? "not-allowed" : "pointer",
                       opacity: procesando === refugio.id ? 0.6 : 1,
                     }}
                   >

@@ -1,7 +1,6 @@
 import { pool } from '../config/database';
 import { Animal, CreateAnimalDto, UpdateAnimalDto, Raza, Especie } from '../animales/Animal.types';
 
-
 export const findAllAnimales = async (): Promise<Animal[]> => {
   const { rows } = await pool.query(
     `SELECT m.*, r.nom_raza, e.nom_espe
@@ -49,7 +48,8 @@ export const createAnimal = async (dto: CreateAnimalDto): Promise<Animal> => {
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
      RETURNING *`,
     [
-      dto.id_raza, dto.nom_mascot, dto.edad_mascot, dto.fenac_mascot,
+      dto.id_raza, dto.nom_mascot, dto.edad_mascot,
+      dto.fenac_mascot || new Date().toISOString().slice(0, 10),
       dto.descrip_mascot, dto.gen_mascot, dto.esterilizado, dto.img_mascot,
     ],
   );
@@ -79,9 +79,22 @@ export const updateAnimal = async (id: number, dto: UpdateAnimalDto): Promise<An
   return rows[0] || null;
 };
 
-export const findAllRazas = async (): Promise<Raza[]> => {
+/** Razas — filtra por especie si se pasa id_espe */
+export const findAllRazas = async (id_espe?: number): Promise<Raza[]> => {
+  if (id_espe) {
+    const { rows } = await pool.query(
+      `SELECT r.*, e.nom_espe FROM RAZAS r
+       JOIN ESPECIES e ON e.id_espe = r.id_espe
+       WHERE r.id_espe = $1
+       ORDER BY r.nom_raza`,
+      [id_espe],
+    );
+    return rows;
+  }
   const { rows } = await pool.query(
-    `SELECT r.*, e.nom_espe FROM RAZAS r JOIN ESPECIES e ON e.id_espe = r.id_espe ORDER BY e.nom_espe, r.nom_raza`,
+    `SELECT r.*, e.nom_espe FROM RAZAS r
+     JOIN ESPECIES e ON e.id_espe = r.id_espe
+     ORDER BY e.nom_espe, r.nom_raza`,
   );
   return rows;
 };

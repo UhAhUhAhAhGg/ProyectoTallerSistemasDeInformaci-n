@@ -12,7 +12,7 @@ async function guardarDatosRefugio(id_usuario, datos) {
     [id_usuario]
   );
 
-  if (usuario.rows[0]?.id_rol !== 3) {
+  if (Number(usuario.rows[0]?.id_rol) !== 3) {
     throw new Error('No autorizado: el usuario no es refugio');
   }
 
