@@ -14,6 +14,15 @@ npm run dev
 #  ✓ Frontend en http://localhost:5173
 ```
 
+Si recreaste la base de datos, carga el esquema `backend/auth-service/src/config/schema.sql` y luego pobla datos de prueba:
+
+```bash
+npm run seed:admin
+npm run seed:demo
+```
+
+El seed demo crea un refugio aprobado, razas, mascotas y publicaciones para que el catalogo no aparezca vacio.
+
 ---
 
 ## 📍 Tu Estructura Actual
