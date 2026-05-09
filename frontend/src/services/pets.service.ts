@@ -1,5 +1,10 @@
 const BASE = import.meta.env.VITE_PETS_API_URL || 'http://localhost:3003';
 
+async function parseError(res: Response, fallback: string) {
+  const err = await res.json().catch(() => ({}));
+  return err.message || fallback;
+}
+
 export interface PetFilters {
   especie?: string;
   raza?: string;
@@ -60,7 +65,7 @@ function authHeadersNoContent(): HeadersInit | undefined {
 
 export async function getAnimalesRefugio() {
   const res = await fetch(`${BASE}/animales`, { headers: authHeaders() });
-  if (!res.ok) throw new Error('Error al obtener animales');
+  if (!res.ok) throw new Error(await parseError(res, 'Error al obtener animales'));
   const json = await res.json();
   return json.data ?? [];
 }
