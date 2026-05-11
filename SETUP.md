@@ -24,6 +24,35 @@ npm run dev
 
 ---
 
+## 🌱 Poblar la Base de Datos
+
+Si recreaste la base de datos o esta vacia, primero carga el esquema actual:
+
+```text
+backend/auth-service/src/config/schema.sql
+```
+
+Luego ejecuta los seeds desde la raiz del proyecto:
+
+```bash
+npm run seed:admin
+npm run seed:demo
+```
+
+El seed demo crea un refugio aprobado, razas, mascotas y publicaciones activas para que el catalogo tenga datos.
+
+Credenciales de prueba:
+
+```text
+Admin:
+admin@petmatch.com / Admin123456!
+
+Refugio:
+refugio.demo@petmatch.com / Refugio123456!
+```
+
+---
+
 ## ⚡ OPCIÓN 2: Scripts Batch (Windows)
 
 Si prefieres abrir cada servicio en su propia ventana (Windows):
@@ -53,6 +82,8 @@ Si prefieres abrir cada servicio en su propia ventana (Windows):
 | `npm run dev` | Ejecuta TODOS los servicios en paralelo |
 | `npm run dev:backend` | Solo backend |
 | `npm run dev:frontend` | Solo frontend |
+| `npm run seed:admin` | Crea el usuario administrador |
+| `npm run seed:demo` | Crea refugio demo, razas, mascotas y publicaciones |
 | `npm run build` | Compilar frontend para producción |
 | `npm run start` | Ejecutar servicios en modo producción |
 

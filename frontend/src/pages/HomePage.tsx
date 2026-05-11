@@ -63,7 +63,7 @@ export default function HomePage() {
                 <button className="hp-btn hp-btn-dark" onClick={handleDashboard}>Ir a mi panel →</button>
               ) : (
                 <>
-                  <button className="hp-btn hp-btn-dark" onClick={() => navigate('/register')}>Quiero adoptar</button>
+                  <button className="hp-btn hp-btn-dark" onClick={() => navigate('/register')}>Crear cuenta</button>
                   <button className="hp-btn hp-btn-outline" onClick={() => navigate('/login')}>Soy un refugio</button>
                 </>
               )}

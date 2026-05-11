@@ -36,7 +36,7 @@ export default function RegisterRefugioMF({ onSuccess, onSwitchToAdoptante }: Pr
     setForm(p => ({ ...p, [name]: value }));
     if (name === 'contrasena') {
       setPwReqs({
-        length: value.length >= 12,
+        length: value.length >= 8,
         upper: /[A-Z]/.test(value),
         num: /[0-9]/.test(value),
         special: /[!@#$%^&*]/.test(value),
@@ -138,7 +138,7 @@ export default function RegisterRefugioMF({ onSuccess, onSwitchToAdoptante }: Pr
       {/* Correo */}
       <div style={field}>
         <label style={label} htmlFor="rr-correo">Correo electrónico</label>
-        <input id="rr-correo" name="correo" type="email" autoComplete="email"
+        <input id="rr-correo" name="correo" type="email" autoComplete="username"
           value={form.correo} onChange={onChange} placeholder="refugio@correo.com"
           style={{ ...input, borderColor: errors.correo ? '#e53e3e' : '#e8e8e8' }} />
         {errors.correo && <span style={errStyle}>{errors.correo}</span>}
@@ -154,7 +154,7 @@ export default function RegisterRefugioMF({ onSuccess, onSwitchToAdoptante }: Pr
         </div>
         <div style={field}>
           <label style={label} htmlFor="rr-direccion">Dirección / zona</label>
-          <input id="rr-direccion" name="direccion" type="text" autoComplete="street-address"
+          <input id="rr-direccion" name="direccion" type="text" autoComplete="address-line1"
             value={form.direccion} onChange={onChange} placeholder="Zona Norte, La Paz"
             style={input} />
         </div>
@@ -164,11 +164,11 @@ export default function RegisterRefugioMF({ onSuccess, onSwitchToAdoptante }: Pr
       <div style={field}>
         <label style={label} htmlFor="rr-contrasena">Contraseña</label>
         <input id="rr-contrasena" name="contrasena" type="password" autoComplete="new-password"
-          value={form.contrasena} onChange={onChange} placeholder="Mínimo 12 caracteres"
+          value={form.contrasena} onChange={onChange} placeholder="Mínimo 8 caracteres"
           style={{ ...input, borderColor: errors.contrasena ? '#e53e3e' : '#e8e8e8' }} />
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, marginTop: 6 }}>
           {[
-            { ok: pwReqs.length,  txt: '12 caracteres' },
+            { ok: pwReqs.length,  txt: '8 caracteres' },
             { ok: pwReqs.upper,   txt: 'Mayúscula' },
             { ok: pwReqs.num,     txt: 'Número' },
             { ok: pwReqs.special, txt: 'Especial (!@#...)' },

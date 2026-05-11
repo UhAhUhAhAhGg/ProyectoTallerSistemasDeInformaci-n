@@ -61,8 +61,9 @@ export default function GestionMascotasPage() {
       const [a, e] = await Promise.all([getAnimalesRefugio(), getEspecies()]);
       setAnimales(a);
       setEspecies(e);
-    } catch {
-      setError('Error al cargar datos. Verifica que el servidor esté activo.');
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Error al cargar datos';
+      setError(`${message}. Verifica tu sesión y que el servidor de mascotas esté activo.`);
     } finally {
       setLoading(false);
     }

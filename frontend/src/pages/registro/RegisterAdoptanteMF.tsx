@@ -5,7 +5,6 @@ import { authService } from '../../services/api';
 
 interface Props {
   onSuccess?: () => void;
-  onSwitchToRefugio?: () => void;
 }
 
 const field: React.CSSProperties = {
@@ -21,7 +20,7 @@ const input: React.CSSProperties = {
 };
 const errStyle: React.CSSProperties = { fontSize: 11, color: '#e53e3e', marginTop: 2 };
 
-export default function RegisterAdoptanteMF({ onSuccess, onSwitchToRefugio }: Props) {
+export default function RegisterAdoptanteMF({ onSuccess }: Props) {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     nombre: '', apellido: '', correo: '', telefono: '',
@@ -36,7 +35,7 @@ export default function RegisterAdoptanteMF({ onSuccess, onSwitchToRefugio }: Pr
     setForm(p => ({ ...p, [name]: value }));
     if (name === 'contrasena') {
       setPwReqs({
-        length: value.length >= 12,
+        length: value.length >= 8,
         upper: /[A-Z]/.test(value),
         num: /[0-9]/.test(value),
         special: /[!@#$%^&*]/.test(value),
@@ -131,7 +130,7 @@ export default function RegisterAdoptanteMF({ onSuccess, onSwitchToRefugio }: Pr
       {/* Correo */}
       <div style={field}>
         <label style={label} htmlFor="ra-correo">Correo electrónico</label>
-        <input id="ra-correo" name="correo" type="email" autoComplete="email"
+        <input id="ra-correo" name="correo" type="email" autoComplete="username"
           value={form.correo} onChange={onChange} placeholder="tu@correo.com"
           style={{ ...input, borderColor: errors.correo ? '#e53e3e' : '#e8e8e8' }} />
         {errors.correo && <span style={errStyle}>{errors.correo}</span>}
@@ -147,7 +146,7 @@ export default function RegisterAdoptanteMF({ onSuccess, onSwitchToRefugio }: Pr
         </div>
         <div style={field}>
           <label style={label} htmlFor="ra-direccion">Dirección / zona</label>
-          <input id="ra-direccion" name="direccion" type="text" autoComplete="street-address"
+          <input id="ra-direccion" name="direccion" type="text" autoComplete="address-line1"
             value={form.direccion} onChange={onChange} placeholder="Zona Sur, La Paz"
             style={input} />
         </div>
@@ -157,11 +156,11 @@ export default function RegisterAdoptanteMF({ onSuccess, onSwitchToRefugio }: Pr
       <div style={field}>
         <label style={label} htmlFor="ra-contrasena">Contraseña</label>
         <input id="ra-contrasena" name="contrasena" type="password" autoComplete="new-password"
-          value={form.contrasena} onChange={onChange} placeholder="Mínimo 12 caracteres"
+          value={form.contrasena} onChange={onChange} placeholder="Mínimo 8 caracteres"
           style={{ ...input, borderColor: errors.contrasena ? '#e53e3e' : '#e8e8e8' }} />
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, marginTop: 6 }}>
           {[
-            { ok: pwReqs.length,  txt: '12 caracteres' },
+            { ok: pwReqs.length,  txt: '8 caracteres' },
             { ok: pwReqs.upper,   txt: 'Mayúscula' },
             { ok: pwReqs.num,     txt: 'Número' },
             { ok: pwReqs.special, txt: 'Especial (!@#...)' },
@@ -202,14 +201,6 @@ export default function RegisterAdoptanteMF({ onSuccess, onSwitchToRefugio }: Pr
         </button>
       </p>
 
-      {/* Switch to Refugio */}
-      <button type="button" onClick={onSwitchToRefugio} style={{
-        width: '100%', padding: '12px', background: '#e4adcc', border: 'none',
-        borderRadius: 12, fontSize: 14, fontWeight: 600, cursor: 'pointer',
-        fontFamily: 'DM Sans, sans-serif', color: '#1a1a1a', transition: 'background 0.2s',
-      }}>
-        Registro Como Refugio
-      </button>
     </form>
   );
 }
