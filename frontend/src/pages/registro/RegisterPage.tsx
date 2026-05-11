@@ -16,11 +16,18 @@ const RegisterPage: React.FC = () => {
     setRolSeleccionado(nuevoRol);
   };
 
+  const seleccionarAdoptante = () => {
+    setRolSeleccionado("adoptante");
+  };
+
+  const seleccionarRefugio = () => {
+    setRolSeleccionado("refugio");
+  };
+
   if (rolSeleccionado === "adoptante") {
     return (
       <RegisterAdoptanteMF
         onSuccess={handleSuccess}
-        onSwitchToRefugio={() => handleSwitch("refugio")}
       />
     );
   }
@@ -48,7 +55,7 @@ const RegisterPage: React.FC = () => {
         <div className="register-shell__options">
           <button
             className="register-shell__option register-shell__option--adoptante"
-            onClick={() => setRolSeleccionado("adoptante")}
+            onClick={seleccionarAdoptante}
           >
             <span className="register-shell__option-icon">👤</span>
             <span className="register-shell__option-label">Soy Adoptante</span>
@@ -59,7 +66,7 @@ const RegisterPage: React.FC = () => {
 
           <button
             className="register-shell__option register-shell__option--refugio"
-            onClick={() => setRolSeleccionado("refugio")}
+            onClick={seleccionarRefugio}
           >
             <span className="register-shell__option-icon">🏠</span>
             <span className="register-shell__option-label">Soy Refugio</span>

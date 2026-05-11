@@ -29,7 +29,7 @@ async function registro(req, res) {
   if (!validarContrasena(contrasena)) {
     return res.status(400).json({
       success: false,
-      mensaje: 'La contraseña debe tener mínimo 12 caracteres, una mayúscula, un número y un carácter especial (!@#$%^&*)'
+      mensaje: 'La contraseña debe tener mínimo 8 caracteres, una mayúscula, un número y un carácter especial (!@#$%^&*)'
     });
   }
 

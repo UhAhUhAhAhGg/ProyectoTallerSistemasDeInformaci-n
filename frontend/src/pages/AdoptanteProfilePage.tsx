@@ -104,13 +104,9 @@ export default function AdoptanteProfilePage() {
         acepta_otros: formData.acepta_otros,
       });
       if (response.success) {
+        setErrors({});
         setGuardadoOk(true);
-        // Si venía de completar perfil por primera vez, redirigir al dashboard
-        const est = localStorage.getItem('est_usuario');
-        if (est === 'incompleto') {
-          localStorage.setItem('est_usuario', 'activo');
-          navigate('/dashboard/adoptante');
-        }
+        localStorage.setItem('est_usuario', 'activo');
       }
     } catch (error: any) {
       setErrors({ general: error.response?.data?.mensaje || 'Error al guardar perfil' });
@@ -127,6 +123,30 @@ export default function AdoptanteProfilePage() {
           <div className="ap-card">
             <div style={{ textAlign: 'center', padding: '60px', color: '#888' }}>
               Cargando datos...
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (guardadoOk) {
+    return (
+      <div className="ap-wrapper">
+        <Navbar />
+        <div className="ap-container">
+          <div className="ap-card">
+            <div className="ap-success-panel">
+              <div className="ap-success-icon">✓</div>
+              <h1>Registro exitoso</h1>
+              <p>Tu perfil de adoptante fue guardado correctamente. Ya puedes explorar mascotas y enviar solicitudes de adopción.</p>
+              <button
+                type="button"
+                className="ap-btn primary"
+                onClick={() => navigate('/dashboard/adoptante')}
+              >
+                Ir a mi panel
+              </button>
             </div>
           </div>
         </div>

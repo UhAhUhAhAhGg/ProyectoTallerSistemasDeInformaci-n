@@ -48,6 +48,13 @@ async function guardarPerfilAdoptante(id_usuario, datos) {
     ]
   );
 
+  await pool.query(
+    `UPDATE USUARIOS
+     SET est_usuario = 'activo'
+     WHERE id_usuario = $1 AND est_usuario = 'incompleto'`,
+    [id_usuario]
+  );
+
   return result.rows[0];
 }
 

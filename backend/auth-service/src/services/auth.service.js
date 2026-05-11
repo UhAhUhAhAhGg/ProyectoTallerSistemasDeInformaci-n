@@ -4,10 +4,10 @@ const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
 
 /**
- * Validación de contraseña: mín 12 chars, mayúscula, número, carácter especial
+ * Validación de contraseña: mín 8 chars, mayúscula, número, carácter especial
  */
 function validarContrasena(contra) {
-  const regex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{12,}$/;
+  const regex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
   return regex.test(contra);
 }
 

@@ -85,6 +85,7 @@ export default function LoginPage() {
               type="email"
               id="correo"
               name="correo"
+              autoComplete="username"
               value={formData.correo}
               onChange={handleChange}
               placeholder="tu@email.com"
@@ -98,6 +99,7 @@ export default function LoginPage() {
               type="password"
               id="contrasena"
               name="contrasena"
+              autoComplete="current-password"
               value={formData.contrasena}
               onChange={handleChange}
               placeholder="Tu contraseña"
