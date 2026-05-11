@@ -5,7 +5,6 @@ import { authService } from '../../services/api';
 
 interface Props {
   onSuccess?: () => void;
-  onSwitchToAdoptante?: () => void;
 }
 
 const field: React.CSSProperties = {
@@ -21,7 +20,7 @@ const input: React.CSSProperties = {
 };
 const errStyle: React.CSSProperties = { fontSize: 11, color: '#e53e3e', marginTop: 2 };
 
-export default function RegisterRefugioMF({ onSuccess, onSwitchToAdoptante }: Props) {
+export default function RegisterRefugioMF({ onSuccess }: Props) {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     nombre: '', apellido: '', nombreRefugio: '', correo: '',
@@ -209,14 +208,6 @@ export default function RegisterRefugioMF({ onSuccess, onSwitchToAdoptante }: Pr
         </button>
       </p>
 
-      {/* Switch to Adoptante */}
-      <button type="button" onClick={onSwitchToAdoptante} style={{
-        width: '100%', padding: '12px', background: '#e4adcc', border: 'none',
-        borderRadius: 12, fontSize: 14, fontWeight: 600, cursor: 'pointer',
-        fontFamily: 'DM Sans, sans-serif', color: '#1a1a1a', transition: 'background 0.2s',
-      }}>
-        Registro Como Adoptante
-      </button>
     </form>
   );
 }
