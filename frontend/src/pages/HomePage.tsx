@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
 import Navbar from './Navbar';
 import heroPets from '../assets/hero-pets.png';
+import { refugioService } from '../services/api';
 
 const featuredPets = [
   { name: 'Luna', meta: '2 años · Tamaño mediano', image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=500&q=80' },
@@ -12,14 +13,34 @@ const featuredPets = [
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState<string | null>(null);
-  const [userRol, setUserRol] = useState<string | null>(null);
-  const [estUsuario, setEstUsuario] = useState<string | null>(null);
+  const [userName] = useState<string | null>(() => localStorage.getItem('nombre'));
+  const [userRol] = useState<string | null>(() => localStorage.getItem('rol'));
+  const [estUsuario, setEstUsuario] = useState<string | null>(() => localStorage.getItem('est_usuario'));
 
   useEffect(() => {
-    setUserName(localStorage.getItem('nombre'));
-    setUserRol(localStorage.getItem('rol'));
-    setEstUsuario(localStorage.getItem('est_usuario'));
+    const rol = localStorage.getItem('rol');
+
+    if (rol === 'refugio') {
+      refugioService.obtenerDatos()
+        .then((res) => {
+          const estadoRefugio = res?.data?.est_aprobacion;
+          if (estadoRefugio === 'aprobado') {
+            localStorage.setItem('est_usuario', 'activo');
+            setEstUsuario('activo');
+          }
+          if (estadoRefugio === 'pendiente') {
+            localStorage.setItem('est_usuario', 'pendiente');
+            setEstUsuario('pendiente');
+          }
+          if (estadoRefugio === 'rechazado') {
+            localStorage.setItem('est_usuario', 'rechazado');
+            setEstUsuario('rechazado');
+          }
+        })
+        .catch(() => {
+          setEstUsuario(localStorage.getItem('est_usuario'));
+        });
+    }
   }, []);
 
   const handleDashboard = () => {

@@ -11,6 +11,31 @@ function validarContrasena(contra) {
   return regex.test(contra);
 }
 
+async function notificarAdministradoresNuevoRegistro(usuario, rol) {
+  const admins = await pool.query(
+    'SELECT id_usuario FROM USUARIOS WHERE id_rol = 1'
+  );
+
+  if (admins.rowCount === 0) return;
+
+  const nombre = [usuario.nom_usuario, usuario.apell_usuario].filter(Boolean).join(' ').trim();
+  const titulo = rol === 'refugio'
+    ? 'Nuevo refugio registrado'
+    : 'Nuevo adoptante registrado';
+  const cuerpo = `${nombre || usuario.corr_usuario} se registro como ${rol}.`;
+
+  await Promise.all(
+    admins.rows.map((admin) =>
+      pool.query(
+        `INSERT INTO NOTIFICACIONES
+          (id_usuario, tipo_notif, titulo_notif, cuerpo_notif, ref_id)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [admin.id_usuario, `registro_${rol}`, titulo, cuerpo, usuario.id_usuario]
+      )
+    )
+  );
+}
+
 /**
  * Registrar usuario general (adoptante o refugio)
  */
@@ -40,11 +65,15 @@ async function registrarUsuario(datos) {
     `INSERT INTO USUARIOS 
       (id_rol, corr_usuario, contra_usuario, nom_usuario, apell_usuario, est_usuario)
      VALUES ($1, $2, $3, $4, $5, $6)
-     RETURNING id_usuario, id_rol, corr_usuario, est_usuario`,
+     RETURNING id_usuario, id_rol, corr_usuario, nom_usuario, apell_usuario, est_usuario`,
     [id_rol, correo, hash, nombre || '', apellido || '', est_usuario]
   );
 
   const usuario = result.rows[0];
+
+  if (rol === 'adoptante') {
+    await notificarAdministradoresNuevoRegistro(usuario, rol);
+  }
 
   const token = jwt.sign(
     {

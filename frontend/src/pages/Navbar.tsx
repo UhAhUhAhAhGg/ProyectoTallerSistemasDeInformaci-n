@@ -1,18 +1,39 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Navbar.css';
+import { refugioService } from '../services/api';
 
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [userName, setUserName] = useState<string | null>(null);
-  const [userRol, setUserRol] = useState<string | null>(null);
-  const [estUsuario, setEstUsuario] = useState<string | null>(null);
+  const [userName] = useState<string | null>(() => localStorage.getItem('nombre'));
+  const [userRol] = useState<string | null>(() => localStorage.getItem('rol'));
+  const [estUsuario, setEstUsuario] = useState<string | null>(() => localStorage.getItem('est_usuario'));
 
   useEffect(() => {
-    setUserName(localStorage.getItem('nombre'));
-    setUserRol(localStorage.getItem('rol'));
-    setEstUsuario(localStorage.getItem('est_usuario'));
+    const rol = localStorage.getItem('rol');
+
+    if (rol === 'refugio') {
+      refugioService.obtenerDatos()
+        .then((res) => {
+          const estadoRefugio = res?.data?.est_aprobacion;
+          if (estadoRefugio === 'aprobado') {
+            localStorage.setItem('est_usuario', 'activo');
+            setEstUsuario('activo');
+          }
+          if (estadoRefugio === 'pendiente') {
+            localStorage.setItem('est_usuario', 'pendiente');
+            setEstUsuario('pendiente');
+          }
+          if (estadoRefugio === 'rechazado') {
+            localStorage.setItem('est_usuario', 'rechazado');
+            setEstUsuario('rechazado');
+          }
+        })
+        .catch(() => {
+          setEstUsuario(localStorage.getItem('est_usuario'));
+        });
+    }
   }, [location.pathname]);
 
   const handleLogout = () => {
