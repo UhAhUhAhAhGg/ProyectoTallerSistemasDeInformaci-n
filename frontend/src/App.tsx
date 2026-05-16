@@ -12,6 +12,7 @@ import GestionMascotasPage    from './pages/GestionMascotasPage';
 import SolicitudesRefugioPage from './pages/SolicitudesRefugioPage';
 import MisSolicitudesPage     from './pages/MisSolicitudesPage';
 import NotificacionesPage     from './pages/NotificacionesPage';
+import MatchingPage           from './pages/MatchingPage';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -133,6 +134,14 @@ export default function App() {
       />
 
       {/* ── Compartida ───────────────────────────────────────────────────── */}
+      <Route
+        path="/matching"
+        element={
+          <RoleRoute rol="adoptante">
+            <MatchingPage />
+          </RoleRoute>
+        }
+      />
       <Route
         path="/notificaciones"
         element={

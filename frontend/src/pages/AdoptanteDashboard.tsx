@@ -112,6 +112,15 @@ export default function AdoptanteDashboard() {
             <span className="ad-option-arrow">→</span>
           </div>
 
+          <div className="ad-option ad-option--matching" onClick={() => navigate('/matching')}>
+            <div className="ad-option-icon">IA</div>
+            <div className="ad-option-info">
+              <h3>Matching IA</h3>
+              <p>Recibe recomendaciones segun tu perfil</p>
+            </div>
+            <span className="ad-option-arrow">→</span>
+          </div>
+
           <div className="ad-option" onClick={() => navigate('/notificaciones')}>
             <div className="ad-option-icon">🔔</div>
             <div className="ad-option-info">
