@@ -269,7 +269,8 @@ async function loginUsuario(correo, contrasena) {
     id_usuario: usuario.id_usuario,
     nombre: usuario.nom_usuario,
     correo: usuario.corr_usuario,
-    est_usuario: usuario.est_usuario
+    est_usuario: usuario.est_usuario,
+    id_refug
   };
 }
 

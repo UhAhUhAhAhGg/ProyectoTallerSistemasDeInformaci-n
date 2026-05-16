@@ -64,17 +64,17 @@ export default function App() {
       <Route
         path="/completar-perfil/adoptante"
         element={
-          <PrivateRoute>
+          <RoleRoute rol="adoptante">
             <AdoptanteProfilePage />
-          </PrivateRoute>
+          </RoleRoute>
         }
       />
       <Route
         path="/completar-perfil/refugio"
         element={
-          <PrivateRoute>
+          <RoleRoute rol="refugio">
             <RefugioProfilePage />
-          </PrivateRoute>
+          </RoleRoute>
         }
       />
 
