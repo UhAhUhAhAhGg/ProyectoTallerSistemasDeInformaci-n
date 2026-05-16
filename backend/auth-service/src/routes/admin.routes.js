@@ -13,10 +13,24 @@ router.get("/usuarios", authMiddleware, adminMiddleware, async (req, res) => {
               u.apell_usuario AS apellido,
               u.corr_usuario AS correo,
               r.nom_rol AS rol,
+              u.est_usuario AS estado,
               CASE WHEN u.est_usuario = 'bloqueado' THEN false ELSE true END AS activo,
-              u.fecha_registro AS "fechaRegistro"
+              u.fecha_registro AS "fechaRegistro",
+              pa.tipo_vivienda AS "tipoVivienda",
+              pa.disp_tiempo AS "disponibilidadTiempo",
+              pa.pref_tamanio AS "preferenciaTamanio",
+              pa.pref_edad AS "preferenciaEdad",
+              e.nom_espe AS "preferenciaEspecie",
+              CASE WHEN pa.id_perfil IS NULL THEN false ELSE true END AS "perfilAdoptanteCompleto",
+              ref.id_refug AS "idRefugio",
+              ref.nom_refug AS "nombreRefugio",
+              ref.est_aprobacion AS "estadoRefugio",
+              ref.licencia_refug AS "licenciaRefugio"
        FROM USUARIOS u
        JOIN ROLES r ON u.id_rol = r.id_rol
+       LEFT JOIN PERFIL_ADOPTANTE pa ON pa.id_usuario = u.id_usuario
+       LEFT JOIN ESPECIES e ON e.id_espe = pa.pref_especie
+       LEFT JOIN REFUGIOS ref ON ref.id_usuario = u.id_usuario
        ORDER BY u.fecha_registro DESC`
     );
     res.json(result.rows);

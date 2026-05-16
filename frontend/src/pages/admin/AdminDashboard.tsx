@@ -4,7 +4,15 @@ import ReportesAdminMF from "./ReportesAdminMF";
 import ValidarRefugiosMF from "./ValidarRefugiosMF";
 import "./AdminDashboard.css";
 
-type Tab = "refugios" | "usuarios" | "reportes";
+type Tab =
+  | "panel"
+  | "refugios"
+  | "animales"
+  | "perfiles"
+  | "solicitudes"
+  | "matching"
+  | "reportes"
+  | "mensajeria";
 
 interface Notificacion {
   id_notif: number;
@@ -18,8 +26,79 @@ interface Notificacion {
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
 
+const AdminPlaceholder = ({
+  titulo,
+  descripcion,
+  detalles,
+}: {
+  titulo: string;
+  descripcion: string;
+  detalles: string[];
+}) => (
+  <div className="admin-placeholder">
+    <div className="admin-placeholder__head">
+      <span className="admin-placeholder__icon">+</span>
+      <div>
+        <h2>{titulo}</h2>
+        <p>{descripcion}</p>
+      </div>
+    </div>
+    <div className="admin-placeholder__grid">
+      {detalles.map((detalle) => (
+        <div className="admin-placeholder__item" key={detalle}>
+          {detalle}
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const PanelGeneral = ({ notificaciones }: { notificaciones: Notificacion[] }) => {
+  const refugiosPendientes = notificaciones.filter((n) => n.tipo_notif.includes("refugio")).length;
+  const registros = notificaciones.filter((n) => n.tipo_notif.includes("registro")).length;
+
+  return (
+    <div className="admin-overview">
+      <div className="admin-overview__grid">
+        <article>
+          <span>Refugios por revisar</span>
+          <strong>{refugiosPendientes}</strong>
+          <small>Solicitudes y avisos recientes</small>
+        </article>
+        <article>
+          <span>Nuevos registros</span>
+          <strong>{registros}</strong>
+          <small>Actividad recibida por el panel</small>
+        </article>
+        <article>
+          <span>Notificaciones</span>
+          <strong>{notificaciones.length}</strong>
+          <small>Total visible para administracion</small>
+        </article>
+      </div>
+
+      <section className="admin-overview__activity">
+        <h2>Actividad reciente</h2>
+        {notificaciones.length === 0 ? (
+          <p>Sin actividad reciente.</p>
+        ) : (
+          notificaciones.slice(0, 5).map((notificacion) => (
+            <div className="admin-overview__event" key={notificacion.id_notif}>
+              <div>
+                <strong>{notificacion.titulo_notif}</strong>
+                <span>{notificacion.cuerpo_notif}</span>
+              </div>
+              <time>{new Date(notificacion.fech_notif).toLocaleDateString("es-BO")}</time>
+            </div>
+          ))
+        )}
+      </section>
+    </div>
+  );
+};
+
 const AdminDashboard: React.FC = () => {
-  const [tabActiva, setTabActiva] = useState<Tab>("refugios");
+  const [tabActiva, setTabActiva] = useState<Tab>("panel");
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
   const [notificacionesAbiertas, setNotificacionesAbiertas] = useState(false);
 
@@ -28,22 +107,52 @@ const AdminDashboard: React.FC = () => {
   const tabs: { id: Tab; label: string; icon: string; descripcion: string }[] = useMemo(
     () => [
       {
-        id: "refugios",
-        label: "Validar Refugios",
-        icon: "H",
-        descripcion: "HU-03 - Aprobar o rechazar nuevos refugios",
+        id: "panel",
+        label: "Panel General",
+        icon: "PG",
+        descripcion: "Resumen de actividad y validaciones recientes",
       },
       {
-        id: "usuarios",
-        label: "Gestion de Usuarios",
-        icon: "U",
-        descripcion: "HU-04 - Bloquear o reactivar cuentas",
+        id: "refugios",
+        label: "Refugios",
+        icon: "RF",
+        descripcion: "Validacion y estado de refugios",
+      },
+      {
+        id: "animales",
+        label: "Animales",
+        icon: "AN",
+        descripcion: "Inventario y publicaciones de mascotas",
+      },
+      {
+        id: "perfiles",
+        label: "Perfiles",
+        icon: "PF",
+        descripcion: "Perfiles de adoptantes, refugios y estado de cuenta",
+      },
+      {
+        id: "solicitudes",
+        label: "Solicitudes",
+        icon: "SO",
+        descripcion: "Seguimiento de solicitudes de adopcion",
+      },
+      {
+        id: "matching",
+        label: "Config. Matching",
+        icon: "IA",
+        descripcion: "Parametros del motor de compatibilidad",
       },
       {
         id: "reportes",
         label: "Reportes",
         icon: "R",
         descripcion: "Resumen general y descarga en PDF",
+      },
+      {
+        id: "mensajeria",
+        label: "Mensajeria",
+        icon: "MS",
+        descripcion: "Comunicaciones y avisos del sistema",
       },
     ],
     []
@@ -181,7 +290,7 @@ const AdminDashboard: React.FC = () => {
                           className="admin-dashboard__notification-item"
                           onClick={() => {
                             if (notificacion.tipo_notif.includes("refugio")) setTabActiva("refugios");
-                            if (notificacion.tipo_notif.includes("adoptante")) setTabActiva("usuarios");
+                            if (notificacion.tipo_notif.includes("adoptante")) setTabActiva("perfiles");
                             setNotificacionesAbiertas(false);
                           }}
                           type="button"
@@ -205,9 +314,38 @@ const AdminDashboard: React.FC = () => {
         </header>
 
         <section className="admin-dashboard__content">
+          {tabActiva === "panel" && <PanelGeneral notificaciones={notificaciones} />}
           {tabActiva === "refugios" && <ValidarRefugiosMF />}
-          {tabActiva === "usuarios" && <GestionUsuariosMF />}
+          {tabActiva === "animales" && (
+            <AdminPlaceholder
+              titulo="Animales"
+              descripcion="Seccion preparada para revisar animales registrados, publicaciones activas y bajas."
+              detalles={["Mascotas por refugio", "Publicaciones activas", "Animales dados de baja"]}
+            />
+          )}
+          {tabActiva === "perfiles" && <GestionUsuariosMF />}
+          {tabActiva === "solicitudes" && (
+            <AdminPlaceholder
+              titulo="Solicitudes"
+              descripcion="Vista administrativa para auditar solicitudes de adopcion y sus estados."
+              detalles={["Solicitudes pendientes", "Aprobadas y rechazadas", "Historial por adoptante"]}
+            />
+          )}
+          {tabActiva === "matching" && (
+            <AdminPlaceholder
+              titulo="Configuracion de Matching"
+              descripcion="Parametros listos para conectar el motor de reglas con la API de IA."
+              detalles={["Umbral minimo de compatibilidad", "Peso de preferencias", "Prioridad de animales con mas tiempo"]}
+            />
+          )}
           {tabActiva === "reportes" && <ReportesAdminMF />}
+          {tabActiva === "mensajeria" && (
+            <AdminPlaceholder
+              titulo="Mensajeria"
+              descripcion="Bandeja preparada para comunicaciones entre administracion, refugios y adoptantes."
+              detalles={["Avisos a refugios", "Alertas a adoptantes", "Mensajes del sistema"]}
+            />
+          )}
         </section>
       </main>
     </div>

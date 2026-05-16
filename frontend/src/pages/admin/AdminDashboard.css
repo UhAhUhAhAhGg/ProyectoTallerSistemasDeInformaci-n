@@ -458,6 +458,133 @@
   color: #8a94a6;
 }
 
+.admin-overview {
+  padding: 1.5rem;
+}
+
+.admin-overview__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.admin-overview__grid article {
+  border: 1px solid #e5e7eb;
+  background: #fafbfc;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.admin-overview__grid span {
+  display: block;
+  color: #667085;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-overview__grid strong {
+  display: block;
+  margin-top: 0.35rem;
+  color: #111827;
+  font-size: 2rem;
+}
+
+.admin-overview__grid small {
+  display: block;
+  color: #8a94a6;
+  margin-top: 0.25rem;
+}
+
+.admin-overview__activity,
+.admin-placeholder {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.admin-overview__activity h2,
+.admin-placeholder h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 1.05rem;
+}
+
+.admin-overview__activity p,
+.admin-placeholder p {
+  color: #667085;
+  margin: 0.35rem 0 0;
+}
+
+.admin-overview__event {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid #edf0f4;
+  padding: 0.75rem 0;
+}
+
+.admin-overview__event:first-of-type {
+  margin-top: 0.8rem;
+}
+
+.admin-overview__event strong,
+.admin-overview__event span {
+  display: block;
+}
+
+.admin-overview__event strong {
+  color: #111827;
+  font-size: 0.88rem;
+}
+
+.admin-overview__event span,
+.admin-overview__event time {
+  color: #667085;
+  font-size: 0.8rem;
+}
+
+.admin-placeholder {
+  margin: 1.5rem;
+}
+
+.admin-placeholder__head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.admin-placeholder__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #1f2937;
+  color: #fff;
+  font-weight: 900;
+}
+
+.admin-placeholder__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.admin-placeholder__item {
+  border: 1px solid #edf0f4;
+  background: #fafbfc;
+  border-radius: 8px;
+  padding: 0.9rem;
+  color: #374151;
+  font-weight: 700;
+  font-size: 0.86rem;
+}
+
 @media (max-width: 920px) {
   .admin-dashboard {
     flex-direction: column;
@@ -508,6 +635,11 @@
 
   .admin-reportes__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-overview__grid,
+  .admin-placeholder__grid {
+    grid-template-columns: 1fr;
   }
 }
 
