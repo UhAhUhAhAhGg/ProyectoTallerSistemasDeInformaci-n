@@ -5,6 +5,7 @@ import { connectDB } from './config/database';
 import animalRoutes      from './animales/Animal.routes';
 import publicacionRoutes from './publicaciones/Publicacion.routes';
 import catalogoRoutes    from './catalogo/Catalogo.routes';
+import recomendacionRoutes from './recomendaciones/Recomendacion.routes';
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.get('/health', (_req, res) => {
 app.use('/animales',     animalRoutes);
 app.use('/publicaciones', publicacionRoutes);
 app.use('/catalogo',     catalogoRoutes);
+app.use('/recomendaciones', recomendacionRoutes);
 
 // 404
 app.use((_req, res) => {

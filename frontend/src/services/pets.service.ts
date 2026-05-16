@@ -39,6 +39,13 @@ export async function getEspecies() {
   return json.data ?? [];
 }
 
+export async function getRecomendaciones() {
+  const res = await fetch(`${BASE}/recomendaciones`, { headers: authHeadersNoContent() });
+  if (!res.ok) throw new Error(await parseError(res, 'Error al obtener recomendaciones'));
+  const json = await res.json();
+  return json.data ?? [];
+}
+
 /** Razas filtradas por especie. Pasa id_espe para obtener solo las de esa especie. */
 export async function getRazas(id_espe?: number) {
   const url = id_espe
