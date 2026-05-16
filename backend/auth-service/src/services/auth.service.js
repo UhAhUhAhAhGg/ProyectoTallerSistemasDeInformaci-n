@@ -96,6 +96,115 @@ async function registrarUsuario(datos) {
 }
 
 /**
+ * Registrar cuenta de refugio y perfil en una sola transaccion.
+ * Si cualquier paso falla, no se crea ni el usuario ni el refugio.
+ */
+async function registrarRefugioCompleto(datos) {
+  const {
+    correo,
+    contrasena,
+    nombre,
+    apellido,
+    nom_refug,
+    dir_refug,
+    telf_refug,
+    licencia_refug,
+    descripcion
+  } = datos;
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const existe = await client.query(
+      'SELECT id_usuario FROM USUARIOS WHERE corr_usuario = $1',
+      [correo]
+    );
+    if (existe.rowCount > 0) {
+      throw new Error('El correo ya esta registrado');
+    }
+
+    const hash = await bcrypt.hash(contrasena, 12);
+
+    const usuarioResult = await client.query(
+      `INSERT INTO USUARIOS
+        (id_rol, corr_usuario, contra_usuario, nom_usuario, apell_usuario, est_usuario)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id_usuario, id_rol, corr_usuario, nom_usuario, apell_usuario, est_usuario`,
+      [3, correo, hash, nombre || nom_refug, apellido || '-', 'pendiente']
+    );
+
+    const usuario = usuarioResult.rows[0];
+
+    const refugioResult = await client.query(
+      `INSERT INTO REFUGIOS
+        (id_usuario, nom_refug, dir_refug, telf_refug, licencia_refug, descripcion, est_aprobacion)
+       VALUES ($1, $2, $3, $4, $5, $6, 'pendiente')
+       RETURNING *`,
+      [
+        usuario.id_usuario,
+        nom_refug,
+        dir_refug,
+        telf_refug,
+        licencia_refug,
+        descripcion || null
+      ]
+    );
+
+    const refugio = refugioResult.rows[0];
+
+    const admins = await client.query(
+      'SELECT id_usuario FROM USUARIOS WHERE id_rol = 1'
+    );
+
+    for (const admin of admins.rows) {
+      await client.query(
+        `INSERT INTO NOTIFICACIONES
+          (id_usuario, tipo_notif, titulo_notif, cuerpo_notif, ref_id)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [
+          admin.id_usuario,
+          'solicitud_refugio',
+          'Nuevo refugio pendiente de aprobacion',
+          `El refugio "${nom_refug}" completo su perfil y espera validacion.`,
+          refugio.id_refug
+        ]
+      );
+    }
+
+    await client.query('COMMIT');
+
+    const token = jwt.sign(
+      {
+        id: usuario.id_usuario,
+        rol: 'refugio',
+        id_rol: 3,
+        est: 'pendiente',
+        id_refug: refugio.id_refug
+      },
+      process.env.JWT_SECRET || 'default-secret-key',
+      { expiresIn: '7d' }
+    );
+
+    return {
+      token,
+      rol: 'refugio',
+      id_usuario: usuario.id_usuario,
+      correo: usuario.corr_usuario,
+      est_usuario: usuario.est_usuario,
+      id_refug: refugio.id_refug,
+      est_aprobacion: refugio.est_aprobacion
+    };
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+/**
  * Login de usuario
  */
 async function loginUsuario(correo, contrasena) {
@@ -187,6 +296,7 @@ async function obtenerUsuarioActual(id_usuario) {
 module.exports = {
   validarContrasena,
   registrarUsuario,
+  registrarRefugioCompleto,
   loginUsuario,
   obtenerUsuarioActual
 };

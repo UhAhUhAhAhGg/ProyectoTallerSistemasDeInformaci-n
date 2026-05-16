@@ -3,6 +3,7 @@ const express = require("express");
 const {
   login,
   registro,
+  registroRefugio,
   logout,
   getCurrentUser
 } = require("../controllers/auth.controller");
@@ -18,6 +19,9 @@ router.post("/login", login);
 
 // POST /api/auth/register
 router.post("/register", registro);
+
+// POST /api/auth/register/refugio
+router.post("/register/refugio", registroRefugio);
 
 // POST /api/auth/logout
 router.post("/logout", logout);

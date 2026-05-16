@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api, authService } from '../../services/api';
+import { authService } from '../../services/api';
 
 interface Props {
   onSuccess?: () => void;
@@ -92,9 +92,19 @@ export default function RegisterRefugioMF({ onSuccess }: Props) {
 
     if (!form.nombreRefugio.trim()) nextErrors.nombreRefugio = 'Requerido';
     if (!form.correo.trim()) nextErrors.correo = 'Requerido';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.correo.trim())) {
+      nextErrors.correo = 'Correo invalido';
+    }
     if (!form.telefono.trim()) nextErrors.telefono = 'Requerido';
+    else {
+      const digitosTelefono = form.telefono.replace(/\D/g, '');
+      if (!/^[+\d\s()-]+$/.test(form.telefono.trim()) || digitosTelefono.length < 7 || digitosTelefono.length > 15) {
+        nextErrors.telefono = 'Telefono invalido';
+      }
+    }
     if (!form.direccion.trim()) nextErrors.direccion = 'Requerido';
     if (!form.licencia.trim()) nextErrors.licencia = 'Requerido';
+    else if (form.licencia.trim().length < 3) nextErrors.licencia = 'Licencia invalida';
     if (!pwReqs.length || !pwReqs.upper || !pwReqs.num || !pwReqs.special) {
       nextErrors.contrasena = 'No cumple los requisitos';
     }
@@ -114,13 +124,17 @@ export default function RegisterRefugioMF({ onSuccess }: Props) {
     setErrors({});
 
     try {
-      const res = await authService.register({
+      const res = await authService.registerRefugio({
         correo: form.correo,
         contrasena: form.contrasena,
         confirmar_contrasena: form.confirmacion,
-        rol: 'refugio',
         nombre: form.nombre || form.nombreRefugio,
         apellido: form.apellido || '-',
+        nom_refug: form.nombreRefugio,
+        dir_refug: form.direccion,
+        telf_refug: form.telefono,
+        licencia_refug: form.licencia,
+        descripcion: form.descripcion,
       });
 
       if (!res.success) return;
@@ -129,21 +143,10 @@ export default function RegisterRefugioMF({ onSuccess }: Props) {
       localStorage.setItem('rol', res.data.rol);
       localStorage.setItem('userId', res.data.id_usuario);
       localStorage.setItem('nombre', form.nombre || form.nombreRefugio);
-      localStorage.setItem('est_usuario', res.data.est_usuario || 'incompleto');
-
-      const perfilRes = await api.post('/refugios/datos', {
-        nom_refug: form.nombreRefugio,
-        dir_refug: form.direccion,
-        telf_refug: form.telefono,
-        licencia_refug: form.licencia,
-        descripcion: form.descripcion,
-      });
-
-      if (perfilRes.data?.data?.token) {
-        localStorage.setItem('token', perfilRes.data.data.token);
+      localStorage.setItem('est_usuario', res.data.est_usuario || 'pendiente');
+      if (res.data.id_refug) {
+        localStorage.setItem('refugioId', String(res.data.id_refug));
       }
-
-      localStorage.setItem('est_usuario', 'pendiente');
       onSuccess?.();
       navigate('/dashboard/refugio');
     } catch (err: unknown) {

@@ -32,6 +32,22 @@ export const authService = {
     return response.data;
   },
 
+  registerRefugio: async (data: {
+    correo: string;
+    contrasena: string;
+    confirmar_contrasena: string;
+    nombre?: string;
+    apellido?: string;
+    nom_refug: string;
+    dir_refug: string;
+    telf_refug: string;
+    licencia_refug: string;
+    descripcion?: string;
+  }) => {
+    const response = await api.post('/auth/register/refugio', data);
+    return response.data;
+  },
+
   login: async (correo: string, contrasena: string) => {
     const response = await api.post('/auth/login', { correo, contrasena });
     return response.data;
