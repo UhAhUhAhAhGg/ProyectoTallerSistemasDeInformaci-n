@@ -11,4 +11,10 @@ export const ENV = {
     password: process.env.DB_PASSWORD || 'password',
   },
   AUTH_SERVICE_URL: process.env.AUTH_SERVICE_URL || 'http://localhost:3001',
+  AI: {
+    recommendationsEnabled: process.env.AI_RECOMMENDATIONS_ENABLED === 'true',
+    provider: process.env.AI_PROVIDER || 'openai',
+    apiKey: process.env.AI_API_KEY || '',
+    model: process.env.AI_MODEL || 'gpt-4o-mini',
+  },
 };
