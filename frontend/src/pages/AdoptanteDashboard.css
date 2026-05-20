@@ -61,6 +61,15 @@
   box-shadow: 0 8px 24px rgba(0,0,0,0.1);
   border-color: rgba(212,168,83,0.3);
 }
+.ad-option--matching {
+  border-color: rgba(141, 107, 159, 0.24);
+}
+.ad-option--matching .ad-option-icon {
+  background: #f4eef7;
+  color: #6f3d8f;
+  font-size: 18px;
+  font-weight: 900;
+}
 .ad-option-icon {
   font-size: 32px;
   width: 56px;

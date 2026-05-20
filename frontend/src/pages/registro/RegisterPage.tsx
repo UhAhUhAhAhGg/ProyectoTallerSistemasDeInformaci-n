@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import RegisterAdoptanteMF from "./RegisterAdoptanteMF";
 import RegisterRefugioMF from "./RegisterRefugioMF";
 import "./RegisterPage.css";
@@ -6,39 +7,18 @@ import "./RegisterPage.css";
 type Rol = "adoptante" | "refugio" | null;
 
 const RegisterPage: React.FC = () => {
-  const [rolSeleccionado, setRolSeleccionado] = useState<Rol>(null);
+  const location = useLocation();
+  const initialRole = (location.state as { role?: Rol } | null)?.role ?? null;
+  const [rolSeleccionado, setRolSeleccionado] = useState<Rol>(initialRole);
 
-  // Cada MF maneja su propia navegación post-registro (navigate interno),
-  // por eso onSuccess no necesita redirigir — evita conflicto de navegaciones.
   const handleSuccess = () => {};
 
-  const handleSwitch = (nuevoRol: Rol) => {
-    setRolSeleccionado(nuevoRol);
-  };
-
-  const seleccionarAdoptante = () => {
-    setRolSeleccionado("adoptante");
-  };
-
-  const seleccionarRefugio = () => {
-    setRolSeleccionado("refugio");
-  };
-
   if (rolSeleccionado === "adoptante") {
-    return (
-      <RegisterAdoptanteMF
-        onSuccess={handleSuccess}
-      />
-    );
+    return <RegisterAdoptanteMF onSuccess={handleSuccess} />;
   }
 
   if (rolSeleccionado === "refugio") {
-    return (
-      <RegisterRefugioMF
-        onSuccess={handleSuccess}
-        onSwitchToAdoptante={() => handleSwitch("adoptante")}
-      />
-    );
+    return <RegisterRefugioMF onSuccess={handleSuccess} />;
   }
 
   return (
@@ -46,32 +26,32 @@ const RegisterPage: React.FC = () => {
       <div className="register-shell__card">
         <div className="register-shell__logo">
           <span className="register-shell__paw">🐾</span>
-          <h1 className="register-shell__title">Crear Cuenta</h1>
+          <h1 className="register-shell__title">Crear cuenta</h1>
           <p className="register-shell__subtitle">
-            ¿Cómo deseas registrarte en la plataforma?
+            Elige como quieres registrarte en PetMatch.
           </p>
         </div>
 
         <div className="register-shell__options">
           <button
             className="register-shell__option register-shell__option--adoptante"
-            onClick={seleccionarAdoptante}
+            onClick={() => setRolSeleccionado("adoptante")}
           >
             <span className="register-shell__option-icon">👤</span>
-            <span className="register-shell__option-label">Soy Adoptante</span>
+            <span className="register-shell__option-label">Soy adoptante</span>
             <span className="register-shell__option-desc">
-              Quiero encontrar una mascota para adoptar
+              Quiero encontrar una mascota para adoptar.
             </span>
           </button>
 
           <button
             className="register-shell__option register-shell__option--refugio"
-            onClick={seleccionarRefugio}
+            onClick={() => setRolSeleccionado("refugio")}
           >
             <span className="register-shell__option-icon">🏠</span>
-            <span className="register-shell__option-label">Soy Refugio</span>
+            <span className="register-shell__option-label">Soy refugio</span>
             <span className="register-shell__option-desc">
-              Represento una organización o refugio de animales
+              Represento una organizacion o refugio de animales.
             </span>
           </button>
         </div>
@@ -79,7 +59,7 @@ const RegisterPage: React.FC = () => {
         <p className="register-shell__login">
           ¿Ya tienes cuenta?{" "}
           <a href="/login" className="register-shell__login-link">
-            Inicia sesión
+            Inicia sesion
           </a>
         </p>
       </div>

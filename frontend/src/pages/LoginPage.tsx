@@ -34,6 +34,12 @@ export default function LoginPage() {
         // ✅ Guardar nombre para mostrarlo en la navbar/home
         localStorage.setItem('nombre', response.data.nombre || response.data.correo || 'Usuario');
 
+        if (response.data.id_refug) {
+          localStorage.setItem('refugioId', String(response.data.id_refug));
+        } else {
+          localStorage.removeItem('refugioId');
+        }
+
         const rol = response.data.rol;
         const est = response.data.est_usuario;
 

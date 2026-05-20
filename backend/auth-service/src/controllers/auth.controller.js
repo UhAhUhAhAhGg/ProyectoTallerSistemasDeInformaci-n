@@ -1,5 +1,11 @@
 // filepath: src/controllers/auth.controller.js
-const { validarContrasena, registrarUsuario, loginUsuario, obtenerUsuarioActual } = require('../services/auth.service');
+const {
+  validarContrasena,
+  registrarUsuario,
+  registrarRefugioCompleto,
+  loginUsuario,
+  obtenerUsuarioActual
+} = require('../services/auth.service');
 
 /**
  * Registro de usuario general
@@ -22,6 +28,13 @@ async function registro(req, res) {
     return res.status(400).json({
       success: false,
       mensaje: `Rol inválido recibido: "${rol}". Debe ser 'adoptante' o 'refugio'`
+    });
+  }
+
+  if (rol === 'refugio') {
+    return res.status(400).json({
+      success: false,
+      mensaje: 'El registro de refugio debe incluir los datos completos del refugio'
     });
   }
 
@@ -51,6 +64,112 @@ async function registro(req, res) {
   } catch (error) {
     // Exponer el mensaje real del error (incluye errores de PostgreSQL)
     console.error('[REGISTER] Error:', error.message);
+    res.status(400).json({
+      success: false,
+      mensaje: error.message
+    });
+  }
+}
+
+/**
+ * Registro atomico de refugio
+ * POST /api/auth/register/refugio
+ */
+async function registroRefugio(req, res) {
+  const {
+    correo,
+    contrasena,
+    confirmar_contrasena,
+    nombre,
+    apellido,
+    nom_refug,
+    dir_refug,
+    telf_refug,
+    licencia_refug,
+    descripcion
+  } = req.body;
+
+  const correoLimpio = typeof correo === 'string' ? correo.trim() : '';
+  const nombreLimpio = typeof nombre === 'string' ? nombre.trim() : '';
+  const apellidoLimpio = typeof apellido === 'string' ? apellido.trim() : '';
+  const nomRefugioLimpio = typeof nom_refug === 'string' ? nom_refug.trim() : '';
+  const dirRefugioLimpia = typeof dir_refug === 'string' ? dir_refug.trim() : '';
+  const telefonoLimpio = typeof telf_refug === 'string' ? telf_refug.trim() : '';
+  const licenciaLimpia = typeof licencia_refug === 'string' ? licencia_refug.trim() : '';
+  const descripcionLimpia = typeof descripcion === 'string' ? descripcion.trim() : '';
+
+  if (!correoLimpio || !contrasena || !confirmar_contrasena || !nomRefugioLimpio || !dirRefugioLimpia || !telefonoLimpio || !licenciaLimpia) {
+    return res.status(400).json({
+      success: false,
+      mensaje: 'Todos los campos requeridos deben ser completados',
+      campos_recibidos: {
+        correo: !!correoLimpio,
+        contrasena: !!contrasena,
+        confirmar_contrasena: !!confirmar_contrasena,
+        nom_refug: !!nomRefugioLimpio,
+        dir_refug: !!dirRefugioLimpia,
+        telf_refug: !!telefonoLimpio,
+        licencia_refug: !!licenciaLimpia
+      }
+    });
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correoLimpio)) {
+    return res.status(400).json({
+      success: false,
+      mensaje: 'El correo electronico no tiene un formato valido'
+    });
+  }
+
+  const digitosTelefono = telefonoLimpio.replace(/\D/g, '');
+  if (!/^[+\d\s()-]+$/.test(telefonoLimpio) || digitosTelefono.length < 7 || digitosTelefono.length > 15) {
+    return res.status(400).json({
+      success: false,
+      mensaje: 'El telefono no tiene un formato valido'
+    });
+  }
+
+  if (licenciaLimpia.length < 3) {
+    return res.status(400).json({
+      success: false,
+      mensaje: 'La licencia o registro oficial no tiene un formato valido'
+    });
+  }
+
+  if (!validarContrasena(contrasena)) {
+    return res.status(400).json({
+      success: false,
+      mensaje: 'La contrasena debe tener minimo 8 caracteres, una mayuscula, un numero y un caracter especial (!@#$%^&*)'
+    });
+  }
+
+  if (contrasena !== confirmar_contrasena) {
+    return res.status(400).json({
+      success: false,
+      mensaje: 'Las contrasenas no coinciden'
+    });
+  }
+
+  try {
+    const resultado = await registrarRefugioCompleto({
+      correo: correoLimpio,
+      contrasena,
+      nombre: nombreLimpio,
+      apellido: apellidoLimpio,
+      nom_refug: nomRefugioLimpio,
+      dir_refug: dirRefugioLimpia,
+      telf_refug: telefonoLimpio,
+      licencia_refug: licenciaLimpia,
+      descripcion: descripcionLimpia
+    });
+
+    res.status(201).json({
+      success: true,
+      mensaje: 'Refugio registrado. Tu perfil esta pendiente de validacion.',
+      data: resultado
+    });
+  } catch (error) {
+    console.error('[REGISTER_REFUGIO] Error:', error.message);
     res.status(400).json({
       success: false,
       mensaje: error.message
@@ -126,4 +245,4 @@ function logout(req, res) {
   });
 }
 
-module.exports = { registro, login, logout, getCurrentUser };
+module.exports = { registro, registroRefugio, login, logout, getCurrentUser };

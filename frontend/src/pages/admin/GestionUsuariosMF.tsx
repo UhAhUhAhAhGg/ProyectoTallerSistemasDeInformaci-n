@@ -6,8 +6,19 @@ interface Usuario {
   apellido?: string;
   correo: string;
   rol: "adoptante" | "refugio" | "administrador";
+  estado?: string;
   activo: boolean;
   fechaRegistro: string;
+  tipoVivienda?: string | null;
+  disponibilidadTiempo?: string | null;
+  preferenciaEspecie?: string | null;
+  preferenciaTamanio?: string | null;
+  preferenciaEdad?: string | null;
+  perfilAdoptanteCompleto?: boolean;
+  idRefugio?: number | null;
+  nombreRefugio?: string | null;
+  estadoRefugio?: "pendiente" | "aprobado" | "rechazado" | null;
+  licenciaRefugio?: string | null;
 }
 
 interface Props {
@@ -27,6 +38,28 @@ const ROL_COLOR: Record<string, string> = {
   adoptante: "#5b8fa8",
   refugio: "#c97d4e",
   administrador: "#7c3aed",
+};
+
+const estadoPerfil = (usuario: Usuario) => {
+  if (usuario.rol === "adoptante") {
+    return usuario.perfilAdoptanteCompleto ? "Perfil completo" : "Perfil pendiente";
+  }
+  if (usuario.rol === "refugio") {
+    if (usuario.estadoRefugio === "aprobado") return "Refugio aprobado";
+    if (usuario.estadoRefugio === "rechazado") return "Refugio rechazado";
+    return "Refugio pendiente";
+  }
+  return "Administrador";
+};
+
+const estadoPerfilColor = (usuario: Usuario) => {
+  if (usuario.rol === "adoptante") return usuario.perfilAdoptanteCompleto ? "#10b981" : "#f59e0b";
+  if (usuario.rol === "refugio") {
+    if (usuario.estadoRefugio === "aprobado") return "#10b981";
+    if (usuario.estadoRefugio === "rechazado") return "#ef4444";
+    return "#f59e0b";
+  }
+  return "#7c3aed";
 };
 
 const GestionUsuariosMF: React.FC<Props> = ({ onClose }) => {
@@ -103,16 +136,27 @@ const GestionUsuariosMF: React.FC<Props> = ({ onClose }) => {
     return coincideBusqueda && coincideRol && coincideEstado;
   });
 
+  const resumen = {
+    adoptantes: usuarios.filter((u) => u.rol === "adoptante").length,
+    refugios: usuarios.filter((u) => u.rol === "refugio").length,
+    pendientes: usuarios.filter(
+      (u) =>
+        (u.rol === "adoptante" && !u.perfilAdoptanteCompleto) ||
+        (u.rol === "refugio" && u.estadoRefugio === "pendiente")
+    ).length,
+    bloqueados: usuarios.filter((u) => !u.activo).length,
+  };
+
   return (
     <div style={{ padding: "1.5rem" }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
         <div>
           <h2 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, color: "#1f2937" }}>
-            Gestión de Usuarios
+            Gestion de Perfiles
           </h2>
           <p style={{ margin: "0.25rem 0 0", fontSize: "0.85rem", color: "#6b7280" }}>
-            Bloquea o reactiva cuentas que infrinjan las normas de la plataforma.
+            Revisa perfiles de adoptantes y refugios, y administra el estado de sus cuentas.
           </p>
         </div>
         {onClose && (
@@ -135,6 +179,28 @@ const GestionUsuariosMF: React.FC<Props> = ({ onClose }) => {
           {mensaje.texto}
         </div>
       )}
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "0.75rem", marginBottom: "1.25rem" }}>
+        {[
+          { label: "Adoptantes", value: resumen.adoptantes, color: "#5b8fa8" },
+          { label: "Refugios", value: resumen.refugios, color: "#c97d4e" },
+          { label: "Perfiles pendientes", value: resumen.pendientes, color: "#f59e0b" },
+          { label: "Cuentas bloqueadas", value: resumen.bloqueados, color: "#ef4444" },
+        ].map((item) => (
+          <div
+            key={item.label}
+            style={{
+              border: "1px solid #e5e7eb",
+              borderRadius: 10,
+              padding: "0.85rem 1rem",
+              background: "#fafbfc",
+            }}
+          >
+            <span style={{ display: "block", fontSize: "0.75rem", color: "#6b7280", fontWeight: 700 }}>{item.label}</span>
+            <strong style={{ display: "block", marginTop: "0.25rem", color: item.color, fontSize: "1.6rem" }}>{item.value}</strong>
+          </div>
+        ))}
+      </div>
 
       {/* Filtros */}
       <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.25rem", flexWrap: "wrap", alignItems: "center" }}>
@@ -216,7 +282,9 @@ const GestionUsuariosMF: React.FC<Props> = ({ onClose }) => {
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                     <span style={{ fontWeight: 600, fontSize: "0.92rem", color: "#111827" }}>
-                      {usuario.nombre} {usuario.apellido || ""}
+                      {usuario.rol === "refugio" && usuario.nombreRefugio
+                        ? usuario.nombreRefugio
+                        : `${usuario.nombre} ${usuario.apellido || ""}`}
                     </span>
                     <span style={{
                       fontSize: "0.7rem", padding: "0.1rem 0.55rem", borderRadius: "10px",
@@ -233,9 +301,27 @@ const GestionUsuariosMF: React.FC<Props> = ({ onClose }) => {
                       </span>
                     )}
                   </div>
+                  <div style={{ marginTop: "0.35rem" }}>
+                    <span style={{
+                      fontSize: "0.7rem", padding: "0.1rem 0.55rem", borderRadius: "10px",
+                      background: estadoPerfilColor(usuario) + "22", color: estadoPerfilColor(usuario), fontWeight: 600,
+                    }}>
+                      {estadoPerfil(usuario)}
+                    </span>
+                  </div>
                   <div style={{ fontSize: "0.8rem", color: "#6b7280", marginTop: "0.15rem" }}>
                     {usuario.correo}
                   </div>
+                  {usuario.rol === "adoptante" && usuario.perfilAdoptanteCompleto && (
+                    <div style={{ fontSize: "0.76rem", color: "#6b7280", marginTop: "0.25rem" }}>
+                      Vivienda: {usuario.tipoVivienda || "Sin dato"} - Tiempo: {usuario.disponibilidadTiempo || "Sin dato"} - Preferencia: {usuario.preferenciaEspecie || "Sin especie"}
+                    </div>
+                  )}
+                  {usuario.rol === "refugio" && (
+                    <div style={{ fontSize: "0.76rem", color: "#6b7280", marginTop: "0.25rem" }}>
+                      Responsable: {usuario.nombre} {usuario.apellido || ""} - Licencia: {usuario.licenciaRefugio || "Sin dato"}
+                    </div>
+                  )}
                   <div style={{ fontSize: "0.72rem", color: "#d1d5db", marginTop: "0.15rem" }}>
                     Registrado: {usuario.fechaRegistro ? new Date(usuario.fechaRegistro).toLocaleDateString("es-BO") : "—"}
                   </div>
