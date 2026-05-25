@@ -73,6 +73,16 @@
   border: 1px solid #e7dfd9;
 }
 
+.search-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  background-color: #3f3a40;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+}
+
 .ai-btn {
   border: none;
   border-radius: 12px;
