@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import '../middlewares/auth.middleware';
 import * as service from './solicitud.service';
 import * as estadoRepo from '../estados/estado.repository';
 import * as histRepo from '../historial/historial.repository';
@@ -16,7 +17,8 @@ export const enviarSolicitud = async (req: Request, res: Response): Promise<void
       return;
     }
 
-    const solicitud = await service.enviarSolicitud(req.user!.id, { id_publi, decrip_soli });
+    const token = req.headers.authorization?.replace(/^Bearer\s+/i, '') ?? '';
+    const solicitud = await service.enviarSolicitud(req.user!.id, { id_publi, decrip_soli }, token);
     created(res, solicitud, 'Solicitud enviada exitosamente');
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Error al enviar la solicitud';
