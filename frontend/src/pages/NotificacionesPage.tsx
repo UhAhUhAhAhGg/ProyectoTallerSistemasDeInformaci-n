@@ -27,7 +27,7 @@ function getRolDashboard() {
     const token = localStorage.getItem('token');
     if (!token) return '/login';
     const payload = JSON.parse(atob(token.split('.')[1]));
-    if (payload.rol === 'refugio')  return '/dashboard/refugio';
+    if (payload.rol === 'refugio') return '/dashboard/refugio';
     if (payload.rol === 'administrador') return '/admin/dashboard';
     return '/dashboard/adoptante';
   } catch {
@@ -37,9 +37,8 @@ function getRolDashboard() {
 
 export default function NotificacionesPage() {
   const navigate = useNavigate();
-  const [notis, setNotis]     = useState<Notificacion[]>([]);
+  const [notis, setNotis] = useState<Notificacion[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState('');
 
   useEffect(() => {
     (async () => {
@@ -57,9 +56,9 @@ export default function NotificacionesPage() {
     })();
   }, []);
 
-  const getId    = (n: Notificacion) => n.id_noti ?? n.id_notificacion ?? 0;
+  const getId = (n: Notificacion) => n.id_noti ?? n.id_notificacion ?? 0;
   const getTitulo = (n: Notificacion) => n.tit_noti ?? n.titulo ?? 'Notificación';
-  const getDesc  = (n: Notificacion) => n.desc_noti ?? n.descripcion ?? '';
+  const getDesc = (n: Notificacion) => n.desc_noti ?? n.descripcion ?? '';
   const getFecha = (n: Notificacion) => {
     const f = n.fech_noti ?? n.fecha;
     return f ? new Date(f).toLocaleDateString('es-BO', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
@@ -83,8 +82,6 @@ export default function NotificacionesPage() {
 
       <div style={{ padding: '32px', maxWidth: 700, margin: '0 auto' }}>
         {loading && <p style={{ textAlign: 'center', color: '#64748b' }}>Cargando notificaciones...</p>}
-        {error   && <div style={{ background: '#fee2e2', color: '#dc2626', padding: 16, borderRadius: 8 }}>{error}</div>}
-
         {!loading && notis.length === 0 && (
           <div style={{ textAlign: 'center', padding: '80px 20px', color: '#94a3b8' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>🔕</div>
