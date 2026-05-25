@@ -94,6 +94,18 @@ const FilterSideBar: React.FC<Props> = ({
         </div>
       </div>
 
+      {/* ZONA GEOGRÁFICA */}
+      <div className="filter-group">
+        <h4>Zona geográfica</h4>
+        <input
+          className="filter-input"
+          type="search"
+          value={filters.zonaGeografica}
+          onChange={(e) => onChange('zonaGeografica', e.target.value)}
+          placeholder="Ej: Centro, Norte, Sopocachi"
+        />
+      </div>
+
       {/* BOTONES */}
       <div className="sidebar-actions">
         <button className="apply-btn" onClick={onApply}>
