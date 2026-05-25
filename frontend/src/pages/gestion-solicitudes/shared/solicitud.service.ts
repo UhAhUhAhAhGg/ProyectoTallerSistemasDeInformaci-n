@@ -7,14 +7,20 @@ const headers = () => ({
   Authorization: `Bearer ${localStorage.getItem('token') ?? ''}`,
 });
 
+async function parseError(res: Response, fallback: string) {
+  const body = await res.json().catch(() => ({}));
+  return body.message || body.mensaje || fallback;
+}
+
 export const solicitudService = {
   // HU-16: adoptante envía solicitud
   async enviar(data: NuevaSolicitud): Promise<Solicitud> {
     const r = await fetch(`${BASE}/solicitudes`, {
       method: 'POST', headers: headers(), body: JSON.stringify(data),
     });
-    if (!r.ok) throw new Error('Error al enviar solicitud');
-    return r.json();
+    if (!r.ok) throw new Error(await parseError(r, 'Error al enviar solicitud'));
+    const json = await r.json();
+    return json.data ?? json;
   },
 
   // HU-17: historial del adoptante
