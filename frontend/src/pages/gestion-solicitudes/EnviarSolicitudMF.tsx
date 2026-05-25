@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { solicitudService } from './shared/solicitud.service';
-import type { NuevaSolicitud } from './shared/solicitud.types';
 
 interface Props {
   id_publ: number;
@@ -27,8 +26,8 @@ export default function EnviarSolicitudMF({
     });
     setEnviada(true);
     onEnviada?.();
-  } catch {
-    setError('No se pudo enviar la solicitud. Intenta de nuevo.');
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'No se pudo enviar la solicitud. Intenta de nuevo.');
   } finally {
     setLoading(false);
   }
