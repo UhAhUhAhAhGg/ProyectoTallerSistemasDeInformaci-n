@@ -169,13 +169,21 @@ CREATE TABLE SOLI_ADOP (
 );
 
 -- =========================
--- HISTORIAL (sin cambios)
+-- HISTORIAL
 -- =========================
 
 CREATE TABLE HISTO_ADOP (
-    id_ha   serial PRIMARY KEY,
-    id_soli int NOT NULL,
-    FOREIGN KEY (id_soli) REFERENCES SOLI_ADOP(id_soli)
+    id_ha             serial PRIMARY KEY,
+    id_soli           int NOT NULL,
+    id_est_anterior   int NOT NULL DEFAULT 1,
+    id_est_nuevo      int NOT NULL DEFAULT 1,
+    motivo            text NOT NULL DEFAULT '',
+    fech_cambio       timestamp NOT NULL DEFAULT now(),
+    id_usuario_accion int NOT NULL DEFAULT 0,
+
+    FOREIGN KEY (id_soli) REFERENCES SOLI_ADOP(id_soli),
+    FOREIGN KEY (id_est_anterior) REFERENCES ESTAD_SOLI(id_est),
+    FOREIGN KEY (id_est_nuevo) REFERENCES ESTAD_SOLI(id_est)
 );
 
 -- =========================
@@ -208,7 +216,7 @@ VALUES
 (2, 'en revisión'),
 (3, 'aprobada'),
 (4, 'rechazada'),
-(5, 'completada');
+(5, 'en espera');
 
 INSERT INTO ESPECIES (nom_espe)
 VALUES ('Perro'), ('Gato'), ('Ave'), ('Conejo'), ('Hamster'), ('Reptil'), ('Otro');
