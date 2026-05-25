@@ -11,6 +11,14 @@ const ACCIONES: { est: EstadoSolicitud; label: string; color: string }[] = [
   { est: 'en_revision', label: 'Marcar en revisión', color: '#d97706' },
 ];
 
+const ESTADOS: Record<number, EstadoSolicitud> = {
+  1: 'enviada',
+  2: 'en_revision',
+  3: 'aprobada',
+  4: 'rechazada',
+  5: 'en_espera',
+};
+
 export default function GestionSolicitudesMF({ id_refu }: Props) {
   const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,17 +56,17 @@ export default function GestionSolicitudesMF({ id_refu }: Props) {
           padding: 16, marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <div>
-              <strong>{s.nom_adop ?? `Adoptante #${s.id_adop}`}</strong>
+              <strong>{s.nom_adop ?? `Adoptante #${s.id_usuario}`}</strong>
               <span style={{ fontSize: 12, color: '#6b7280', marginLeft: 8 }}>
-                → {s.nom_animal ?? `Publicación #${s.id_publ}`}
+                → {s.nom_animal ?? `Publicación #${s.id_publi}`}
               </span>
             </div>
             <span style={{ fontSize: 12, color: '#374151', fontWeight: 600 }}>
-              {s.est_soli.replace('_', ' ')}
+              {(ESTADOS[s.id_est] ?? 'enviada').replace('_', ' ')}
             </span>
           </div>
           <p style={{ fontSize: 12, color: '#6b7280', margin: '6px 0' }}>
-            {new Date(s.fec_soli).toLocaleDateString('es-BO')}
+            {new Date(s.fech_soli).toLocaleDateString('es-BO')}
           </p>
           <textarea
             rows={2}
