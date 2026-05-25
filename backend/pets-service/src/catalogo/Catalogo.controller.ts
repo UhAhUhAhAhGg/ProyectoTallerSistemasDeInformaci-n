@@ -5,13 +5,13 @@ import { ok, serverError } from '../utils/response.helper';
 
 /**
  * GET /catalogo
- * Query params: especie, edad, refugioId
+ * Query params: busqueda, especie, edad, refugioId, zonaGeografica
  *   edad: 'cachorro' | 'joven' | 'adulto' | 'senior'
  *   (tamano todavía no soportado: la tabla MASCOTAS no tiene esa columna)
  */
 export const getCatalogo = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { especie, edad, refugioId } = req.query as Record<string, string>;
+    const { busqueda, especie, edad, refugioId, zonaGeografica } = req.query as Record<string, string>;
 
     const conditions: string[] = ['p.est_publi = true', 'p.est_adop = false'];
     const values: unknown[] = [];
@@ -20,6 +20,22 @@ export const getCatalogo = async (req: Request, res: Response): Promise<void> =>
     if (especie) {
       conditions.push(`LOWER(e.nom_espe) = LOWER($${i++})`);
       values.push(especie);
+    }
+
+    if (busqueda) {
+      conditions.push(`(
+        m.nom_mascot ILIKE $${i}
+        OR r.nom_raza ILIKE $${i}
+        OR e.nom_espe ILIKE $${i}
+        OR ref.nom_refug ILIKE $${i}
+      )`);
+      values.push(`%${busqueda}%`);
+      i++;
+    }
+
+    if (zonaGeografica) {
+      conditions.push(`ref.dir_refug ILIKE $${i++}`);
+      values.push(`%${zonaGeografica}%`);
     }
 
     if (refugioId) {
