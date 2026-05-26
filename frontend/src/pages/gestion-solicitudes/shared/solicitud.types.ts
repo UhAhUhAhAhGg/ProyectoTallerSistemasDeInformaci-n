@@ -6,14 +6,17 @@ export interface NuevaSolicitud {
 }
 
 export interface Solicitud {
-  id_soli:      number;
-  id_publi:     number;
-  id_usuario:   number;
-  id_est:       number;
-  decrip_soli:  string;
-  fech_soli:    string;
-  mot_soli?:    string;
-  nom_animal?:  string;
-  nom_adop?:    string;
-  foto_animal?: string;
+  id_soli:       number;
+  id_publi:      number;
+  id_usuario:    number;
+  id_refug:      number;
+  id_est:        number;
+  fech_soli:     string;
+  decrip_soli:   string;
+  nom_mascot:    string;
+  nom_refug:     string;
+  nom_usuario:   string;
+  apell_usuario: string;
+  corr_usuario:  string;
+  nom_est:       string;
 }

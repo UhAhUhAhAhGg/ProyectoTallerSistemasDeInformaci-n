@@ -1,6 +1,6 @@
 import { pool } from '../config/database';
-import { SolicitudAdopcion, CreateSolicitudDto } from './solicitud.types';
 import { EstadoId } from '../estados/estado.types';
+import { CreateSolicitudDto, SolicitudAdopcion } from './solicitud.types';
 
 // HU-17: crear solicitud con estado inicial ENVIADA
 export const createSolicitud = async (
@@ -22,9 +22,18 @@ export const findSolicitudesByAdoptante = async (
   id_usuario: number
 ): Promise<SolicitudAdopcion[]> => {
   const { rows } = await pool.query(
-    `SELECT s.*, e.nom_est
+    `SELECT s.id_soli, s.id_usuario, s.id_publi, s.id_est, s.fech_soli, s.decrip_soli,
+            e.nom_est,
+            p.id_refug,
+            m.nom_mascot,
+            r.nom_refug,
+            u.nom_usuario, u.apell_usuario, u.corr_usuario
      FROM SOLI_ADOP s
-     JOIN ESTAD_SOLI e ON e.id_est = s.id_est
+     JOIN ESTAD_SOLI e   ON e.id_est   = s.id_est
+     JOIN PUBLICACIONES p ON p.id_publi = s.id_publi
+     JOIN MASCOTAS m     ON m.id_mascot = p.id_mascot
+     JOIN REFUGIOS r     ON r.id_refug  = p.id_refug
+     JOIN USUARIOS u     ON u.id_usuario = s.id_usuario
      WHERE s.id_usuario = $1
      ORDER BY s.fech_soli DESC`,
     [id_usuario]

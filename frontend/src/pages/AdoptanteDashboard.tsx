@@ -1,14 +1,15 @@
 // filepath: frontend/src/pages/AdoptanteDashboard.tsx
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from './Navbar';
 import './AdoptanteDashboard.css';
+import Navbar from './Navbar';
 
 const ADMIN_EMAIL = 'admin@petmatch.com';
 
 export default function AdoptanteDashboard() {
   const navigate = useNavigate();
   const [nombre, setNombre]         = useState<string | null>(null);
+  const [userRol, setUserRol]       = useState<string | null>(null);
   const [estUsuario, setEstUsuario] = useState<string | null>(null);
   const [loading, setLoading]       = useState(true);
 
@@ -29,6 +30,7 @@ export default function AdoptanteDashboard() {
     }
 
     setNombre(localStorage.getItem('nombre'));
+    setUserRol(rol);
     setLoading(false);
   }, []);
 
@@ -82,6 +84,46 @@ export default function AdoptanteDashboard() {
             <h1>¡Hola, {nombre || 'Adoptante'}! 🐾</h1>
             <p>Encuentra tu compañero ideal y gestiona tus solicitudes desde aquí.</p>
           </div>
+        </div>
+
+        {/* 🧪 DEBUG BOX */}
+        <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#ffe0e6', borderRadius: '5px', border: '2px solid #d4437d' }}>
+          <p style={{ fontSize: '14px', margin: '5px 0', fontWeight: 'bold', color: '#d4437d' }}>
+            🔍 DEBUG - Valores en localStorage:
+          </p>
+          <p style={{ fontSize: '12px', margin: '3px 0', color: '#333' }}>
+            • rol = "{userRol}" {userRol === 'adoptante' ? '✅' : '❌'}
+          </p>
+          <p style={{ fontSize: '12px', margin: '3px 0', color: '#333' }}>
+            • est_usuario = "{estUsuario}" {estUsuario === 'activo' || estUsuario === 'incompleto' ? '✅' : '❌'}
+          </p>
+          <p style={{ fontSize: '12px', margin: '3px 0', color: '#333' }}>
+            • nombre = "{nombre}" {nombre ? '✅' : '❌'}
+          </p>
+          <p style={{ fontSize: '12px', margin: '10px 0 0 0', fontWeight: 'bold', color: '#d4437d' }}>
+            Condición para botón: (rol=adoptante) OR (rol=refugio AND estado=activo)
+          </p>
+          {(userRol === 'adoptante' || (userRol === 'refugio' && estUsuario === 'activo')) ? (
+            <button
+              onClick={() => navigate('/adaptacion-seguimiento')}
+              style={{
+                marginTop: '10px',
+                backgroundColor: '#d4437d',
+                color: 'white',
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              ✅ BOTÓN VISIBLE - Ir a {userRol === 'refugio' ? 'Observaciones' : 'Seguimiento'}
+            </button>
+          ) : (
+            <p style={{ fontSize: '12px', margin: '10px 0 0 0', color: '#999', fontWeight: 'bold' }}>
+              ❌ BOTÓN NO VISIBLE - Condición no se cumple
+            </p>
+          )}
         </div>
 
         <div className="ad-grid">

@@ -1,18 +1,26 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import './Navbar.css';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { refugioService } from '../services/api';
+import './Navbar.css';
 
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [userName] = useState<string | null>(() => localStorage.getItem('nombre'));
-  const [userRol] = useState<string | null>(() => localStorage.getItem('rol'));
+  const [userName, setUserName] = useState<string | null>(() => localStorage.getItem('nombre'));
+  const [userRol, setUserRol] = useState<string | null>(() => localStorage.getItem('rol'));
   const [estUsuario, setEstUsuario] = useState<string | null>(() => localStorage.getItem('est_usuario'));
 
-  useEffect(() => {
+  // Función auxiliar para actualizar estado desde localStorage
+  const updateAuthState = () => {
+    const nombre = localStorage.getItem('nombre');
     const rol = localStorage.getItem('rol');
+    const estado = localStorage.getItem('est_usuario');
+    
+    setUserName(nombre);
+    setUserRol(rol);
+    setEstUsuario(estado);
 
+    // Si es refugio, validar estado con el backend
     if (rol === 'refugio') {
       refugioService.obtenerDatos()
         .then((res) => {
@@ -20,12 +28,10 @@ export default function Navbar() {
           if (estadoRefugio === 'aprobado') {
             localStorage.setItem('est_usuario', 'activo');
             setEstUsuario('activo');
-          }
-          if (estadoRefugio === 'pendiente') {
+          } else if (estadoRefugio === 'pendiente') {
             localStorage.setItem('est_usuario', 'pendiente');
             setEstUsuario('pendiente');
-          }
-          if (estadoRefugio === 'rechazado') {
+          } else if (estadoRefugio === 'rechazado') {
             localStorage.setItem('est_usuario', 'rechazado');
             setEstUsuario('rechazado');
           }
@@ -34,7 +40,32 @@ export default function Navbar() {
           setEstUsuario(localStorage.getItem('est_usuario'));
         });
     }
+  };
+
+  // Actualizar al montar
+  useEffect(() => {
+    updateAuthState();
+  }, []);
+
+  // Actualizar cuando cambia la ruta
+  useEffect(() => {
+    updateAuthState();
   }, [location.pathname]);
+
+  // Polling: verificar localStorage cada 500ms para cambios inmediatos (login, logout)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const nombre = localStorage.getItem('nombre');
+      const rol = localStorage.getItem('rol');
+      const estado = localStorage.getItem('est_usuario');
+      
+      setUserName(nombre);
+      setUserRol(rol);
+      setEstUsuario(estado);
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -64,6 +95,12 @@ export default function Navbar() {
         <button className={`navbar-link ${isActive('/catalogo') ? 'active' : ''}`} onClick={() => navigate('/catalogo')}>
           Catalogo
         </button>
+
+        {(userRol === 'adoptante' || (userRol === 'refugio' && estUsuario === 'activo')) && (
+          <button className={`navbar-link ${isActive('/adaptacion-seguimiento') ? 'active' : ''}`} onClick={() => navigate('/adaptacion-seguimiento')}>
+            {userRol === 'refugio' ? 'Observaciones' : 'Seguimiento'}
+          </button>
+        )}
 
         {userRol === 'adoptante' && (
           <button className={`navbar-link ${isActive('/mis-solicitudes') ? 'active' : ''}`} onClick={() => navigate('/mis-solicitudes')}>

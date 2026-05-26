@@ -9,14 +9,14 @@ async function seedAdmin() {
     const contraPlana = 'Admin123456!';
     const hash = await bcrypt.hash(contraPlana, 12);
 
-    // id_rol = 1 → administrador
+    // id_rol = 5 → administrador
     // est_usuario = 'activo' porque el admin no necesita completar perfil
     await pool.query(
       `INSERT INTO USUARIOS
         (id_rol, corr_usuario, contra_usuario, nom_usuario, apell_usuario, est_usuario)
        VALUES ($1, $2, $3, $4, $5, $6)
        ON CONFLICT (corr_usuario) DO NOTHING`,
-      [1, correo, hash, 'Admin', 'Sistema', 'activo']
+      [5, correo, hash, 'Admin', 'Sistema', 'activo']
     );
 
     console.log('✅ Admin creado exitosamente');

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { solicitudService } from './shared/solicitud.service';
-import type { Solicitud, EstadoSolicitud } from './shared/solicitud.types';
+import type { EstadoSolicitud, Solicitud } from './shared/solicitud.types';
 
 interface Props { id_refu: number }
 
@@ -48,17 +48,17 @@ export default function GestionSolicitudesMF({ id_refu }: Props) {
           padding: 16, marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <div>
-              <strong>{s.nom_adop ?? `Adoptante #${s.id_adop}`}</strong>
+              <strong>{s.nom_usuario ?? `Adoptante #${s.id_usuario}`}</strong>
               <span style={{ fontSize: 12, color: '#6b7280', marginLeft: 8 }}>
-                → {s.nom_animal ?? `Publicación #${s.id_publ}`}
+                → {s.nom_mascot ?? `Publicación #${s.id_publi}`}
               </span>
             </div>
             <span style={{ fontSize: 12, color: '#374151', fontWeight: 600 }}>
-              {s.est_soli.replace('_', ' ')}
+              {s.nom_est?.replace('_', ' ') || 'Sin estado'}
             </span>
           </div>
           <p style={{ fontSize: 12, color: '#6b7280', margin: '6px 0' }}>
-            {new Date(s.fec_soli).toLocaleDateString('es-BO')}
+            {s.fech_soli ? new Date(s.fech_soli).toLocaleDateString('es-BO') : 'Sin fecha'}
           </p>
           <textarea
             rows={2}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { solicitudService } from './shared/solicitud.service';
-import type { Solicitud, EstadoSolicitud } from './shared/solicitud.types';
+import type { EstadoSolicitud, Solicitud } from './shared/solicitud.types';
 
 interface Props { id_adop: number }
 
@@ -34,29 +34,25 @@ export default function HistorialSolicitudesMF({ id_adop }: Props) {
     <div style={{ padding: 16 }}>
       <h3 style={{ marginBottom: 16 }}>Mis solicitudes de adopción</h3>
       {solicitudes.map((s: Solicitud) => {
-        const badge = BADGE[s.est_soli as EstadoSolicitud];
+        const badge = BADGE[s.nom_est as EstadoSolicitud] || { label: 'Unknown', color: '#000', bg: '#f0f0f0' };
         return (
           <div key={s.id_soli} style={{ border: '1px solid #e5e7eb', borderRadius: 10,
             padding: 16, marginBottom: 12, display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-            {s.foto_animal && (
-              <img src={s.foto_animal} alt={s.nom_animal}
-                style={{ width: 64, height: 64, borderRadius: 8, objectFit: 'cover' }} />
-            )}
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <strong style={{ fontSize: 15 }}>{s.nom_animal ?? `Publicación #${s.id_publ}`}</strong>
+                <strong style={{ fontSize: 15 }}>{s.nom_mascot ?? `Publicación #${s.id_publi}`}</strong>
                 <span style={{ fontSize: 12, padding: '3px 10px', borderRadius: 20,
                   fontWeight: 600, color: badge.color, background: badge.bg }}>
                   {badge.label}
                 </span>
               </div>
               <p style={{ fontSize: 12, color: '#6b7280', margin: '4px 0' }}>
-                Enviada el {new Date(s.fec_soli).toLocaleDateString('es-BO')}
+                Enviada el {s.fech_soli ? new Date(s.fech_soli).toLocaleDateString('es-BO') : 'Sin fecha'}
               </p>
-              {s.mot_soli && (
+              {s.decrip_soli && (
                 <p style={{ fontSize: 13, color: '#374151', marginTop: 6,
                   background: '#f9fafb', padding: '6px 10px', borderRadius: 6 }}>
-                  <em>Respuesta: {s.mot_soli}</em>
+                  <em>Descripción: {s.decrip_soli}</em>
                 </p>
               )}
             </div>

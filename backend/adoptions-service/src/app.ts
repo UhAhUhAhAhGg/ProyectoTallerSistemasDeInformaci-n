@@ -1,7 +1,8 @@
-import express from 'express';
 import cors from 'cors';
-import { ENV } from './config/env';
+import express from 'express';
 import { connectDB } from './config/database';
+import { ENV } from './config/env';
+import observacionRoutes from './observaciones/observacion.routes';
 import solicitudRoutes from './solicitudes/solicitud.routes';
 
 const app = express();
@@ -19,6 +20,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/solicitudes', solicitudRoutes);
+app.use('/observaciones', observacionRoutes);
 
 // 404
 app.use((_req, res) => {
