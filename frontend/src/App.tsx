@@ -13,6 +13,7 @@ import SolicitudesRefugioPage from './pages/SolicitudesRefugioPage';
 import MisSolicitudesPage     from './pages/MisSolicitudesPage';
 import NotificacionesPage     from './pages/NotificacionesPage';
 import MatchingPage           from './pages/MatchingPage';
+import MensajeriaPage         from './pages/MensajeriaPage';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -147,6 +148,14 @@ export default function App() {
         element={
           <PrivateRoute>
             <NotificacionesPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/mensajeria"
+        element={
+          <PrivateRoute>
+            <MensajeriaPage />
           </PrivateRoute>
         }
       />

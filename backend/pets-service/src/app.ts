@@ -6,6 +6,7 @@ import animalRoutes      from './animales/Animal.routes';
 import publicacionRoutes from './publicaciones/Publicacion.routes';
 import catalogoRoutes    from './catalogo/Catalogo.routes';
 import recomendacionRoutes from './recomendaciones/Recomendacion.routes';
+import metricasRoutes from './metricas/metricas.routes';
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use('/animales',     animalRoutes);
 app.use('/publicaciones', publicacionRoutes);
 app.use('/catalogo',     catalogoRoutes);
 app.use('/recomendaciones', recomendacionRoutes);
+app.use('/metricas',        metricasRoutes);
 
 // 404
 app.use((_req, res) => {
@@ -49,6 +51,7 @@ const start = async () => {
 ║    PUT    /publicaciones/:id    (refugio) ║
 ║    PATCH  /publicaciones/:id/estado       ║
 ║    PATCH  /publicaciones/:id/baja         ║
+║    GET    /metricas/refugio/:id  (refugio)║
 ╚═══════════════════════════════════════════╝
     `);
   });

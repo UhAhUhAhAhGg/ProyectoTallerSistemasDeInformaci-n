@@ -212,3 +212,34 @@ VALUES
 
 INSERT INTO ESPECIES (nom_espe)
 VALUES ('Perro'), ('Gato'), ('Ave'), ('Conejo'), ('Hamster'), ('Reptil'), ('Otro');
+
+-- =========================
+-- MENSAJERÍA (HU-24)
+-- =========================
+
+CREATE TABLE CONVERSACIONES (
+    id_conversacion serial PRIMARY KEY,
+    id_usuario_adoptante int NOT NULL,
+    id_refug             int NOT NULL,
+    id_publi             int,
+    fech_creacion        timestamp NOT NULL DEFAULT now(),
+    ultimo_mensaje       timestamp,
+
+    FOREIGN KEY (id_usuario_adoptante) REFERENCES USUARIOS(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_refug)             REFERENCES REFUGIOS(id_refug)   ON DELETE CASCADE,
+    FOREIGN KEY (id_publi)             REFERENCES PUBLICACIONES(id_publi) ON DELETE SET NULL,
+
+    CONSTRAINT uq_conversacion UNIQUE (id_usuario_adoptante, id_refug, id_publi)
+);
+
+CREATE TABLE MENSAJES (
+    id_mensaje      serial PRIMARY KEY,
+    id_conversacion int  NOT NULL,
+    id_remitente    int  NOT NULL,
+    contenido       text NOT NULL,
+    leido           boolean   NOT NULL DEFAULT false,
+    fech_mensaje    timestamp NOT NULL DEFAULT now(),
+
+    FOREIGN KEY (id_conversacion) REFERENCES CONVERSACIONES(id_conversacion) ON DELETE CASCADE,
+    FOREIGN KEY (id_remitente)    REFERENCES USUARIOS(id_usuario)             ON DELETE CASCADE
+);

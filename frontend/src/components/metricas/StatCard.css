@@ -1,0 +1,12 @@
+.stat-card{
+  background: #fff;
+  border-radius: 10px;
+  padding: 0.8rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  display:flex;
+  align-items:center;
+}
+.stat-card-left{display:flex;align-items:center;gap:0.6rem}
+.stat-icon{font-size:1.4rem}
+.stat-value{font-size:1.25rem;font-weight:700}
+.stat-label{font-size:0.85rem;color:#666}

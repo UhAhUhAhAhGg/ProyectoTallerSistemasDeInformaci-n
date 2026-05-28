@@ -1,0 +1,69 @@
+.mensajeria-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.mensajeria-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.mensajeria-sidebar {
+  width: 320px;
+  min-width: 260px;
+  border-right: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+}
+
+.mensajeria-sidebar__titulo {
+  padding: 1rem 1.25rem 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-bottom: 1px solid #eee;
+  margin: 0;
+}
+
+.mensajeria-sidebar__cargando,
+.mensajeria-sidebar__error {
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.mensajeria-sidebar__error {
+  color: #e53e3e;
+}
+
+/* Chat */
+.mensajeria-chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Responsive — una sola columna en móvil */
+@media (max-width: 640px) {
+  .mensajeria-layout {
+    flex-direction: column;
+  }
+
+  .mensajeria-sidebar {
+    width: 100%;
+    max-height: 40vh;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  .mensajeria-chat {
+    flex: 1;
+    min-height: 0;
+  }
+}

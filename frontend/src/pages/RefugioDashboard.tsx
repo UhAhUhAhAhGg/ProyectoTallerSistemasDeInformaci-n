@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import { refugioService } from '../services/api';
 import './RefugioDashboard.css';
+import MetricasRefugioPanel from '../components/metricas/MetricasRefugioPanel';
 
 const ADMIN_EMAIL = 'admin@petmatch.com';
 
@@ -134,6 +135,10 @@ export default function RefugioDashboard() {
           <span className="rd-approved-icon">✓</span> Refugio aprobado
         </div>
 
+        <div style={{ margin: '1rem 0' }}>
+          <MetricasRefugioPanel idRefug={datosRefugio.id_refug} />
+        </div>
+
         <div className="rd-grid">
           <div className="rd-option" onClick={() => navigate('/refugio/mascotas')}>
             <div className="rd-option-icon">🐾</div>
@@ -167,6 +172,15 @@ export default function RefugioDashboard() {
             <div className="rd-option-info">
               <h3>Notificaciones</h3>
               <p>Mensajes y alertas recientes</p>
+            </div>
+            <span className="rd-option-arrow">→</span>
+          </div>
+
+          <div className="rd-option" onClick={() => navigate('/mensajeria')}>
+            <div className="rd-option-icon">💬</div>
+            <div className="rd-option-info">
+              <h3>Mensajes</h3>
+              <p>Responde consultas de los adoptantes interesados</p>
             </div>
             <span className="rd-option-arrow">→</span>
           </div>

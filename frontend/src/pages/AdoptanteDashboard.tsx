@@ -129,6 +129,15 @@ export default function AdoptanteDashboard() {
             </div>
             <span className="ad-option-arrow">→</span>
           </div>
+
+          <div className="ad-option" onClick={() => navigate('/mensajeria')}>
+            <div className="ad-option-icon">💬</div>
+            <div className="ad-option-info">
+              <h3>Mensajes</h3>
+              <p>Conversa con los refugios sobre sus mascotas</p>
+            </div>
+            <span className="ad-option-arrow">→</span>
+          </div>
         </div>
       </div>
     </div>
