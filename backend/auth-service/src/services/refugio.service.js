@@ -68,7 +68,7 @@ async function guardarDatosRefugio(id_usuario, datos) {
 
   // Notificar al admin
   const admin = await pool.query(
-    `SELECT id_usuario FROM USUARIOS WHERE id_rol = 1 LIMIT 1`
+    `SELECT id_usuario FROM USUARIOS WHERE id_rol = 5 LIMIT 1`
   );
 
   if (admin.rowCount > 0) {
@@ -169,7 +169,7 @@ async function cambiarEstadoRefugio(id_refug, nuevo_estado) {
 
   if (nuevo_estado === 'rechazado') {
     await pool.query(
-      `UPDATE USUARIOS SET est_usuario = $1, id_rol = 2 WHERE id_usuario = $2`,
+      `UPDATE USUARIOS SET est_usuario = $1, id_rol = 6 WHERE id_usuario = $2`,
       [est_usuario, refugio.id_usuario]
     );
   } else {

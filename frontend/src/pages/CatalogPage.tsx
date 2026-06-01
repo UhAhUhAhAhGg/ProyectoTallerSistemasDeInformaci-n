@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './CatalogPage.css';
 import FilterSidebar from '../components/catalog/FilterSideBar';
 import { getPets, getRefugios } from '../services/pets.service';
-import EnviarSolicitudMF from './gestion-solicitudes/EnviarSolicitudMF';
 import type { PetFilters } from '../types/pet';
+import './CatalogPage.css';
+import EnviarSolicitudMF from './gestion-solicitudes/EnviarSolicitudMF';
 import Navbar from './Navbar';
 
 // Lo que realmente devuelve el backend en /catalogo
@@ -41,7 +41,6 @@ export default function CatalogPage() {
   const [refugios, setRefugios] = useState<{ id: number; nombre: string }[]>([]);
   const [solicitando, setSolicitando] = useState<CatalogItem | null>(null);
 
-  const userName = localStorage.getItem('nombre');
   const userRol  = localStorage.getItem('rol');
   const userId   = Number(localStorage.getItem('userId') || 0);
 

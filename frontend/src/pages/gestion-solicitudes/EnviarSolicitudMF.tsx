@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { solicitudService } from './shared/solicitud.service';
-import type { NuevaSolicitud } from './shared/solicitud.types';
 
 interface Props {
   id_publ: number;

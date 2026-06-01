@@ -1,10 +1,14 @@
 import { Request, Response } from 'express';
-import * as service from './solicitud.service';
 import * as estadoRepo from '../estados/estado.repository';
 import * as histRepo from '../historial/historial.repository';
 import {
-  ok, created, badRequest, forbidden, notFound, serverError,
+    badRequest,
+    created,
+    forbidden, notFound,
+    ok,
+    serverError,
 } from '../utils/response.helper';
+import * as service from './solicitud.service';
 
 // ─── HU-17: Adoptante envía solicitud ────────────────────────────────────────
 export const enviarSolicitud = async (req: Request, res: Response): Promise<void> => {
@@ -16,7 +20,8 @@ export const enviarSolicitud = async (req: Request, res: Response): Promise<void
       return;
     }
 
-    const solicitud = await service.enviarSolicitud(req.user!.id, { id_publi, decrip_soli });
+    const token = req.headers.authorization?.split(' ')[1] || '';
+    const solicitud = await service.enviarSolicitud(req.user!.id, { id_publi, decrip_soli }, token);
     created(res, solicitud, 'Solicitud enviada exitosamente');
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Error al enviar la solicitud';

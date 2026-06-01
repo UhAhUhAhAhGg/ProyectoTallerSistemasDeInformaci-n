@@ -13,7 +13,7 @@ function validarContrasena(contra) {
 
 async function notificarAdministradoresNuevoRegistro(usuario, rol) {
   const admins = await pool.query(
-    'SELECT id_usuario FROM USUARIOS WHERE id_rol = 1'
+    'SELECT id_usuario FROM USUARIOS WHERE id_rol = 5'
   );
 
   if (admins.rowCount === 0) return;
@@ -51,8 +51,8 @@ async function registrarUsuario(datos) {
     throw new Error('El correo ya está registrado');
   }
 
-  // id_rol: 1=administrador, 2=adoptante, 3=refugio
-  const id_rol = rol === 'adoptante' ? 2 : 3;
+  // id_rol: 5=administrador, 6=adoptante, 7=refugio
+  const id_rol = rol === 'adoptante' ? 6 : 7;
 
   // Estado inicial según rol
   const est_usuario = 'incompleto';
@@ -132,7 +132,7 @@ async function registrarRefugioCompleto(datos) {
         (id_rol, corr_usuario, contra_usuario, nom_usuario, apell_usuario, est_usuario)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id_usuario, id_rol, corr_usuario, nom_usuario, apell_usuario, est_usuario`,
-      [3, correo, hash, nombre || nom_refug, apellido || '-', 'pendiente']
+      [7, correo, hash, nombre || nom_refug, apellido || '-', 'pendiente']
     );
 
     const usuario = usuarioResult.rows[0];
@@ -155,7 +155,7 @@ async function registrarRefugioCompleto(datos) {
     const refugio = refugioResult.rows[0];
 
     const admins = await client.query(
-      'SELECT id_usuario FROM USUARIOS WHERE id_rol = 1'
+      'SELECT id_usuario FROM USUARIOS WHERE id_rol = 5'
     );
 
     for (const admin of admins.rows) {
@@ -179,7 +179,7 @@ async function registrarRefugioCompleto(datos) {
       {
         id: usuario.id_usuario,
         rol: 'refugio',
-        id_rol: 3,
+        id_rol: 7,
         est: 'pendiente',
         id_refug: refugio.id_refug
       },

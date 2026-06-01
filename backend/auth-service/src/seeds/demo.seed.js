@@ -106,7 +106,7 @@ async function ensureRefugio() {
     `INSERT INTO USUARIOS
       (id_rol, corr_usuario, contra_usuario, nom_usuario, apell_usuario, est_usuario,
        telf_usuario, fenac_usuario, gen_usuario, direc_usuario)
-     VALUES (3, $1, $2, 'Refugio', 'Demo', 'activo', '70000001', '1995-01-01', true, 'Av. Siempre Viva 123')
+     VALUES (7, $1, $2, 'Refugio', 'Demo', 'aprobado', '70000001', '1995-01-01', true, 'Av. Siempre Viva 123')
      ON CONFLICT (corr_usuario) DO UPDATE
        SET est_usuario = EXCLUDED.est_usuario
      RETURNING id_usuario`,

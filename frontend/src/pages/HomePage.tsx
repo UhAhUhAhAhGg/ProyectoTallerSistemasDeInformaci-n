@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './HomePage.css';
-import Navbar from './Navbar';
 import heroPets from '../assets/hero-pets.png';
 import { refugioService } from '../services/api';
+import './HomePage.css';
+import Navbar from './Navbar';
 
 const featuredPets = [
   { name: 'Luna', meta: '2 años · Tamaño mediano', image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=500&q=80' },
@@ -13,9 +13,20 @@ const featuredPets = [
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [userName] = useState<string | null>(() => localStorage.getItem('nombre'));
-  const [userRol] = useState<string | null>(() => localStorage.getItem('rol'));
+  const [userName, setUserName] = useState<string | null>(() => localStorage.getItem('nombre'));
+  const [userRol, setUserRol] = useState<string | null>(() => localStorage.getItem('rol'));
   const [estUsuario, setEstUsuario] = useState<string | null>(() => localStorage.getItem('est_usuario'));
+
+  // Polling para detectar cambios en localStorage
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setUserName(localStorage.getItem('nombre'));
+      setUserRol(localStorage.getItem('rol'));
+      setEstUsuario(localStorage.getItem('est_usuario'));
+    }, 300);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const rol = localStorage.getItem('rol');
@@ -64,6 +75,49 @@ export default function HomePage() {
           <div className="hp-hero-copy">
             <p className="hp-eyebrow">Adopcion responsable en Bolivia</p>
             <h1>Adopta un amigo para toda la vida</h1>
+            
+            {/* 🧪 BOTÓN DE PRUEBA */}
+            <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#ffe0e6', borderRadius: '5px', textAlign: 'left', border: '2px solid #d4437d' }}>
+              <p style={{ fontSize: '14px', margin: '5px 0', fontWeight: 'bold', color: '#d4437d' }}>
+                🔍 DEBUG INFO:
+              </p>
+              <p style={{ fontSize: '12px', margin: '3px 0', color: '#333' }}>
+                rol = "{userRol}" {userRol === 'adoptante' ? '✅' : userRol === 'refugio' ? '✅' : '❌'}
+              </p>
+              <p style={{ fontSize: '12px', margin: '3px 0', color: '#333' }}>
+                estado = "{estUsuario}" {estUsuario === 'activo' ? '✅' : estUsuario === 'incompleto' ? '⚠️' : '❌'}
+              </p>
+              <p style={{ fontSize: '12px', margin: '3px 0', color: '#333' }}>
+                nombre = "{userName}" {userName ? '✅' : '❌'}
+              </p>
+              <p style={{ fontSize: '12px', margin: '10px 0 0 0', fontWeight: 'bold', color: '#d4437d' }}>
+                Condición: (rol=adoptante) OR (rol=refugio AND estado=activo)
+              </p>
+              
+              {(userRol === 'adoptante' || (userRol === 'refugio' && estUsuario === 'activo')) && (
+                <button 
+                  style={{ 
+                    backgroundColor: '#d4437d', 
+                    color: 'white', 
+                    border: 'none', 
+                    padding: '10px 20px', 
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    marginTop: '10px',
+                    fontWeight: 'bold'
+                  }}
+                  onClick={() => navigate('/adaptacion-seguimiento')}
+                >
+                  {userRol === 'refugio' ? '🔬 PRUEBA: Observaciones' : '🔬 PRUEBA: Seguimiento'}
+                </button>
+              )}
+              {!((userRol === 'adoptante' || (userRol === 'refugio' && estUsuario === 'activo')) && userName) && (
+                <p style={{ fontSize: '12px', margin: '10px 0 0 0', color: '#999' }}>
+                  ⚠️ Botón NO visible - condición no se cumple
+                </p>
+              )}
+            </div>
+            
             <p className="hp-hero-sub">
               Miles de mascotas esperan un hogar lleno de amor. Encuentra companeros cercanos,
               conoce refugios verificados y empieza una adopcion simple y segura.

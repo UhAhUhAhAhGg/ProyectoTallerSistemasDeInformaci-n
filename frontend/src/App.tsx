@@ -1,19 +1,22 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import HomePage               from './pages/HomePage';
-import LoginPage              from './pages/LoginPage';
-import RegisterPage           from './pages/registro/RegisterPage';
-import AdoptanteProfilePage   from './pages/AdoptanteProfilePage';
-import RefugioProfilePage     from './pages/RefugioProfilePage';
-import AdoptanteDashboard     from './pages/AdoptanteDashboard';
-import RefugioDashboard       from './pages/RefugioDashboard';
-import AdminDashboard         from './pages/admin/AdminDashboard';
-import CatalogPage            from './pages/CatalogPage';
-import GestionMascotasPage    from './pages/GestionMascotasPage';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import AdaptacionSeguimientoPage from './pages/AdaptacionSeguimientoPage';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdoptanteDashboard from './pages/AdoptanteDashboard';
+import AdoptanteProfilePage from './pages/AdoptanteProfilePage';
+import CatalogPage from './pages/CatalogPage';
+import GestionMascotasPage from './pages/GestionMascotasPage';
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import MatchingPage from './pages/MatchingPage';
+import MisSolicitudesPage from './pages/MisSolicitudesPage';
+import NotificacionesPage from './pages/NotificacionesPage';
+import RefugioDashboard from './pages/RefugioDashboard';
+import RefugioProfilePage from './pages/RefugioProfilePage';
+import RegisterPage from './pages/registro/RegisterPage';
 import SolicitudesRefugioPage from './pages/SolicitudesRefugioPage';
 import MisSolicitudesPage     from './pages/MisSolicitudesPage';
 import NotificacionesPage     from './pages/NotificacionesPage';
 import MatchingPage           from './pages/MatchingPage';
-import MensajeriaPage         from './pages/MensajeriaPage';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -148,14 +151,6 @@ export default function App() {
         element={
           <PrivateRoute>
             <NotificacionesPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/mensajeria"
-        element={
-          <PrivateRoute>
-            <MensajeriaPage />
           </PrivateRoute>
         }
       />

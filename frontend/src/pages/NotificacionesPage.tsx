@@ -39,7 +39,6 @@ export default function NotificacionesPage() {
   const navigate = useNavigate();
   const [notis, setNotis]     = useState<Notificacion[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState('');
 
   useEffect(() => {
     (async () => {
