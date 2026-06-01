@@ -224,3 +224,38 @@ VALUES
 
 INSERT INTO ESPECIES (nom_espe)
 VALUES ('Perro'), ('Gato'), ('Ave'), ('Conejo'), ('Hamster'), ('Reptil'), ('Otro');
+
+-- =========================
+-- MENSAJERÍA
+-- =========================
+
+CREATE TABLE IF NOT EXISTS CONVERSACIONES (
+    id_conv     serial PRIMARY KEY,
+    id_soli     int       NOT NULL UNIQUE,
+    creado_en   timestamp NOT NULL DEFAULT now(),
+    FOREIGN KEY (id_soli) REFERENCES SOLI_ADOP(id_soli) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS MENSAJES (
+    id_msg      serial PRIMARY KEY,
+    id_conv     int       NOT NULL,
+    id_usuario  int       NOT NULL,
+    contenido   text      NOT NULL,
+    enviado_en  timestamp NOT NULL DEFAULT now(),
+    FOREIGN KEY (id_conv)    REFERENCES CONVERSACIONES(id_conv) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES USUARIOS(id_usuario)
+);
+
+CREATE INDEX IF NOT EXISTS idx_mensajes_conv ON MENSAJES(id_conv);
+
+-- =========================
+-- HU-05: Recuperación de contraseña
+-- =========================
+
+CREATE TABLE IF NOT EXISTS PASSWORD_RESET_TOKENS (
+    id_usuario  INTEGER PRIMARY KEY REFERENCES USUARIOS(id_usuario) ON DELETE CASCADE,
+    token       VARCHAR(64) NOT NULL UNIQUE,
+    expira_en   TIMESTAMPTZ NOT NULL,
+    usado       BOOLEAN     NOT NULL DEFAULT false,
+    creado_en   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
