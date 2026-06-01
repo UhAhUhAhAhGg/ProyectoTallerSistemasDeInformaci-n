@@ -35,6 +35,7 @@ router.get("/usuarios", authMiddleware, adminMiddleware, async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
+    console.error('[ADMIN usuarios] Error:', err.message);
     res.status(500).json({ success: false, mensaje: "Error al obtener usuarios" });
   }
 });
@@ -51,7 +52,94 @@ router.put("/usuarios/:id/estado", authMiddleware, adminMiddleware, async (req, 
     );
     res.json({ success: true, mensaje: `Usuario ${est}` });
   } catch (err) {
+    console.error('[ADMIN estado] Error:', err.message);
     res.status(500).json({ success: false, mensaje: "Error al actualizar usuario" });
+  }
+});
+
+// ─── HU-28: Reporte ampliado ───────────────────────────────────────────────────
+// GET /api/admin/reporte
+router.get("/reporte", authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const [estadosResult, porMesResult, porEspecieResult, topRefugiosResult] = await Promise.all([
+      // Resumen global de solicitudes
+      pool.query(`
+        SELECT
+          COUNT(*) FILTER (WHERE sa.id_est = 3) AS total_aprobadas,
+          COUNT(*) FILTER (WHERE sa.id_est = 4) AS total_rechazadas,
+          COUNT(*) FILTER (WHERE sa.id_est = 1) AS total_enviadas,
+          COUNT(*) FILTER (WHERE sa.id_est = 2) AS total_en_revision,
+          COUNT(*) FILTER (WHERE sa.id_est = 5) AS total_en_espera,
+          COUNT(*)                               AS total_solicitudes
+        FROM SOLI_ADOP sa
+      `),
+
+      // Adopciones agrupadas por mes (últimos 6 meses)
+      pool.query(`
+        SELECT
+          TO_CHAR(DATE_TRUNC('month', sa.fech_soli), 'YYYY-MM') AS mes,
+          COUNT(*) FILTER (WHERE sa.id_est = 3) AS aprobadas,
+          COUNT(*) FILTER (WHERE sa.id_est = 4) AS rechazadas,
+          COUNT(*)                               AS total
+        FROM SOLI_ADOP sa
+        WHERE sa.fech_soli >= NOW() - INTERVAL '6 months'
+        GROUP BY DATE_TRUNC('month', sa.fech_soli)
+        ORDER BY mes ASC
+      `),
+
+      // Adopciones por especie
+      pool.query(`
+        SELECT
+          e.nom_espe AS especie,
+          COUNT(*) FILTER (WHERE sa.id_est = 3) AS aprobadas,
+          COUNT(*)                               AS total
+        FROM SOLI_ADOP sa
+        JOIN PUBLICACIONES p ON p.id_publi = sa.id_publi
+        JOIN MASCOTAS m      ON m.id_mascot = p.id_mascot
+        JOIN RAZAS r         ON r.id_raza   = m.id_raza
+        JOIN ESPECIES e      ON e.id_espe   = r.id_espe
+        GROUP BY e.nom_espe
+        ORDER BY aprobadas DESC
+      `),
+
+      // Top 5 refugios con más adopciones aprobadas
+      pool.query(`
+        SELECT
+          ref.nom_refug,
+          COUNT(*) FILTER (WHERE sa.id_est = 3) AS adopciones
+        FROM SOLI_ADOP sa
+        JOIN PUBLICACIONES p ON p.id_publi = sa.id_publi
+        JOIN REFUGIOS ref    ON ref.id_refug = p.id_refug
+        GROUP BY ref.nom_refug
+        ORDER BY adopciones DESC
+        LIMIT 5
+      `),
+    ]);
+
+    const estados = estadosResult.rows[0];
+    const total     = Number(estados.total_solicitudes ?? 0);
+    const aprobadas = Number(estados.total_aprobadas   ?? 0);
+
+    res.json({
+      success: true,
+      data: {
+        resumen: {
+          total_solicitudes: total,
+          total_aprobadas:   aprobadas,
+          total_rechazadas:  Number(estados.total_rechazadas  ?? 0),
+          total_enviadas:    Number(estados.total_enviadas    ?? 0),
+          total_en_revision: Number(estados.total_en_revision ?? 0),
+          total_en_espera:   Number(estados.total_en_espera   ?? 0),
+          tasa_adopcion:     total > 0 ? Math.round((aprobadas / total) * 1000) / 10 : 0,
+        },
+        por_mes:      porMesResult.rows,
+        por_especie:  porEspecieResult.rows,
+        top_refugios: topRefugiosResult.rows,
+      },
+    });
+  } catch (err) {
+    console.error('[ADMIN reporte] Error:', err.message);
+    res.status(500).json({ success: false, mensaje: "Error al generar el reporte" });
   }
 });
 

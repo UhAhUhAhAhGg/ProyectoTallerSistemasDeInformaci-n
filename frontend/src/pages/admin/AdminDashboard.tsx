@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import GestionUsuariosMF from "./GestionUsuariosMF";
 import ReportesAdminMF from "./ReportesAdminMF";
 import ValidarRefugiosMF from "./ValidarRefugiosMF";
+import ConfigMatchingMF from './ConfigMatchingMF';
+import AnimalesAdminMF from './AnimalesAdminMF';
 import "./AdminDashboard.css";
 
 type Tab =
@@ -316,13 +318,7 @@ const AdminDashboard: React.FC = () => {
         <section className="admin-dashboard__content">
           {tabActiva === "panel" && <PanelGeneral notificaciones={notificaciones} />}
           {tabActiva === "refugios" && <ValidarRefugiosMF />}
-          {tabActiva === "animales" && (
-            <AdminPlaceholder
-              titulo="Animales"
-              descripcion="Seccion preparada para revisar animales registrados, publicaciones activas y bajas."
-              detalles={["Mascotas por refugio", "Publicaciones activas", "Animales dados de baja"]}
-            />
-          )}
+          {tabActiva === "animales" && <AnimalesAdminMF />}
           {tabActiva === "perfiles" && <GestionUsuariosMF />}
           {tabActiva === "solicitudes" && (
             <AdminPlaceholder
@@ -331,13 +327,7 @@ const AdminDashboard: React.FC = () => {
               detalles={["Solicitudes pendientes", "Aprobadas y rechazadas", "Historial por adoptante"]}
             />
           )}
-          {tabActiva === "matching" && (
-            <AdminPlaceholder
-              titulo="Configuracion de Matching"
-              descripcion="Parametros listos para conectar el motor de reglas con la API de IA."
-              detalles={["Umbral minimo de compatibilidad", "Peso de preferencias", "Prioridad de animales con mas tiempo"]}
-            />
-          )}
+          {tabActiva === "matching" && <ConfigMatchingMF />}
           {tabActiva === "reportes" && <ReportesAdminMF />}
           {tabActiva === "mensajeria" && (
             <AdminPlaceholder

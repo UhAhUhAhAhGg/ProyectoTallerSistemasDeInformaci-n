@@ -220,3 +220,11 @@ VALUES
 
 INSERT INTO ESPECIES (nom_espe)
 VALUES ('Perro'), ('Gato'), ('Ave'), ('Conejo'), ('Hamster'), ('Reptil'), ('Otro');
+ -- HU-05: Tokens de recuperación de contraseña
+CREATE TABLE IF NOT EXISTS PASSWORD_RESET_TOKENS (
+  id_usuario   INTEGER PRIMARY KEY REFERENCES USUARIOS(id_usuario) ON DELETE CASCADE,
+  token        VARCHAR(64) NOT NULL UNIQUE,
+  expira_en    TIMESTAMPTZ NOT NULL,
+  usado        BOOLEAN DEFAULT false,
+  creado_en    TIMESTAMPTZ DEFAULT NOW()
+);

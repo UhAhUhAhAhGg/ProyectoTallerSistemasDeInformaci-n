@@ -18,12 +18,26 @@ interface Recomendacion {
     especie: string;
     raza: string;
     imagen?: string;
+    esterilizado: boolean;
   };
   refugio: {
     nombre: string;
     direccion: string;
   };
 }
+
+const ScoreBadge = ({ score, fuente }: { score: number; fuente: string }) => {
+  const color = score >= 75 ? '#16a34a' : score >= 50 ? '#d97706' : '#dc2626';
+  return (
+    <div className="match-score" style={{ borderColor: color }}>
+      <strong style={{ color }}>{score}%</strong>
+      <span>match</span>
+      <small style={{ fontSize: 9, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 1 }}>
+        {fuente === 'ia' ? 'IA' : 'reglas'}
+      </small>
+    </div>
+  );
+};
 
 export default function MatchingPage() {
   const navigate = useNavigate();
@@ -38,17 +52,20 @@ export default function MatchingPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const fuenteIA = recomendaciones[0]?.fuente === 'ia';
+
   return (
     <div className="match-wrapper">
       <Navbar />
       <main className="match-main">
         <section className="match-header">
           <div>
-            <span className="match-kicker">Matching IA</span>
+            <span className="match-kicker">Matching {fuenteIA ? 'IA · Groq Llama 3.3' : 'Reglas'}</span>
             <h1>Recomendaciones para ti</h1>
             <p>
-              Esta vista ya usa tu perfil y las mascotas disponibles. Mas adelante conectaremos aqui la API de IA para
-              refinar el ranking y explicar cada coincidencia.
+              {fuenteIA
+                ? 'Las recomendaciones fueron generadas por inteligencia artificial analizando tu perfil y las descripciones de cada mascota.'
+                : 'Las recomendaciones se calculan con el motor de reglas. Activa la IA en la configuración del administrador.'}
             </p>
           </div>
           <button className="match-btn secondary" type="button" onClick={() => navigate('/dashboard/adoptante')}>
@@ -58,8 +75,8 @@ export default function MatchingPage() {
 
         <section className="match-config">
           <div>
-            <strong>Motor actual</strong>
-            <span>Reglas de compatibilidad listas para integrarse con IA</span>
+            <strong>Motor activo</strong>
+            <span>{fuenteIA ? 'Groq / Llama 3.3 70B' : 'Motor de reglas'}</span>
           </div>
           <div>
             <strong>Endpoint</strong>
@@ -67,7 +84,9 @@ export default function MatchingPage() {
           </div>
           <div>
             <strong>Estado</strong>
-            <span>Preparado para API externa</span>
+            <span style={{ color: fuenteIA ? '#16a34a' : '#d97706' }}>
+              {fuenteIA ? 'IA activa' : 'Fallback a reglas'}
+            </span>
           </div>
         </section>
 
@@ -76,7 +95,7 @@ export default function MatchingPage() {
 
         {!loading && !error && recomendaciones.length === 0 && (
           <div className="match-empty">
-            <h2>Sin recomendaciones aun</h2>
+            <h2>Sin recomendaciones aún</h2>
             <p>Completa tu perfil de adoptante o revisa que existan mascotas publicadas para generar matches.</p>
             <button className="match-btn primary" type="button" onClick={() => navigate('/completar-perfil/adoptante')}>
               Actualizar perfil
@@ -88,27 +107,32 @@ export default function MatchingPage() {
           <div className="match-list">
             {recomendaciones.map((item) => (
               <article className="match-card" key={item.id_publi}>
-                <div className="match-score">
-                  <strong>{item.score}%</strong>
-                  <span>match</span>
-                </div>
+                <ScoreBadge score={item.score} fuente={item.fuente} />
                 <div className="match-card__body">
                   <div className="match-card__title">
                     <h2>{item.mascota.nombre}</h2>
-                    <span>{item.mascota.especie} - {item.mascota.raza}</span>
+                    <span>{item.mascota.especie} · {item.mascota.raza}</span>
                   </div>
                   <p className="match-card__meta">
-                    {item.mascota.edad_categoria} · {item.mascota.edad} anios · {item.refugio.nombre}
+                    {item.mascota.edad_categoria} · {item.mascota.edad} años
+                    {item.mascota.esterilizado ? ' · Esterilizado/a' : ''}
+                    {' · '}{item.refugio.nombre}
                   </p>
                   <ul>
-                    {item.motivos.slice(0, 2).map((motivo) => (
-                      <li key={motivo}>{motivo}</li>
+                    {item.motivos.slice(0, 3).map((motivo) => (
+                      <li key={motivo} style={{ color: '#16a34a' }}>✓ {motivo}</li>
                     ))}
                   </ul>
-                  {item.alertas.length > 0 && <p className="match-alert">{item.alertas[0]}</p>}
+                  {item.alertas.length > 0 && (
+                    <ul>
+                      {item.alertas.slice(0, 2).map((alerta) => (
+                        <li key={alerta} className="match-alert">⚠ {alerta}</li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
                 <button className="match-btn primary" type="button" onClick={() => navigate('/catalogo')}>
-                  Ver catalogo
+                  Ver catálogo
                 </button>
               </article>
             ))}

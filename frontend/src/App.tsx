@@ -4,6 +4,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdoptanteDashboard from './pages/AdoptanteDashboard';
 import AdoptanteProfilePage from './pages/AdoptanteProfilePage';
 import CatalogPage from './pages/CatalogPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import GestionMascotasPage from './pages/GestionMascotasPage';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -15,11 +16,11 @@ import NotificacionesPage from './pages/NotificacionesPage';
 import RefugioDashboard from './pages/RefugioDashboard';
 import RefugioProfilePage from './pages/RefugioProfilePage';
 import RegisterPage from './pages/registro/RegisterPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import SolicitudesRefugioPage from './pages/SolicitudesRefugioPage';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Decodifica el payload del JWT almacenado en localStorage. */
 const getPayload = (): { rol?: string } | null => {
   try {
     const token = localStorage.getItem('token');
@@ -32,14 +33,12 @@ const getPayload = (): { rol?: string } | null => {
 
 // ── Guardas de ruta ───────────────────────────────────────────────────────────
 
-/** Redirige a /login si no hay sesión activa. */
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const payload = getPayload();
   if (!payload) return <Navigate to="/login" replace />;
   return <>{children}</>;
 };
 
-/** Permite acceso solo al rol indicado; si no coincide redirige a /. */
 const RoleRoute = ({
   rol,
   children,
@@ -59,11 +58,13 @@ export default function App() {
   return (
     <Routes>
       {/* ── Públicas ─────────────────────────────────────────────────────── */}
-      <Route path="/"         element={<HomePage />} />
-      <Route path="/login"    element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/catalogo" element={<CatalogPage />} />
-      <Route path="/normas-politicas" element={<NormasPoliticasPage />} />
+      <Route path="/"                  element={<HomePage />} />
+      <Route path="/login"             element={<LoginPage />} />
+      <Route path="/register"          element={<RegisterPage />} />
+      <Route path="/catalogo"          element={<CatalogPage />} />
+      <Route path="/normas-politicas"  element={<NormasPoliticasPage />} />
+      <Route path="/forgot-password"   element={<ForgotPasswordPage />} />
+      <Route path="/reset-password"    element={<ResetPasswordPage />} />
 
       {/* ── Completar perfil (requiere sesión) ───────────────────────────── */}
       <Route

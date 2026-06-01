@@ -6,7 +6,7 @@ import './LoginPage.css';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState({ correo: '', contrasena: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,6 @@ export default function LoginPage() {
         localStorage.setItem('rol', response.data.rol);
         localStorage.setItem('userId', response.data.id_usuario);
         localStorage.setItem('est_usuario', response.data.est_usuario);
-        // ✅ Guardar nombre para mostrarlo en la navbar/home
         localStorage.setItem('nombre', response.data.nombre || response.data.correo || 'Usuario');
 
         if (response.data.id_refug) {
@@ -44,24 +43,24 @@ export default function LoginPage() {
         const est = response.data.est_usuario;
 
         switch (rol) {
-  case 'administrador':
-    navigate('/admin/dashboard');
-    break;
-  case 'adoptante':
-    if (est === 'incompleto') navigate('/completar-perfil/adoptante');
-    else navigate('/dashboard/adoptante');
-    break;
-  case 'refugio':
-    if (est === 'incompleto')      navigate('/completar-perfil/refugio');
-    else if (est === 'rechazado')  navigate('/dashboard/refugio'); // verá la pantalla "rechazada"
-    else                            navigate('/dashboard/refugio'); // pendiente o activo
-    break;
-  default:
-    navigate('/');
-}
+          case 'administrador':
+            navigate('/admin/dashboard');
+            break;
+          case 'adoptante':
+            if (est === 'incompleto') navigate('/completar-perfil/adoptante');
+            else navigate('/dashboard/adoptante');
+            break;
+          case 'refugio':
+            if (est === 'incompleto') navigate('/completar-perfil/refugio');
+            else navigate('/dashboard/refugio');
+            break;
+          default:
+            navigate('/');
+        }
       }
-    } catch (error: any) {
-      setError(error.response?.data?.mensaje || 'Error al iniciar sesión');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { mensaje?: string } } };
+      setError(err.response?.data?.mensaje || 'Error al iniciar sesión');
     } finally {
       setLoading(false);
     }
@@ -69,7 +68,6 @@ export default function LoginPage() {
 
   return (
     <div className="login-container">
-      {/* Back to home */}
       <button className="login-back-btn" onClick={() => navigate('/')}>
         ← Volver al inicio
       </button>
@@ -117,6 +115,15 @@ export default function LoginPage() {
             {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
         </form>
+
+        <p style={{ textAlign: 'center', margin: '12px 0 4px' }}>
+          <a
+            href="/forgot-password"
+            style={{ fontSize: 14, color: '#4f46e5', textDecoration: 'none' }}
+          >
+            ¿Olvidaste tu contraseña?
+          </a>
+        </p>
 
         <p className="register-link">
           ¿No tienes cuenta? <a href="/register">Registrarse</a>
