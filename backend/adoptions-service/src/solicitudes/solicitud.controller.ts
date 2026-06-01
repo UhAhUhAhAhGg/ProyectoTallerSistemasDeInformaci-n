@@ -10,7 +10,6 @@ import {
     ok,
     serverError,
 } from '../utils/response.helper';
-import * as service from './solicitud.service';
 
 // ─── HU-17: Adoptante envía solicitud ────────────────────────────────────────
 export const enviarSolicitud = async (req: Request, res: Response): Promise<void> => {
