@@ -49,7 +49,7 @@ export default function HistorialSolicitudesMF({ id_adop }: Props) {
             padding: 16, marginBottom: 12, display: 'flex', gap: 14, alignItems: 'flex-start' }}>
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <strong style={{ fontSize: 15 }}>{s.nom_animal ?? `Publicación #${s.id_publi}`}</strong>
+                <strong style={{ fontSize: 15 }}>{s.nom_mascot ?? `Publicación #${s.id_publi}`}</strong>
                 <span style={{ fontSize: 12, padding: '3px 10px', borderRadius: 20,
                   fontWeight: 600, color: badge.color, background: badge.bg }}>
                   {badge.label}

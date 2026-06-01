@@ -56,9 +56,9 @@ export default function GestionSolicitudesMF({ id_refu }: Props) {
           padding: 16, marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <div>
-              <strong>{s.nom_adop ?? `Adoptante #${s.id_usuario}`}</strong>
+              <strong>{s.nom_usuario ?? `Adoptante #${s.id_usuario}`}</strong>
               <span style={{ fontSize: 12, color: '#6b7280', marginLeft: 8 }}>
-                → {s.nom_animal ?? `Publicación #${s.id_publi}`}
+                → {s.nom_mascot ?? `Publicación #${s.id_publi}`}
               </span>
             </div>
             <span style={{ fontSize: 12, color: '#374151', fontWeight: 600 }}>

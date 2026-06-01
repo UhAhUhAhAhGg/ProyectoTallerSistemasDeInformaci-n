@@ -8,16 +8,14 @@ import GestionMascotasPage from './pages/GestionMascotasPage';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import MatchingPage from './pages/MatchingPage';
+import MensajeriaPage from './pages/MensajeriaPage';
 import MisSolicitudesPage from './pages/MisSolicitudesPage';
+import NormasPoliticasPage from './pages/NormasPoliticasPage';
 import NotificacionesPage from './pages/NotificacionesPage';
 import RefugioDashboard from './pages/RefugioDashboard';
 import RefugioProfilePage from './pages/RefugioProfilePage';
 import RegisterPage from './pages/registro/RegisterPage';
 import SolicitudesRefugioPage from './pages/SolicitudesRefugioPage';
-import MisSolicitudesPage     from './pages/MisSolicitudesPage';
-import NotificacionesPage     from './pages/NotificacionesPage';
-import MatchingPage           from './pages/MatchingPage';
-import NormasPoliticasPage    from './pages/NormasPoliticasPage';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -153,6 +151,26 @@ export default function App() {
         element={
           <PrivateRoute>
             <NotificacionesPage />
+          </PrivateRoute>
+        }
+      />
+
+      {/* ── Adaptación / Seguimiento ─────────────────────────────────────── */}
+      <Route
+        path="/adaptacion-seguimiento"
+        element={
+          <PrivateRoute>
+            <AdaptacionSeguimientoPage />
+          </PrivateRoute>
+        }
+      />
+
+      {/* ── Mensajería ───────────────────────────────────────────────────── */}
+      <Route
+        path="/mensajeria"
+        element={
+          <PrivateRoute>
+            <MensajeriaPage />
           </PrivateRoute>
         }
       />
