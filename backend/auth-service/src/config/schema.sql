@@ -169,13 +169,21 @@ CREATE TABLE SOLI_ADOP (
 );
 
 -- =========================
--- HISTORIAL (sin cambios)
+-- HISTORIAL
 -- =========================
 
 CREATE TABLE HISTO_ADOP (
-    id_ha   serial PRIMARY KEY,
-    id_soli int NOT NULL,
-    FOREIGN KEY (id_soli) REFERENCES SOLI_ADOP(id_soli)
+    id_ha             serial PRIMARY KEY,
+    id_soli           int NOT NULL,
+    id_est_anterior   int NOT NULL DEFAULT 1,
+    id_est_nuevo      int NOT NULL DEFAULT 1,
+    motivo            text NOT NULL DEFAULT '',
+    fech_cambio       timestamp NOT NULL DEFAULT now(),
+    id_usuario_accion int NOT NULL DEFAULT 0,
+
+    FOREIGN KEY (id_soli) REFERENCES SOLI_ADOP(id_soli),
+    FOREIGN KEY (id_est_anterior) REFERENCES ESTAD_SOLI(id_est),
+    FOREIGN KEY (id_est_nuevo) REFERENCES ESTAD_SOLI(id_est)
 );
 
 -- =========================
@@ -208,38 +216,7 @@ VALUES
 (2, 'en revisión'),
 (3, 'aprobada'),
 (4, 'rechazada'),
-(5, 'completada');
+(5, 'en espera');
 
 INSERT INTO ESPECIES (nom_espe)
 VALUES ('Perro'), ('Gato'), ('Ave'), ('Conejo'), ('Hamster'), ('Reptil'), ('Otro');
-
--- =========================
--- MENSAJERÍA (HU-24)
--- =========================
-
-CREATE TABLE CONVERSACIONES (
-    id_conversacion serial PRIMARY KEY,
-    id_usuario_adoptante int NOT NULL,
-    id_refug             int NOT NULL,
-    id_publi             int,
-    fech_creacion        timestamp NOT NULL DEFAULT now(),
-    ultimo_mensaje       timestamp,
-
-    FOREIGN KEY (id_usuario_adoptante) REFERENCES USUARIOS(id_usuario) ON DELETE CASCADE,
-    FOREIGN KEY (id_refug)             REFERENCES REFUGIOS(id_refug)   ON DELETE CASCADE,
-    FOREIGN KEY (id_publi)             REFERENCES PUBLICACIONES(id_publi) ON DELETE SET NULL,
-
-    CONSTRAINT uq_conversacion UNIQUE (id_usuario_adoptante, id_refug, id_publi)
-);
-
-CREATE TABLE MENSAJES (
-    id_mensaje      serial PRIMARY KEY,
-    id_conversacion int  NOT NULL,
-    id_remitente    int  NOT NULL,
-    contenido       text NOT NULL,
-    leido           boolean   NOT NULL DEFAULT false,
-    fech_mensaje    timestamp NOT NULL DEFAULT now(),
-
-    FOREIGN KEY (id_conversacion) REFERENCES CONVERSACIONES(id_conversacion) ON DELETE CASCADE,
-    FOREIGN KEY (id_remitente)    REFERENCES USUARIOS(id_usuario)             ON DELETE CASCADE
-);

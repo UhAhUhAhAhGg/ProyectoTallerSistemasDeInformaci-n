@@ -37,6 +37,7 @@ const initialFilters: PetFilters = {
 export default function CatalogPage() {
   const navigate = useNavigate();
   const [filters, setFilters]   = useState<PetFilters>(initialFilters);
+  const [busqueda, setBusqueda] = useState('');
   const [pets, setPets]         = useState<CatalogItem[]>([]);
   const [refugios, setRefugios] = useState<{ id: number; nombre: string }[]>([]);
   const [solicitando, setSolicitando] = useState<CatalogItem | null>(null);
@@ -44,8 +45,8 @@ export default function CatalogPage() {
   const userRol  = localStorage.getItem('rol');
   const userId   = Number(localStorage.getItem('userId') || 0);
 
-  const cargarPets = (f: PetFilters = filters) => {
-    getPets(f as any).then(setPets).catch(console.error);
+  const cargarPets = (f: PetFilters = filters, q = busqueda) => {
+    getPets({ ...f, busqueda: q.trim() } as any).then(setPets).catch(console.error);
   };
 
   useEffect(() => {
@@ -62,7 +63,7 @@ export default function CatalogPage() {
     setSolicitando(pet);
   };
 
-  const activeFilters = [filters.especie, filters.edad].filter(Boolean) as string[];
+  const activeFilters = [busqueda, filters.especie, filters.edad, filters.zonaGeografica].filter(Boolean) as string[];
 
   return (
     <div className="page">
@@ -76,7 +77,8 @@ export default function CatalogPage() {
           onApply={() => cargarPets()}
           onClear={() => {
             setFilters(initialFilters);
-            cargarPets(initialFilters);
+            setBusqueda('');
+            cargarPets(initialFilters, '');
           }}
         />
 
@@ -85,7 +87,18 @@ export default function CatalogPage() {
           <p className="subtitle">{pets.length} animales disponibles</p>
 
           <div className="topbar">
-            <input className="search" placeholder="Buscar por nombre..." />
+            <input
+              className="search"
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') cargarPets(filters, busqueda);
+              }}
+              placeholder="Buscar por nombre, raza, especie o refugio..."
+            />
+            <button className="search-btn" onClick={() => cargarPets(filters, busqueda)}>
+              Buscar
+            </button>
           </div>
 
           <div className="filters-info">

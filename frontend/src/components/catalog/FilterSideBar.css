@@ -50,6 +50,22 @@
   font-weight: 600;
 }
 
+.filter-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e2d8d1;
+  border-radius: 10px;
+  padding: 10px;
+  background: #fff;
+  color: #444;
+  font-size: 13px;
+}
+
+.filter-input:focus {
+  outline: 2px solid #e8bfd3;
+  border-color: transparent;
+}
+
 .sidebar-actions {
   margin-top: 20px;
   display: flex;

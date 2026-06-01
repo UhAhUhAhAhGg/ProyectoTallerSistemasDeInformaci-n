@@ -12,6 +12,14 @@ const BADGE: Record<EstadoSolicitud, { label: string; color: string; bg: string 
   en_espera:   { label: 'En espera',   color: '#6b21a8', bg: '#f3e8ff' },
 };
 
+const ESTADOS: Record<number, EstadoSolicitud> = {
+  1: 'enviada',
+  2: 'en_revision',
+  3: 'aprobada',
+  4: 'rechazada',
+  5: 'en_espera',
+};
+
 export default function HistorialSolicitudesMF({ id_adop }: Props) {
   const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,20 +42,21 @@ export default function HistorialSolicitudesMF({ id_adop }: Props) {
     <div style={{ padding: 16 }}>
       <h3 style={{ marginBottom: 16 }}>Mis solicitudes de adopción</h3>
       {solicitudes.map((s: Solicitud) => {
-        const badge = BADGE[s.nom_est as EstadoSolicitud] || { label: 'Unknown', color: '#000', bg: '#f0f0f0' };
+        const estado = ESTADOS[s.id_est] ?? 'enviada';
+        const badge = BADGE[estado];
         return (
           <div key={s.id_soli} style={{ border: '1px solid #e5e7eb', borderRadius: 10,
             padding: 16, marginBottom: 12, display: 'flex', gap: 14, alignItems: 'flex-start' }}>
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <strong style={{ fontSize: 15 }}>{s.nom_mascot ?? `Publicación #${s.id_publi}`}</strong>
+                <strong style={{ fontSize: 15 }}>{s.nom_animal ?? `Publicación #${s.id_publi}`}</strong>
                 <span style={{ fontSize: 12, padding: '3px 10px', borderRadius: 20,
                   fontWeight: 600, color: badge.color, background: badge.bg }}>
                   {badge.label}
                 </span>
               </div>
               <p style={{ fontSize: 12, color: '#6b7280', margin: '4px 0' }}>
-                Enviada el {s.fech_soli ? new Date(s.fech_soli).toLocaleDateString('es-BO') : 'Sin fecha'}
+                Enviada el {new Date(s.fech_soli).toLocaleDateString('es-BO')}
               </p>
               {s.decrip_soli && (
                 <p style={{ fontSize: 13, color: '#374151', marginTop: 6,

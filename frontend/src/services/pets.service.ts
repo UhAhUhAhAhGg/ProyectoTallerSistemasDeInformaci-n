@@ -6,17 +6,21 @@ async function parseError(res: Response, fallback: string) {
 }
 
 export interface PetFilters {
+  busqueda?: string;
   especie?: string;
   raza?: string;
   edad?: string;
+  zonaGeografica?: string;
   refugioId?: number | string;
 }
 
 export async function getPets(filters: PetFilters = {}) {
   const params = new URLSearchParams();
+  if (filters.busqueda) params.append('busqueda', filters.busqueda);
   if (filters.especie)   params.append('especie', filters.especie);
   if (filters.raza)      params.append('raza', filters.raza);
   if (filters.edad)      params.append('edad', filters.edad);
+  if (filters.zonaGeografica) params.append('zonaGeografica', filters.zonaGeografica);
   if (filters.refugioId) params.append('refugioId', String(filters.refugioId));
 
   const res = await fetch(`${BASE}/catalogo?${params}`);

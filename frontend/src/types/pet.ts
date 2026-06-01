@@ -12,6 +12,7 @@ export interface Pet {
 }
 
 export interface PetFilters {
+  busqueda?: string;
   especie: string;
   tamano: string;
   edad: string;

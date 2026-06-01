@@ -26,8 +26,8 @@ export default function EnviarSolicitudMF({
     });
     setEnviada(true);
     onEnviada?.();
-  } catch {
-    setError('No se pudo enviar la solicitud. Intenta de nuevo.');
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'No se pudo enviar la solicitud. Intenta de nuevo.');
   } finally {
     setLoading(false);
   }

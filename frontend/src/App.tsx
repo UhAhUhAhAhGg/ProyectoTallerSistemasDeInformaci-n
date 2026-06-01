@@ -17,6 +17,7 @@ import SolicitudesRefugioPage from './pages/SolicitudesRefugioPage';
 import MisSolicitudesPage     from './pages/MisSolicitudesPage';
 import NotificacionesPage     from './pages/NotificacionesPage';
 import MatchingPage           from './pages/MatchingPage';
+import NormasPoliticasPage    from './pages/NormasPoliticasPage';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -64,6 +65,7 @@ export default function App() {
       <Route path="/login"    element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/catalogo" element={<CatalogPage />} />
+      <Route path="/normas-politicas" element={<NormasPoliticasPage />} />
 
       {/* ── Completar perfil (requiere sesión) ───────────────────────────── */}
       <Route

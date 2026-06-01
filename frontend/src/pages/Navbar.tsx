@@ -96,6 +96,9 @@ export default function Navbar() {
         <button className={`navbar-link ${isActive('/catalogo') ? 'active' : ''}`} onClick={() => navigate('/catalogo')}>
           Catalogo
         </button>
+        <button className={`navbar-link ${isActive('/normas-politicas') ? 'active' : ''}`} onClick={() => navigate('/normas-politicas')}>
+          Normas
+        </button>
 
         {(userRol === 'adoptante' || (userRol === 'refugio' && estUsuario === 'activo')) && (
           <button className={`navbar-link ${isActive('/adaptacion-seguimiento') ? 'active' : ''}`} onClick={() => navigate('/adaptacion-seguimiento')}>
