@@ -1,23 +1,18 @@
-// filepath: backend/auth-service/src/services/refugio.service.js
 const pool = require('../config/db');
 const jwt  = require('jsonwebtoken');
+const { getRolId } = require('../config/roles');
 
-/**
- * Guardar perfil del refugio.
- * Devuelve también un token JWT actualizado con id_refug.
- */
 async function guardarDatosRefugio(id_usuario, datos) {
-  // Verificar que el usuario sea de rol refugio
+  const idRolRefugio = await getRolId('refugio');
+
   const usuario = await pool.query(
     'SELECT id_rol FROM USUARIOS WHERE id_usuario = $1',
     [id_usuario]
   );
-
-  if (Number(usuario.rows[0]?.id_rol) !== 3) {
+  if (Number(usuario.rows[0]?.id_rol) !== idRolRefugio) {
     throw new Error('No autorizado: el usuario no es refugio');
   }
 
-  // ¿Ya tiene perfil de refugio?
   const existente = await pool.query(
     'SELECT id_refug FROM REFUGIOS WHERE id_usuario = $1',
     [id_usuario]
@@ -32,14 +27,7 @@ async function guardarDatosRefugio(id_usuario, datos) {
            licencia_refug = $4, descripcion = $5, est_aprobacion = 'pendiente'
        WHERE id_usuario = $6
        RETURNING *`,
-      [
-        datos.nom_refug,
-        datos.dir_refug,
-        datos.telf_refug,
-        datos.licencia_refug,
-        datos.descripcion || null,
-        id_usuario
-      ]
+      [datos.nom_refug, datos.dir_refug, datos.telf_refug, datos.licencia_refug, datos.descripcion || null, id_usuario]
     );
     refugio = result.rows[0];
   } else {
@@ -48,27 +36,20 @@ async function guardarDatosRefugio(id_usuario, datos) {
         (id_usuario, nom_refug, dir_refug, telf_refug, licencia_refug, descripcion, est_aprobacion)
        VALUES ($1, $2, $3, $4, $5, $6, 'pendiente')
        RETURNING *`,
-      [
-        id_usuario,
-        datos.nom_refug,
-        datos.dir_refug,
-        datos.telf_refug,
-        datos.licencia_refug,
-        datos.descripcion || null
-      ]
+      [id_usuario, datos.nom_refug, datos.dir_refug, datos.telf_refug, datos.licencia_refug, datos.descripcion || null]
     );
     refugio = result.rows[0];
   }
 
-  // Estado del usuario → 'pendiente'
   await pool.query(
     `UPDATE USUARIOS SET est_usuario = 'pendiente' WHERE id_usuario = $1`,
     [id_usuario]
   );
 
-  // Notificar al admin
+  const idAdmin = await getRolId('administrador');
   const admin = await pool.query(
-    `SELECT id_usuario FROM USUARIOS WHERE id_rol = 5 LIMIT 1`
+    `SELECT id_usuario FROM USUARIOS WHERE id_rol = $1 LIMIT 1`,
+    [idAdmin]
   );
 
   if (admin.rowCount > 0) {
@@ -86,12 +67,11 @@ async function guardarDatosRefugio(id_usuario, datos) {
     );
   }
 
-  // ✅ Generar token nuevo con id_refug
   const token = jwt.sign(
     {
       id: id_usuario,
       rol: 'refugio',
-      id_rol: 3,
+      id_rol: idRolRefugio,
       est: 'pendiente',
       id_refug: refugio.id_refug,
     },
@@ -103,7 +83,7 @@ async function guardarDatosRefugio(id_usuario, datos) {
     id_refug: refugio.id_refug,
     nom_refug: refugio.nom_refug,
     est_aprobacion: refugio.est_aprobacion,
-    token, // ← nuevo
+    token,
     mensaje: 'Tu refugio está pendiente de validación por un administrador'
   };
 }
@@ -119,10 +99,6 @@ async function obtenerDatosRefugio(id_usuario) {
   return result.rowCount === 0 ? null : result.rows[0];
 }
 
-/**
- * Lista TODOS los refugios para el panel admin (no solo pendientes).
- * El frontend filtra por estado en cliente.
- */
 async function obtenerRefugiosPendientes() {
   const result = await pool.query(
     `SELECT r.id_refug, r.nom_refug, r.dir_refug, r.telf_refug,
@@ -168,9 +144,10 @@ async function cambiarEstadoRefugio(id_refug, nuevo_estado) {
   const est_usuario = nuevo_estado === 'aprobado' ? 'activo' : 'rechazado';
 
   if (nuevo_estado === 'rechazado') {
+    const idRolAdoptante = await getRolId('adoptante');
     await pool.query(
-      `UPDATE USUARIOS SET est_usuario = $1, id_rol = 6 WHERE id_usuario = $2`,
-      [est_usuario, refugio.id_usuario]
+      `UPDATE USUARIOS SET est_usuario = $1, id_rol = $3 WHERE id_usuario = $2`,
+      [est_usuario, refugio.id_usuario, idRolAdoptante]
     );
   } else {
     await pool.query(

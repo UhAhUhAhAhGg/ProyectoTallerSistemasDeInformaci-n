@@ -1,19 +1,18 @@
-// filepath: src/services/auth.service.js
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
+const { getRolId } = require('../config/roles');
 
-/**
- * Validación de contraseña: mín 8 chars, mayúscula, número, carácter especial
- */
 function validarContrasena(contra) {
   const regex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
   return regex.test(contra);
 }
 
 async function notificarAdministradoresNuevoRegistro(usuario, rol) {
+  const idAdmin = await getRolId('administrador');
   const admins = await pool.query(
-    'SELECT id_usuario FROM USUARIOS WHERE id_rol = 5'
+    'SELECT id_usuario FROM USUARIOS WHERE id_rol = $1',
+    [idAdmin]
   );
 
   if (admins.rowCount === 0) return;
@@ -36,37 +35,24 @@ async function notificarAdministradoresNuevoRegistro(usuario, rol) {
   );
 }
 
-/**
- * Registrar usuario general (adoptante o refugio)
- */
 async function registrarUsuario(datos) {
   const { correo, contrasena, rol, nombre, apellido } = datos;
 
-  // Verificar que el correo no exista
   const existe = await pool.query(
     'SELECT id_usuario FROM USUARIOS WHERE corr_usuario = $1',
     [correo]
   );
-  if (existe.rowCount > 0) {
-    throw new Error('El correo ya está registrado');
-  }
+  if (existe.rowCount > 0) throw new Error('El correo ya está registrado');
 
-  // id_rol: 5=administrador, 6=adoptante, 7=refugio
-  const id_rol = rol === 'adoptante' ? 6 : 7;
-
-  // Estado inicial según rol
-  const est_usuario = 'incompleto';
-
-  // Hashear contraseña
+  const id_rol = await getRolId(rol);
   const hash = await bcrypt.hash(contrasena, 12);
 
-  // INSERT solo con campos obligatorios
   const result = await pool.query(
     `INSERT INTO USUARIOS 
       (id_rol, corr_usuario, contra_usuario, nom_usuario, apell_usuario, est_usuario)
      VALUES ($1, $2, $3, $4, $5, $6)
      RETURNING id_usuario, id_rol, corr_usuario, nom_usuario, apell_usuario, est_usuario`,
-    [id_rol, correo, hash, nombre || '', apellido || '', est_usuario]
+    [id_rol, correo, hash, nombre || '', apellido || '', 'incompleto']
   );
 
   const usuario = result.rows[0];
@@ -78,9 +64,9 @@ async function registrarUsuario(datos) {
   const token = jwt.sign(
     {
       id: usuario.id_usuario,
-      rol: rol,
+      rol,
       est: usuario.est_usuario,
-      id_refug: null  // recién registrado, aún no tiene refugio
+      id_refug: null
     },
     process.env.JWT_SECRET || 'default-secret-key',
     { expiresIn: '7d' }
@@ -95,21 +81,10 @@ async function registrarUsuario(datos) {
   };
 }
 
-/**
- * Registrar cuenta de refugio y perfil en una sola transaccion.
- * Si cualquier paso falla, no se crea ni el usuario ni el refugio.
- */
 async function registrarRefugioCompleto(datos) {
   const {
-    correo,
-    contrasena,
-    nombre,
-    apellido,
-    nom_refug,
-    dir_refug,
-    telf_refug,
-    licencia_refug,
-    descripcion
+    correo, contrasena, nombre, apellido,
+    nom_refug, dir_refug, telf_refug, licencia_refug, descripcion
   } = datos;
 
   const client = await pool.connect();
@@ -121,10 +96,10 @@ async function registrarRefugioCompleto(datos) {
       'SELECT id_usuario FROM USUARIOS WHERE corr_usuario = $1',
       [correo]
     );
-    if (existe.rowCount > 0) {
-      throw new Error('El correo ya esta registrado');
-    }
+    if (existe.rowCount > 0) throw new Error('El correo ya esta registrado');
 
+    const idRolRefugio = await getRolId('refugio');
+    const idAdmin = await getRolId('administrador');
     const hash = await bcrypt.hash(contrasena, 12);
 
     const usuarioResult = await client.query(
@@ -132,7 +107,7 @@ async function registrarRefugioCompleto(datos) {
         (id_rol, corr_usuario, contra_usuario, nom_usuario, apell_usuario, est_usuario)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id_usuario, id_rol, corr_usuario, nom_usuario, apell_usuario, est_usuario`,
-      [7, correo, hash, nombre || nom_refug, apellido || '-', 'pendiente']
+      [idRolRefugio, correo, hash, nombre || nom_refug, apellido || '-', 'pendiente']
     );
 
     const usuario = usuarioResult.rows[0];
@@ -142,20 +117,14 @@ async function registrarRefugioCompleto(datos) {
         (id_usuario, nom_refug, dir_refug, telf_refug, licencia_refug, descripcion, est_aprobacion)
        VALUES ($1, $2, $3, $4, $5, $6, 'pendiente')
        RETURNING *`,
-      [
-        usuario.id_usuario,
-        nom_refug,
-        dir_refug,
-        telf_refug,
-        licencia_refug,
-        descripcion || null
-      ]
+      [usuario.id_usuario, nom_refug, dir_refug, telf_refug, licencia_refug, descripcion || null]
     );
 
     const refugio = refugioResult.rows[0];
 
     const admins = await client.query(
-      'SELECT id_usuario FROM USUARIOS WHERE id_rol = 5'
+      'SELECT id_usuario FROM USUARIOS WHERE id_rol = $1',
+      [idAdmin]
     );
 
     for (const admin of admins.rows) {
@@ -179,7 +148,7 @@ async function registrarRefugioCompleto(datos) {
       {
         id: usuario.id_usuario,
         rol: 'refugio',
-        id_rol: 7,
+        id_rol: idRolRefugio,
         est: 'pendiente',
         id_refug: refugio.id_refug
       },
@@ -204,9 +173,6 @@ async function registrarRefugioCompleto(datos) {
   }
 }
 
-/**
- * Login de usuario
- */
 async function loginUsuario(correo, contrasena) {
   const result = await pool.query(
     `SELECT u.id_usuario, u.id_rol, u.corr_usuario, u.contra_usuario,
@@ -217,38 +183,29 @@ async function loginUsuario(correo, contrasena) {
     [correo]
   );
 
-  if (result.rowCount === 0) {
-    throw new Error('Usuario o contraseña incorrectos');
-  }
+  if (result.rowCount === 0) throw new Error('Usuario o contraseña incorrectos');
 
   const usuario = result.rows[0];
 
   const esValida = await bcrypt.compare(contrasena, usuario.contra_usuario);
-  if (!esValida) {
-    throw new Error('Usuario o contraseña incorrectos');
-  }
+  if (!esValida) throw new Error('Usuario o contraseña incorrectos');
 
-  // ✅ NUEVO: bloqueo de cuenta por administrador
   if (usuario.est_usuario === 'bloqueado') {
     throw new Error('Tu cuenta ha sido bloqueada por un administrador. Contacta a admin@petmatch.com');
   }
-
   if (usuario.est_usuario === 'rechazado') {
-     throw new Error('Tu solicitud fue rechazada. Contacta al administrador.');
- }
+    throw new Error('Tu solicitud fue rechazada. Contacta al administrador.');
+  }
 
   const nombreRol = usuario.nom_rol.toLowerCase();
 
-  // Si es refugio, buscar su id_refug para incluirlo en el token
   let id_refug = null;
   if (nombreRol === 'refugio') {
     const refResult = await pool.query(
       'SELECT id_refug FROM REFUGIOS WHERE id_usuario = $1',
       [usuario.id_usuario]
     );
-    if (refResult.rowCount > 0) {
-      id_refug = refResult.rows[0].id_refug;
-    }
+    if (refResult.rowCount > 0) id_refug = refResult.rows[0].id_refug;
   }
 
   const token = jwt.sign(
@@ -257,7 +214,7 @@ async function loginUsuario(correo, contrasena) {
       rol: nombreRol,
       id_rol: usuario.id_rol,
       est: usuario.est_usuario,
-      id_refug  // null si es adoptante/admin, número si es refugio
+      id_refug
     },
     process.env.JWT_SECRET || 'default-secret-key',
     { expiresIn: '7d' }
@@ -274,9 +231,6 @@ async function loginUsuario(correo, contrasena) {
   };
 }
 
-/**
- * Obtener datos del usuario actual
- */
 async function obtenerUsuarioActual(id_usuario) {
   const result = await pool.query(
     `SELECT u.id_usuario, u.id_rol, u.corr_usuario, u.nom_usuario,
@@ -286,11 +240,7 @@ async function obtenerUsuarioActual(id_usuario) {
      WHERE u.id_usuario = $1`,
     [id_usuario]
   );
-
-  if (result.rowCount === 0) {
-    throw new Error('Usuario no encontrado');
-  }
-
+  if (result.rowCount === 0) throw new Error('Usuario no encontrado');
   return result.rows[0];
 }
 
