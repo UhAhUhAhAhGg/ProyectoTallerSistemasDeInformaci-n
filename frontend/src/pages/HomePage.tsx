@@ -76,48 +76,6 @@ export default function HomePage() {
             <p className="hp-eyebrow">Adopcion responsable en Bolivia</p>
             <h1>Adopta un amigo para toda la vida</h1>
             
-            {/* 🧪 BOTÓN DE PRUEBA */}
-            <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#ffe0e6', borderRadius: '5px', textAlign: 'left', border: '2px solid #d4437d' }}>
-              <p style={{ fontSize: '14px', margin: '5px 0', fontWeight: 'bold', color: '#d4437d' }}>
-                🔍 DEBUG INFO:
-              </p>
-              <p style={{ fontSize: '12px', margin: '3px 0', color: '#333' }}>
-                rol = "{userRol}" {userRol === 'adoptante' ? '✅' : userRol === 'refugio' ? '✅' : '❌'}
-              </p>
-              <p style={{ fontSize: '12px', margin: '3px 0', color: '#333' }}>
-                estado = "{estUsuario}" {estUsuario === 'activo' ? '✅' : estUsuario === 'incompleto' ? '⚠️' : '❌'}
-              </p>
-              <p style={{ fontSize: '12px', margin: '3px 0', color: '#333' }}>
-                nombre = "{userName}" {userName ? '✅' : '❌'}
-              </p>
-              <p style={{ fontSize: '12px', margin: '10px 0 0 0', fontWeight: 'bold', color: '#d4437d' }}>
-                Condición: (rol=adoptante) OR (rol=refugio AND estado=activo)
-              </p>
-              
-              {(userRol === 'adoptante' || (userRol === 'refugio' && estUsuario === 'activo')) && (
-                <button 
-                  style={{ 
-                    backgroundColor: '#d4437d', 
-                    color: 'white', 
-                    border: 'none', 
-                    padding: '10px 20px', 
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    marginTop: '10px',
-                    fontWeight: 'bold'
-                  }}
-                  onClick={() => navigate('/adaptacion-seguimiento')}
-                >
-                  {userRol === 'refugio' ? '🔬 PRUEBA: Observaciones' : '🔬 PRUEBA: Seguimiento'}
-                </button>
-              )}
-              {!((userRol === 'adoptante' || (userRol === 'refugio' && estUsuario === 'activo')) && userName) && (
-                <p style={{ fontSize: '12px', margin: '10px 0 0 0', color: '#999' }}>
-                  ⚠️ Botón NO visible - condición no se cumple
-                </p>
-              )}
-            </div>
-            
             <p className="hp-hero-sub">
               Miles de mascotas esperan un hogar lleno de amor. Encuentra companeros cercanos,
               conoce refugios verificados y empieza una adopcion simple y segura.
