@@ -1,6 +1,7 @@
 // frontend/src/pages/SolicitudesRefugioPage.tsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Navbar from './Navbar';
 
 const ADOPTIONS_BASE = import.meta.env.VITE_ADOPTIONS_API_URL || 'http://localhost:3004';
 
@@ -12,7 +13,6 @@ interface Solicitud {
   nom_est?: string;
   fech_soli: string;
   decrip_soli?: string;
-  // Enriquecidos por el JOIN del repo
   nom_mascot?: string;
   nom_usuario?: string;
   apell_usuario?: string;
@@ -20,21 +20,21 @@ interface Solicitud {
 }
 
 const ESTADO_ID = {
-  enviada:      1,
-  en_revision:  2,
-  aprobada:     3,
-  rechazada:    4,
-  en_espera:    5,
+  enviada:     1,
+  en_revision: 2,
+  aprobada:    3,
+  rechazada:   4,
+  en_espera:   5,
 } as const;
 
 const estadoColor: Record<string, string> = {
-  enviada:        '#3b82f6',
-  'en revisión':  '#f59e0b',
-  'en revision':  '#f59e0b',
-  aprobada:       '#22c55e',
-  rechazada:      '#ef4444',
-  completada:     '#6366f1',
-  'en espera':    '#a855f7',
+  enviada:       '#3b82f6',
+  'en revisión': '#f59e0b',
+  'en revision': '#f59e0b',
+  aprobada:      '#22c55e',
+  rechazada:     '#ef4444',
+  completada:    '#6366f1',
+  'en espera':   '#a855f7',
 };
 
 function authHeaders() {
@@ -51,21 +51,18 @@ export default function SolicitudesRefugioPage() {
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState('');
 
-  // Modal para capturar motivo
   const [modal, setModal] = useState<{
     solicitud: Solicitud;
     decision: 'aprobada' | 'rechazada';
   } | null>(null);
-  const [motivo, setMotivo]           = useState('');
-  const [accionando, setAccionando]   = useState(false);
+  const [motivo, setMotivo]         = useState('');
+  const [accionando, setAccionando] = useState(false);
 
   const cargar = async () => {
     try {
       setLoading(true);
       setError('');
-      const res = await fetch(`${ADOPTIONS_BASE}/solicitudes/refugio`, {
-        headers: authHeaders(),
-      });
+      const res = await fetch(`${ADOPTIONS_BASE}/solicitudes/refugio`, { headers: authHeaders() });
       if (!res.ok) throw new Error(`Error ${res.status}`);
       const json = await res.json();
       setSolicitudes(json.data ?? []);
@@ -85,10 +82,7 @@ export default function SolicitudesRefugioPage() {
 
   const confirmarAccion = async () => {
     if (!modal) return;
-    if (!motivo.trim()) {
-      alert('El motivo es obligatorio');
-      return;
-    }
+    if (!motivo.trim()) { alert('El motivo es obligatorio'); return; }
 
     setAccionando(true);
     try {
@@ -97,10 +91,7 @@ export default function SolicitudesRefugioPage() {
         {
           method: 'PATCH',
           headers: authHeaders(),
-          body: JSON.stringify({
-            id_est: ESTADO_ID[modal.decision],
-            motivo: motivo.trim(),
-          }),
+          body: JSON.stringify({ id_est: ESTADO_ID[modal.decision], motivo: motivo.trim() }),
         }
       );
       if (!res.ok) {
@@ -127,15 +118,9 @@ export default function SolicitudesRefugioPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', fontFamily: 'system-ui, sans-serif' }}>
-      {/* Header */}
-      <div style={{
-        background: '#fff', borderBottom: '1px solid #e2e8f0',
-        padding: '16px 32px', display: 'flex', alignItems: 'center', gap: 16,
-      }}>
-        <button onClick={() => navigate('/dashboard/refugio')}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', fontSize: 14 }}>
-          ← Volver
-        </button>
+      <Navbar />
+
+      <div style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', padding: '16px 32px', display: 'flex', alignItems: 'center', gap: 16 }}>
         <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>
           📋 Solicitudes de Adopción
         </h1>
@@ -158,11 +143,7 @@ export default function SolicitudesRefugioPage() {
               <thead>
                 <tr style={{ background: '#f8fafc' }}>
                   {['Mascota', 'Adoptante', 'Mensaje', 'Fecha', 'Estado', 'Acciones'].map(h => (
-                    <th key={h} style={{
-                      padding: '12px 16px', textAlign: 'left', fontSize: 12,
-                      fontWeight: 600, color: '#64748b', textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                    }}>{h}</th>
+                    <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -186,33 +167,17 @@ export default function SolicitudesRefugioPage() {
                         {new Date(s.fech_soli).toLocaleDateString('es-BO')}
                       </td>
                       <td style={{ padding: '14px 16px' }}>
-                        <span style={{
-                          background: color + '20', color, padding: '4px 10px',
-                          borderRadius: 20, fontSize: 12, fontWeight: 600,
-                          textTransform: 'capitalize',
-                        }}>
+                        <span style={{ background: color + '20', color, padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600, textTransform: 'capitalize' }}>
                           {est}
                         </span>
                       </td>
                       <td style={{ padding: '14px 16px' }}>
                         {isPendiente(s) ? (
                           <div style={{ display: 'flex', gap: 8 }}>
-                            <button
-                              onClick={() => abrirModal(s, 'aprobada')}
-                              style={{
-                                background: '#dcfce7', color: '#16a34a', border: 'none',
-                                borderRadius: 6, padding: '6px 12px', cursor: 'pointer',
-                                fontWeight: 600, fontSize: 13,
-                              }}>
+                            <button onClick={() => abrirModal(s, 'aprobada')} style={{ background: '#dcfce7', color: '#16a34a', border: 'none', borderRadius: 6, padding: '6px 12px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
                               ✓ Aprobar
                             </button>
-                            <button
-                              onClick={() => abrirModal(s, 'rechazada')}
-                              style={{
-                                background: '#fee2e2', color: '#dc2626', border: 'none',
-                                borderRadius: 6, padding: '6px 12px', cursor: 'pointer',
-                                fontWeight: 600, fontSize: 13,
-                              }}>
+                            <button onClick={() => abrirModal(s, 'rechazada')} style={{ background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: 6, padding: '6px 12px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
                               ✕ Rechazar
                             </button>
                           </div>
@@ -229,17 +194,9 @@ export default function SolicitudesRefugioPage() {
         )}
       </div>
 
-      {/* Modal de motivo */}
       {modal && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          zIndex: 1000, padding: 20,
-        }}>
-          <div style={{
-            background: '#fff', borderRadius: 16, padding: 28,
-            width: '100%', maxWidth: 480, boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
-          }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: 28, width: '100%', maxWidth: 480, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
             <h2 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 700, color: '#1e293b' }}>
               {modal.decision === 'aprobada' ? '✓ Aprobar solicitud' : '✕ Rechazar solicitud'}
             </h2>
@@ -254,40 +211,20 @@ export default function SolicitudesRefugioPage() {
             <textarea
               value={motivo}
               onChange={e => setMotivo(e.target.value)}
-              placeholder={
-                modal.decision === 'aprobada'
-                  ? 'Ej: Bienvenido, te contactaremos pronto para coordinar la entrega...'
-                  : 'Ej: Lo sentimos, en este momento priorizamos otro perfil...'
-              }
+              placeholder={modal.decision === 'aprobada' ? 'Ej: Bienvenido, te contactaremos pronto...' : 'Ej: Lo sentimos, en este momento priorizamos otro perfil...'}
               rows={4}
-              style={{
-                width: '100%', padding: '10px 12px', border: '1px solid #d1d5db',
-                borderRadius: 8, fontSize: 14, outline: 'none',
-                fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box',
-              }}
+              style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: 8, fontSize: 14, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }}
             />
 
             <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
-              <button
-                onClick={() => setModal(null)}
-                disabled={accionando}
-                style={{
-                  flex: 1, background: '#f1f5f9', color: '#475569',
-                  border: 'none', borderRadius: 8, padding: 12,
-                  cursor: 'pointer', fontWeight: 600,
-                }}>
+              <button onClick={() => setModal(null)} disabled={accionando} style={{ flex: 1, background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: 8, padding: 12, cursor: 'pointer', fontWeight: 600 }}>
                 Cancelar
               </button>
               <button
                 onClick={confirmarAccion}
                 disabled={accionando || !motivo.trim()}
-                style={{
-                  flex: 2,
-                  background: modal.decision === 'aprobada' ? '#16a34a' : '#dc2626',
-                  color: '#fff', border: 'none', borderRadius: 8, padding: 12,
-                  cursor: accionando || !motivo.trim() ? 'not-allowed' : 'pointer',
-                  fontWeight: 600, opacity: accionando || !motivo.trim() ? 0.6 : 1,
-                }}>
+                style={{ flex: 2, background: modal.decision === 'aprobada' ? '#16a34a' : '#dc2626', color: '#fff', border: 'none', borderRadius: 8, padding: 12, cursor: accionando || !motivo.trim() ? 'not-allowed' : 'pointer', fontWeight: 600, opacity: accionando || !motivo.trim() ? 0.6 : 1 }}
+              >
                 {accionando ? 'Procesando...' : `Confirmar ${modal.decision === 'aprobada' ? 'aprobación' : 'rechazo'}`}
               </button>
             </div>

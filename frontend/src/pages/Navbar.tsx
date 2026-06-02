@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { refugioService } from '../services/api';
+import { getNoLeidos } from '../services/mensajeriaService';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -11,17 +12,15 @@ export default function Navbar() {
   const [estUsuario, setEstUsuario] = useState<string | null>(() => localStorage.getItem('est_usuario'));
   const [mensajesNoLeidos, setMensajesNoLeidos] = useState(0);
 
-  // Función auxiliar para actualizar estado desde localStorage
   const updateAuthState = () => {
     const nombre = localStorage.getItem('nombre');
     const rol = localStorage.getItem('rol');
     const estado = localStorage.getItem('est_usuario');
-    
+
     setUserName(nombre);
     setUserRol(rol);
     setEstUsuario(estado);
 
-    // Si es refugio, validar estado con el backend
     if (rol === 'refugio') {
       refugioService.obtenerDatos()
         .then((res) => {
@@ -59,7 +58,7 @@ export default function Navbar() {
       const nombre = localStorage.getItem('nombre');
       const rol = localStorage.getItem('rol');
       const estado = localStorage.getItem('est_usuario');
-      
+
       setUserName(nombre);
       setUserRol(rol);
       setEstUsuario(estado);
@@ -67,6 +66,22 @@ export default function Navbar() {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Polling de mensajes no leídos cada 30 segundos
+  useEffect(() => {
+    if (!userName) {
+      setMensajesNoLeidos(0);
+      return;
+    }
+    const fetchNoLeidos = () => {
+      getNoLeidos()
+        .then(setMensajesNoLeidos)
+        .catch(() => {});
+    };
+    fetchNoLeidos();
+    const interval = setInterval(fetchNoLeidos, 30_000);
+    return () => clearInterval(interval);
+  }, [userName, location.pathname]);
 
   const handleLogout = () => {
     localStorage.clear();

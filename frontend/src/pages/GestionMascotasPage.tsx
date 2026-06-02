@@ -1,6 +1,8 @@
 // frontend/src/pages/GestionMascotasPage.tsx
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Navbar from './Navbar';
+import PetDetailModal from '../components/catalog/PetDetailModal';
 import {
   getAnimalesRefugio,
   crearAnimal,
@@ -35,7 +37,7 @@ const DEFAULT_FORM = {
   esterilizado:   'false',
   id_espe:        '',
   id_raza:        '',
-  img_mascot:     '',   // base64 data URL
+  img_mascot:     '',
 };
 
 export default function GestionMascotasPage() {
@@ -51,9 +53,9 @@ export default function GestionMascotasPage() {
   const [form,       setForm]       = useState(DEFAULT_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [imgPreview, setImgPreview] = useState('');
+  const [detalle,    setDetalle]    = useState<Animal | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // ── Carga inicial ────────────────────────────────────────────────────────
   const cargar = async () => {
     try {
       setLoading(true);
@@ -71,7 +73,6 @@ export default function GestionMascotasPage() {
 
   useEffect(() => { cargar(); }, []);
 
-  // Razas se cargan cuando cambia la especie seleccionada
   useEffect(() => {
     if (form.id_espe) {
       getRazas(Number(form.id_espe))
@@ -82,16 +83,10 @@ export default function GestionMascotasPage() {
     }
   }, [form.id_espe]);
 
-  // ── Manejo de imagen ─────────────────────────────────────────────────────
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    if (file.size > 2 * 1024 * 1024) {
-      alert('La imagen no debe superar 2 MB');
-      return;
-    }
-
+    if (file.size > 2 * 1024 * 1024) { alert('La imagen no debe superar 2 MB'); return; }
     try {
       const b64 = await fileToBase64(file);
       setImgPreview(b64);
@@ -101,7 +96,6 @@ export default function GestionMascotasPage() {
     }
   };
 
-  // ── Abrir modal ──────────────────────────────────────────────────────────
   const abrirCrear = () => {
     setEditando(null);
     setForm(DEFAULT_FORM);
@@ -125,7 +119,6 @@ export default function GestionMascotasPage() {
     setShowModal(true);
   };
 
-  // ── Guardar ──────────────────────────────────────────────────────────────
   const guardar = async () => {
     if (!form.nom_mascot.trim())     { alert('El nombre es requerido');       return; }
     if (!form.edad_mascot)           { alert('La edad es requerida');         return; }
@@ -148,20 +141,17 @@ export default function GestionMascotasPage() {
       if (editando) {
         await actualizarAnimal(editando.id_mascot, payload);
       } else {
-        // 1) crear mascota
         const respAnimal = await crearAnimal(payload);
         const id_mascot: number = respAnimal?.data?.id_mascot ?? respAnimal?.id_mascot;
-
-        // 2) crear publicación automáticamente para que aparezca en el listado
         if (id_mascot) {
-  await crearPublicacion({
-    id_mascot,
-    arch_publi:   form.img_mascot,            // misma imagen base64
-    decrip_publi: form.descrip_mascot.trim(), // misma descripción
-  }).catch((err) => {
-    console.warn('No se pudo crear la publicación automática:', err);
-  });
-}
+          await crearPublicacion({
+            id_mascot,
+            arch_publi:   form.img_mascot,
+            decrip_publi: form.descrip_mascot.trim(),
+          }).catch((err) => {
+            console.warn('No se pudo crear la publicación automática:', err);
+          });
+        }
       }
 
       setShowModal(false);
@@ -173,21 +163,13 @@ export default function GestionMascotasPage() {
     }
   };
 
-  // ── Render ───────────────────────────────────────────────────────────────
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', fontFamily: 'system-ui, sans-serif' }}>
 
-      {/* Header */}
+      <Navbar />
+
       <div style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button
-            onClick={() => navigate('/dashboard/refugio')}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', fontSize: 14 }}
-          >
-            ← Volver
-          </button>
-          <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>🐾 Gestión de Mascotas</h1>
-        </div>
+        <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>🐾 Gestión de Mascotas</h1>
         <button
           onClick={abrirCrear}
           style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}
@@ -240,12 +222,20 @@ export default function GestionMascotasPage() {
                     <td style={{ padding: '14px 16px', color: '#475569' }}>{a.edad_mascot} año{a.edad_mascot !== 1 ? 's' : ''}</td>
                     <td style={{ padding: '14px 16px', color: '#475569' }}>{a.gen_mascot ? 'Macho' : 'Hembra'}</td>
                     <td style={{ padding: '14px 16px' }}>
-                      <button
-                        onClick={() => abrirEditar(a)}
-                        style={{ background: '#e0e7ff', color: '#6366f1', border: 'none', borderRadius: 6, padding: '6px 12px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
-                      >
-                        Editar
-                      </button>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <button
+                          onClick={() => setDetalle(a)}
+                          style={{ background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: 6, padding: '6px 12px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
+                        >
+                          Ver
+                        </button>
+                        <button
+                          onClick={() => abrirEditar(a)}
+                          style={{ background: '#e0e7ff', color: '#6366f1', border: 'none', borderRadius: 6, padding: '6px 12px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
+                        >
+                          Editar
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -255,7 +245,25 @@ export default function GestionMascotasPage() {
         )}
       </div>
 
-      {/* ── Modal ─────────────────────────────────────────────────────────── */}
+      {/* Modal detalle */}
+      {detalle && (
+        <PetDetailModal
+          pet={{
+            id_mascot:      detalle.id_mascot,
+            nom_mascot:     detalle.nom_mascot,
+            nom_espe:       detalle.nom_espe ?? '',
+            nom_raza:       detalle.nom_raza ?? '',
+            edad_mascot:    detalle.edad_mascot,
+            gen_mascot:     detalle.gen_mascot,
+            esterilizado:   detalle.esterilizado,
+            img_mascot:     detalle.img_mascot,
+            descrip_mascot: detalle.descrip_mascot,
+          }}
+          onClose={() => setDetalle(null)}
+        />
+      )}
+
+      {/* Modal editar/crear */}
       {showModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, overflowY: 'auto', padding: 24 }}>
           <div style={{ background: '#fff', borderRadius: 16, padding: 32, width: '100%', maxWidth: 500, boxShadow: '0 20px 60px rgba(0,0,0,0.2)', margin: 'auto' }}>
@@ -263,15 +271,10 @@ export default function GestionMascotasPage() {
               {editando ? 'Editar mascota' : 'Nueva mascota'}
             </h2>
 
-            {/* Imagen */}
             <label style={lblStyle}>Foto de la mascota *</label>
             <div
               onClick={() => fileRef.current?.click()}
-              style={{
-                border: '2px dashed #d1d5db', borderRadius: 10, padding: 16,
-                textAlign: 'center', cursor: 'pointer', marginBottom: 4,
-                background: imgPreview ? '#f8fafc' : '#fafafa',
-              }}
+              style={{ border: '2px dashed #d1d5db', borderRadius: 10, padding: 16, textAlign: 'center', cursor: 'pointer', marginBottom: 4, background: imgPreview ? '#f8fafc' : '#fafafa' }}
             >
               {imgPreview ? (
                 <img src={imgPreview} alt="preview" style={{ maxHeight: 160, maxWidth: '100%', borderRadius: 8, objectFit: 'cover' }} />
@@ -282,114 +285,54 @@ export default function GestionMascotasPage() {
                 </div>
               )}
             </div>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleImageChange}
-            />
+            <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageChange} />
             {imgPreview && (
               <button
-                onClick={() => {
-                  setImgPreview('');
-                  setForm(f => ({ ...f, img_mascot: '' }));
-                  if (fileRef.current) fileRef.current.value = '';
-                }}
+                onClick={() => { setImgPreview(''); setForm(f => ({ ...f, img_mascot: '' })); if (fileRef.current) fileRef.current.value = ''; }}
                 style={{ fontSize: 12, color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer', marginTop: 4 }}
               >
                 ✕ Quitar imagen
               </button>
             )}
 
-            {/* Nombre */}
             <label style={lblStyle}>Nombre *</label>
-            <input
-              value={form.nom_mascot}
-              onChange={e => setForm(f => ({ ...f, nom_mascot: e.target.value }))}
-              style={inputStyle}
-              placeholder="Ej: Luna"
-            />
+            <input value={form.nom_mascot} onChange={e => setForm(f => ({ ...f, nom_mascot: e.target.value }))} style={inputStyle} placeholder="Ej: Luna" />
 
-            {/* Especie */}
             <label style={lblStyle}>Especie *</label>
-            <select
-              value={form.id_espe}
-              onChange={e => setForm(f => ({ ...f, id_espe: e.target.value, id_raza: '' }))}
-              style={inputStyle}
-            >
+            <select value={form.id_espe} onChange={e => setForm(f => ({ ...f, id_espe: e.target.value, id_raza: '' }))} style={inputStyle}>
               <option value="">Seleccionar especie</option>
               {especies.map(e => <option key={e.id_espe} value={e.id_espe}>{e.nom_espe}</option>)}
             </select>
 
-            {/* Raza */}
             <label style={lblStyle}>Raza *</label>
-            <select
-              value={form.id_raza}
-              onChange={e => setForm(f => ({ ...f, id_raza: e.target.value }))}
-              style={{ ...inputStyle, opacity: !form.id_espe ? 0.6 : 1 }}
-              disabled={!form.id_espe}
-            >
+            <select value={form.id_raza} onChange={e => setForm(f => ({ ...f, id_raza: e.target.value }))} style={{ ...inputStyle, opacity: !form.id_espe ? 0.6 : 1 }} disabled={!form.id_espe}>
               <option value="">{form.id_espe ? 'Seleccionar raza' : 'Primero elige una especie'}</option>
               {razas.map(r => <option key={r.id_raza} value={r.id_raza}>{r.nom_raza}</option>)}
             </select>
 
-            {/* Edad */}
             <label style={lblStyle}>Edad (años) *</label>
-            <input
-              type="number"
-              min={0}
-              max={30}
-              value={form.edad_mascot}
-              onChange={e => setForm(f => ({ ...f, edad_mascot: e.target.value }))}
-              style={inputStyle}
-              placeholder="Ej: 2"
-            />
+            <input type="number" min={0} max={30} value={form.edad_mascot} onChange={e => setForm(f => ({ ...f, edad_mascot: e.target.value }))} style={inputStyle} placeholder="Ej: 2" />
 
-            {/* Género */}
             <label style={lblStyle}>Género</label>
-            <select
-              value={form.gen_mascot}
-              onChange={e => setForm(f => ({ ...f, gen_mascot: e.target.value }))}
-              style={inputStyle}
-            >
+            <select value={form.gen_mascot} onChange={e => setForm(f => ({ ...f, gen_mascot: e.target.value }))} style={inputStyle}>
               <option value="true">Macho</option>
               <option value="false">Hembra</option>
             </select>
 
-            {/* Esterilizado */}
             <label style={lblStyle}>¿Está esterilizado/a?</label>
-            <select
-              value={form.esterilizado}
-              onChange={e => setForm(f => ({ ...f, esterilizado: e.target.value }))}
-              style={inputStyle}
-            >
+            <select value={form.esterilizado} onChange={e => setForm(f => ({ ...f, esterilizado: e.target.value }))} style={inputStyle}>
               <option value="false">No</option>
               <option value="true">Sí</option>
             </select>
 
-            {/* Descripción */}
             <label style={lblStyle}>Descripción *</label>
-            <textarea
-              value={form.descrip_mascot}
-              onChange={e => setForm(f => ({ ...f, descrip_mascot: e.target.value }))}
-              style={{ ...inputStyle, height: 80, resize: 'vertical' }}
-              placeholder="Personalidad, cuidados especiales, historia..."
-            />
+            <textarea value={form.descrip_mascot} onChange={e => setForm(f => ({ ...f, descrip_mascot: e.target.value }))} style={{ ...inputStyle, height: 80, resize: 'vertical' }} placeholder="Personalidad, cuidados especiales, historia..." />
 
-            {/* Botones */}
             <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
-              <button
-                onClick={() => setShowModal(false)}
-                style={{ flex: 1, background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: 8, padding: 12, cursor: 'pointer', fontWeight: 600 }}
-              >
+              <button onClick={() => setShowModal(false)} style={{ flex: 1, background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: 8, padding: 12, cursor: 'pointer', fontWeight: 600 }}>
                 Cancelar
               </button>
-              <button
-                onClick={guardar}
-                disabled={submitting}
-                style={{ flex: 2, background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: 12, cursor: submitting ? 'not-allowed' : 'pointer', fontWeight: 600, opacity: submitting ? 0.7 : 1 }}
-              >
+              <button onClick={guardar} disabled={submitting} style={{ flex: 2, background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: 12, cursor: submitting ? 'not-allowed' : 'pointer', fontWeight: 600, opacity: submitting ? 0.7 : 1 }}>
                 {submitting ? 'Guardando...' : editando ? 'Guardar cambios' : 'Registrar mascota'}
               </button>
             </div>

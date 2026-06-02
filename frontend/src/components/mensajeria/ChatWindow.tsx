@@ -44,10 +44,18 @@ export default function ChatWindow({
     setEnviando(true);
     setError(null);
     try {
-      const nuevo = await enviarMensaje({
-        contenido:       texto.trim(),
-        id_conversacion: conversacion.id_conversacion,
-      });
+      const isNueva = conversacion.id_conversacion === -1;
+      const payload = isNueva
+        ? {
+            contenido: texto.trim(),
+            id_refug:  conversacion.id_refug,
+            ...(conversacion.id_publi != null ? { id_publi: conversacion.id_publi } : {}),
+          }
+        : {
+            contenido:       texto.trim(),
+            id_conversacion: conversacion.id_conversacion,
+          };
+      const nuevo = await enviarMensaje(payload);
       onMensajeEnviado(nuevo);
       setTexto('');
     } catch (err: unknown) {

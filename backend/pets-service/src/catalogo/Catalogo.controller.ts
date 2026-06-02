@@ -64,9 +64,10 @@ export const getCatalogo = async (req: Request, res: Response): Promise<void> =>
          p.id_publi, p.id_refug, p.fech_publi,
          p.arch_publi, p.decrip_publi,
          m.id_mascot, m.nom_mascot, m.edad_mascot, m.gen_mascot, m.esterilizado, m.img_mascot,
+         m.descrip_mascot,
          r.nom_raza,
          e.nom_espe,
-         ref.nom_refug, ref.dir_refug
+         ref.nom_refug, ref.dir_refug, ref.telf_refug
        FROM PUBLICACIONES p
        JOIN MASCOTAS m   ON m.id_mascot = p.id_mascot
        JOIN RAZAS r      ON r.id_raza   = m.id_raza
