@@ -27,7 +27,6 @@ export default function ForgotPasswordPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.mensaje || 'Error al procesar la solicitud');
-
       setMensaje(data.mensaje);
       if (data.dev_token) setDevToken(data.dev_token);
     } catch (err: unknown) {
@@ -38,69 +37,84 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="login-wrapper">
+    <div className="login-container">
+      <button className="login-back-btn" onClick={() => navigate('/login')}>
+        ← Volver al login
+      </button>
+
       <div className="login-card">
         <div className="login-brand">
-          <span className="login-brand__icon">AM</span>
-          <h1>Recuperar contraseña</h1>
+          <span className="login-brand-paw">🐾</span>
+          <span className="login-brand-name">PetMatch</span>
         </div>
 
-        <p style={{ color: '#6b7280', fontSize: 14, marginBottom: 20 }}>
-          Ingresa tu correo electrónico y te enviaremos las instrucciones para restablecer tu contraseña.
+        <h1>Recuperar contraseña</h1>
+        <p className="login-subtitle">
+          Ingresa tu correo y te enviaremos las instrucciones para restablecer tu contraseña.
         </p>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <label className="login-form__label">
-            Correo electrónico
-            <input
-              type="email"
-              className="login-form__input"
-              value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
-              placeholder="tu@correo.com"
-              required
-            />
-          </label>
+        {error && <div className="error-banner">{error}</div>}
 
-          {error && <p className="login-form__error">{error}</p>}
-          {mensaje && (
-            <div style={{ background: '#dcfce7', color: '#166534', padding: '10px 14px',
-              borderRadius: 8, fontSize: 14, marginBottom: 8 }}>
-              {mensaje}
-            </div>
-          )}
-          {devToken && (
-            <div style={{ background: '#fef9c3', color: '#713f12', padding: '10px 14px',
-              borderRadius: 8, fontSize: 13, marginBottom: 8 }}>
-              <strong>SOLO EN DESARROLLO:</strong> Tu token de reset es:
-              <br />
-              <code style={{ wordBreak: 'break-all' }}>{devToken}</code>
-              <br />
-              <button
-                type="button"
-                style={{ marginTop: 8, padding: '4px 12px', background: '#4f46e5', color: '#fff',
-                  border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}
-                onClick={() => navigate(`/reset-password?token=${devToken}`)}
-              >
-                Ir a cambiar contraseña
-              </button>
-            </div>
-          )}
+        {mensaje && (
+          <div style={{
+            background: '#dcfce7', color: '#166534',
+            padding: '12px 16px', borderRadius: 10,
+            fontSize: 14, marginBottom: 16, border: '1px solid #bbf7d0'
+          }}>
+            {mensaje}
+          </div>
+        )}
 
-          <button
-            type="submit"
-            className="login-form__submit"
-            disabled={loading}
+        {devToken && (
+          <div style={{
+            background: '#fef9c3', color: '#713f12',
+            padding: '12px 16px', borderRadius: 10,
+            fontSize: 13, marginBottom: 16, border: '1px solid #fde68a'
+          }}>
+            <strong>SOLO EN DESARROLLO — token de reset:</strong>
+            <br />
+            <code style={{ wordBreak: 'break-all', display: 'block', marginTop: 4 }}>
+              {devToken}
+            </code>
+            <button
+              type="button"
+              className="login-button"
+              style={{ marginTop: 10 }}
+              onClick={() => navigate(`/reset-password?token=${devToken}`)}
+            >
+              Ir a cambiar contraseña
+            </button>
+          </div>
+        )}
+
+        {!mensaje && (
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="correo">Correo electrónico</label>
+              <input
+                type="email"
+                id="correo"
+                value={correo}
+                onChange={(e) => setCorreo(e.target.value)}
+                placeholder="tu@correo.com"
+                required
+              />
+            </div>
+            <button type="submit" className="login-button" disabled={loading}>
+              {loading ? 'Enviando...' : 'Enviar instrucciones'}
+            </button>
+          </form>
+        )}
+
+        <p className="register-link">
+          ¿Ya recordaste tu contraseña?{' '}
+          <a
+            href="#"
+            onClick={(e) => { e.preventDefault(); navigate('/login'); }}
           >
-            {loading ? 'Enviando...' : 'Enviar instrucciones'}
-          </button>
-        </form>
-
-        <div className="login-footer">
-          <button type="button" className="login-footer__link" onClick={() => navigate('/login')}>
-            Volver al inicio de sesión
-          </button>
-        </div>
+            Iniciar sesión
+          </a>
+        </p>
       </div>
     </div>
   );

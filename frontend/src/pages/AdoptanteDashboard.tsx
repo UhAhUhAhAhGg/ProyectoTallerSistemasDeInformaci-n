@@ -43,7 +43,6 @@ export default function AdoptanteDashboard() {
     );
   }
 
-  // Refugio rechazado degradado a adoptante
   if (estUsuario === 'rechazado') {
     return (
       <div className="ad-wrapper">
@@ -58,7 +57,6 @@ export default function AdoptanteDashboard() {
             <p className="ad-rejected-info">
               Si crees que esto es un error o deseas más información, comunícate directamente con el administrador.
             </p>
-
             <div className="ad-contact-box">
               <span className="ad-contact-box-icon">✉️</span>
               <div className="ad-contact-box-info">
@@ -74,7 +72,10 @@ export default function AdoptanteDashboard() {
     );
   }
 
-  // Adoptante normal
+  const puedeVerSeguimiento =
+    userRol === 'adoptante' ||
+    (userRol === 'refugio' && estUsuario === 'activo');
+
   return (
     <div className="ad-wrapper">
       <Navbar />
@@ -84,46 +85,6 @@ export default function AdoptanteDashboard() {
             <h1>¡Hola, {nombre || 'Adoptante'}! 🐾</h1>
             <p>Encuentra tu compañero ideal y gestiona tus solicitudes desde aquí.</p>
           </div>
-        </div>
-
-        {/* 🧪 DEBUG BOX */}
-        <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#ffe0e6', borderRadius: '5px', border: '2px solid #d4437d' }}>
-          <p style={{ fontSize: '14px', margin: '5px 0', fontWeight: 'bold', color: '#d4437d' }}>
-            🔍 DEBUG - Valores en localStorage:
-          </p>
-          <p style={{ fontSize: '12px', margin: '3px 0', color: '#333' }}>
-            • rol = "{userRol}" {userRol === 'adoptante' ? '✅' : '❌'}
-          </p>
-          <p style={{ fontSize: '12px', margin: '3px 0', color: '#333' }}>
-            • est_usuario = "{estUsuario}" {estUsuario === 'activo' || estUsuario === 'incompleto' ? '✅' : '❌'}
-          </p>
-          <p style={{ fontSize: '12px', margin: '3px 0', color: '#333' }}>
-            • nombre = "{nombre}" {nombre ? '✅' : '❌'}
-          </p>
-          <p style={{ fontSize: '12px', margin: '10px 0 0 0', fontWeight: 'bold', color: '#d4437d' }}>
-            Condición para botón: (rol=adoptante) OR (rol=refugio AND estado=activo)
-          </p>
-          {(userRol === 'adoptante' || (userRol === 'refugio' && estUsuario === 'activo')) ? (
-            <button
-              onClick={() => navigate('/adaptacion-seguimiento')}
-              style={{
-                marginTop: '10px',
-                backgroundColor: '#d4437d',
-                color: 'white',
-                border: 'none',
-                padding: '10px 20px',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
-            >
-              ✅ BOTÓN VISIBLE - Ir a {userRol === 'refugio' ? 'Observaciones' : 'Seguimiento'}
-            </button>
-          ) : (
-            <p style={{ fontSize: '12px', margin: '10px 0 0 0', color: '#999', fontWeight: 'bold' }}>
-              ❌ BOTÓN NO VISIBLE - Condición no se cumple
-            </p>
-          )}
         </div>
 
         <div className="ad-grid">
@@ -158,7 +119,7 @@ export default function AdoptanteDashboard() {
             <div className="ad-option-icon">IA</div>
             <div className="ad-option-info">
               <h3>Matching IA</h3>
-              <p>Recibe recomendaciones segun tu perfil</p>
+              <p>Recibe recomendaciones según tu perfil</p>
             </div>
             <span className="ad-option-arrow">→</span>
           </div>
@@ -180,6 +141,17 @@ export default function AdoptanteDashboard() {
             </div>
             <span className="ad-option-arrow">→</span>
           </div>
+
+          {puedeVerSeguimiento && (
+            <div className="ad-option" onClick={() => navigate('/adaptacion-seguimiento')}>
+              <div className="ad-option-icon">📊</div>
+              <div className="ad-option-info">
+                <h3>Seguimiento</h3>
+                <p>Revisa el proceso de adaptación de tu mascota</p>
+              </div>
+              <span className="ad-option-arrow">→</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

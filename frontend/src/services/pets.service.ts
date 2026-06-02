@@ -16,12 +16,12 @@ export interface PetFilters {
 
 export async function getPets(filters: PetFilters = {}) {
   const params = new URLSearchParams();
-  if (filters.busqueda) params.append('busqueda', filters.busqueda);
-  if (filters.especie)   params.append('especie', filters.especie);
-  if (filters.raza)      params.append('raza', filters.raza);
-  if (filters.edad)      params.append('edad', filters.edad);
+  if (filters.busqueda)      params.append('busqueda', filters.busqueda);
+  if (filters.especie)       params.append('especie', filters.especie);
+  if (filters.raza)          params.append('raza', filters.raza);
+  if (filters.edad)          params.append('edad', filters.edad);
   if (filters.zonaGeografica) params.append('zonaGeografica', filters.zonaGeografica);
-  if (filters.refugioId) params.append('refugioId', String(filters.refugioId));
+  if (filters.refugioId)     params.append('refugioId', String(filters.refugioId));
 
   const res = await fetch(`${BASE}/catalogo?${params}`);
   if (!res.ok) throw new Error('Error al obtener mascotas');
@@ -43,14 +43,16 @@ export async function getEspecies() {
   return json.data ?? [];
 }
 
-export async function getRecomendaciones() {
+export async function getRecomendaciones(): Promise<{ data: unknown[]; mensaje: string }> {
   const res = await fetch(`${BASE}/recomendaciones`, { headers: authHeadersNoContent() });
   if (!res.ok) throw new Error(await parseError(res, 'Error al obtener recomendaciones'));
   const json = await res.json();
-  return json.data ?? [];
+  return {
+    data: json.data ?? [],
+    mensaje: json.mensaje ?? '',
+  };
 }
 
-/** Razas filtradas por especie. Pasa id_espe para obtener solo las de esa especie. */
 export async function getRazas(id_espe?: number) {
   const url = id_espe
     ? `${BASE}/animales/razas?id_espe=${id_espe}`
@@ -81,10 +83,6 @@ export async function getAnimalesRefugio() {
   return json.data ?? [];
 }
 
-/**
- * Convierte un File a base64 data URL para enviarlo como JSON.
- * No requiere multer en el backend.
- */
 export function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -128,8 +126,6 @@ export async function eliminarAnimal(id: number) {
   if (!res.ok) throw new Error('Error al eliminar animal');
   return res.json();
 }
-
-// ── Publicaciones ──────────────────────────────────────────────────────────
 
 export async function getPublicaciones() {
   const res = await fetch(`${BASE}/publicaciones`, { headers: authHeaders() });

@@ -41,10 +41,20 @@ export default function ResetPasswordPage() {
 
   if (!token) {
     return (
-      <div className="login-wrapper">
+      <div className="login-container">
         <div className="login-card">
-          <p style={{ color: '#dc2626' }}>Token inválido. Solicita un nuevo enlace de recuperación.</p>
-          <button className="login-form__submit" onClick={() => navigate('/forgot-password')}>
+          <div className="login-brand">
+            <span className="login-brand-paw">🐾</span>
+            <span className="login-brand-name">PetMatch</span>
+          </div>
+          <div className="error-banner">
+            Token inválido. Solicita un nuevo enlace de recuperación.
+          </div>
+          <button
+            className="login-button"
+            style={{ marginTop: 16 }}
+            onClick={() => navigate('/forgot-password')}
+          >
             Solicitar nuevo enlace
           </button>
         </div>
@@ -54,13 +64,22 @@ export default function ResetPasswordPage() {
 
   if (exito) {
     return (
-      <div className="login-wrapper">
+      <div className="login-container">
         <div className="login-card">
-          <div style={{ textAlign: 'center', padding: 20 }}>
-            <div style={{ fontSize: 48 }}>✓</div>
-            <h2>¡Contraseña actualizada!</h2>
-            <p style={{ color: '#6b7280' }}>Ya puedes iniciar sesión con tu nueva contraseña.</p>
-            <button className="login-form__submit" onClick={() => navigate('/login')}>
+          <div style={{ textAlign: 'center', padding: '20px 0' }}>
+            <div style={{
+              width: 64, height: 64, borderRadius: '50%',
+              background: '#dcfce7', color: '#166534',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 28, fontWeight: 700, margin: '0 auto 20px'
+            }}>
+              ✓
+            </div>
+            <h1>¡Contraseña actualizada!</h1>
+            <p className="login-subtitle">
+              Ya puedes iniciar sesión con tu nueva contraseña.
+            </p>
+            <button className="login-button" onClick={() => navigate('/login')}>
               Iniciar sesión
             </button>
           </div>
@@ -70,40 +89,47 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="login-wrapper">
+    <div className="login-container">
+      <button className="login-back-btn" onClick={() => navigate('/forgot-password')}>
+        ← Volver
+      </button>
+
       <div className="login-card">
         <div className="login-brand">
-          <span className="login-brand__icon">AM</span>
-          <h1>Nueva contraseña</h1>
+          <span className="login-brand-paw">🐾</span>
+          <span className="login-brand-name">PetMatch</span>
         </div>
+        <h1>Nueva contraseña</h1>
+        <p className="login-subtitle">
+          Crea una contraseña segura: mínimo 8 caracteres, una mayúscula, un número y un carácter especial.
+        </p>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <label className="login-form__label">
-            Nueva contraseña
+        {error && <div className="error-banner">{error}</div>}
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="nueva_contrasena">Nueva contraseña</label>
             <input
               type="password"
-              className="login-form__input"
+              id="nueva_contrasena"
               value={form.nueva_contrasena}
               onChange={(e) => setForm((f) => ({ ...f, nueva_contrasena: e.target.value }))}
-              placeholder="Mín. 8 chars, mayúscula, número, especial"
+              placeholder="Ej: MiPerro2024!"
               required
             />
-          </label>
-          <label className="login-form__label">
-            Confirmar contraseña
+          </div>
+          <div className="form-group">
+            <label htmlFor="confirmar_contrasena">Confirmar contraseña</label>
             <input
               type="password"
-              className="login-form__input"
+              id="confirmar_contrasena"
               value={form.confirmar_contrasena}
               onChange={(e) => setForm((f) => ({ ...f, confirmar_contrasena: e.target.value }))}
               placeholder="Repite la contraseña"
               required
             />
-          </label>
-
-          {error && <p className="login-form__error">{error}</p>}
-
-          <button type="submit" className="login-form__submit" disabled={loading}>
+          </div>
+          <button type="submit" className="login-button" disabled={loading}>
             {loading ? 'Actualizando...' : 'Cambiar contraseña'}
           </button>
         </form>
