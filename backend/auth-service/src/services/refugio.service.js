@@ -129,6 +129,19 @@ async function obtenerRefugioPorId(id_refug) {
   return result.rows[0];
 }
 
+async function actualizarDatosRefugio(id_usuario, datos) {
+  const result = await pool.query(
+    `UPDATE REFUGIOS
+     SET nom_refug = $1, dir_refug = $2, telf_refug = $3,
+         licencia_refug = $4, descripcion = $5
+     WHERE id_usuario = $6
+     RETURNING *`,
+    [datos.nom_refug, datos.dir_refug, datos.telf_refug, datos.licencia_refug, datos.descripcion || null, id_usuario]
+  );
+  if (result.rowCount === 0) throw new Error('Refugio no encontrado');
+  return result.rows[0];
+}
+
 async function cambiarEstadoRefugio(id_refug, nuevo_estado) {
   if (!['aprobado', 'rechazado'].includes(nuevo_estado)) {
     throw new Error('Estado inválido');
@@ -178,5 +191,6 @@ module.exports = {
   obtenerDatosRefugio,
   obtenerRefugiosPendientes,
   obtenerRefugioPorId,
+  actualizarDatosRefugio,
   cambiarEstadoRefugio
 };

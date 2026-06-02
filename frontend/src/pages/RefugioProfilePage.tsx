@@ -71,24 +71,27 @@ export default function RefugioProfilePage() {
   setLoading(true);
   setGuardadoOk(false);
   try {
-    const response = await api.post('/refugios/datos', {
+    const payload = {
       nom_refug: formData.nom_refug,
       dir_refug: formData.dir_refug,
       telf_refug: formData.telf_refug,
       licencia_refug: formData.licencia_refug,
       descripcion: formData.descripcion,
-    });
+    };
+
+    const response = estadoRefugio === 'aprobado'
+      ? await api.patch('/refugios/datos', payload)
+      : await api.post('/refugios/datos', payload);
 
     if (response.data.success) {
       setGuardadoOk(true);
-      localStorage.setItem('est_usuario', 'pendiente');
-
-      // ✅ Refrescar token con el nuevo id_refug
-      if (response.data.data?.token) {
-        localStorage.setItem('token', response.data.data.token);
+      if (estadoRefugio !== 'aprobado') {
+        localStorage.setItem('est_usuario', 'pendiente');
+        if (response.data.data?.token) {
+          localStorage.setItem('token', response.data.data.token);
+        }
+        setEstadoRefugio('pendiente');
       }
-
-      setEstadoRefugio('pendiente');
     }
   } catch (error: any) {
     setErrors({ general: error.response?.data?.mensaje || 'Error al guardar datos' });
@@ -178,8 +181,10 @@ export default function RefugioProfilePage() {
               <h1>Datos del Refugio</h1>
               <p>
                 {estadoRefugio === 'pendiente'
-                  ? '⏳ Tu solicitud está pendiente de aprobación'
-                  : 'Completa los datos de tu organización'}
+  ? '⏳ Tu solicitud está pendiente de aprobación'
+  : estadoRefugio === 'aprobado'
+  ? '✓ Refugio aprobado — podés actualizar tus datos'
+  : 'Completa los datos de tu organización'}
               </p>
             </div>
           </div>

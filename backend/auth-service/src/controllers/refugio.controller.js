@@ -148,6 +148,22 @@ async function cambiarEstado(req, res) {
   }
 }
 
+async function actualizarDatos(req, res) {
+  const id_usuario = req.usuario.id;
+  const { nom_refug, dir_refug, telf_refug, licencia_refug, descripcion } = req.body;
+
+  if (!nom_refug || !dir_refug || !telf_refug || !licencia_refug) {
+    return res.status(400).json({ success: false, mensaje: 'Todos los campos requeridos deben ser completados' });
+  }
+
+  try {
+    const resultado = await actualizarDatosRefugio(id_usuario, { nom_refug, dir_refug, telf_refug, licencia_refug, descripcion });
+    res.json({ success: true, mensaje: 'Datos del refugio actualizados', data: resultado });
+  } catch (error) {
+    res.status(400).json({ success: false, mensaje: error.message });
+  }
+}
+
 module.exports = {
   guardarDatos,
   obtenerDatos,

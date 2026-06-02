@@ -1,8 +1,7 @@
-// filepath: src/routes/refugio.routes.js
-// backend\auth-service\src\routes\refugio.routes.js
 const express = require("express");
 const {
   guardarDatos,
+  actualizarDatos,
   obtenerDatos,
   obtenerSolicitudes,
   obtenerRefugio,
@@ -17,23 +16,16 @@ const router = express.Router();
 // RUTAS DE REFUGIO
 // ========================
 
-// POST /api/refugios/datos - Guardar datos del refugio (requiere auth, rol refugio)
 router.post("/datos", authMiddleware, rolesMiddleware(['refugio']), guardarDatos);
-
-// GET /api/refugios/datos - Obtener datos del refugio (requiere auth, rol refugio)
 router.get("/datos", authMiddleware, rolesMiddleware(['refugio']), obtenerDatos);
+router.patch("/datos", authMiddleware, rolesMiddleware(['refugio']), actualizarDatos);
 
 // ========================
 // RUTAS DE ADMIN (solo admin)
 // ========================
 
-// GET /api/refugios/admin/solicitudes - Listar refugios pendientes
 router.get("/admin/solicitudes", authMiddleware, adminMiddleware, obtenerSolicitudes);
-
-// GET /api/refugios/admin/refugio/:id - Ver detalle de un refugio
 router.get("/admin/refugio/:id", authMiddleware, adminMiddleware, obtenerRefugio);
-
-// PATCH /api/refugios/admin/refugio/:id/estado - Aprobar o rechazar
 router.patch("/admin/refugio/:id/estado", authMiddleware, adminMiddleware, cambiarEstado);
 
 module.exports = router;
