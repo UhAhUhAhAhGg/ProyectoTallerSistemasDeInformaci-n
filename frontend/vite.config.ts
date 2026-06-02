@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5173,                           // FRONTEND PUERTO
+    port: 5174,                           // FRONTEND PUERTO
     host: 'localhost',
     strictPort: true,                     // Falla si el puerto está ocupado
     open: false                           // No abre navegador automáticamente
