@@ -9,7 +9,7 @@ import {
   enviarMensaje,
   marcarLeidos,
 } from '../services/mensajeriaService';
-import { Conversacion, Mensaje } from '../types/mensajeria.types';
+import type { Conversacion, Mensaje } from '../types/mensajeria.types';
 import './MensajeriaPage.css';
 
 export default function MensajeriaPage() {

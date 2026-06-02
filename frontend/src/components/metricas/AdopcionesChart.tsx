@@ -1,6 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import { MetricasRefugio } from '../../types/metricas.types';
+import type { MetricasRefugio } from '../../types/metricas.types';
 
 const COLORS = ['#48bb78', '#f6ad55', '#f56565'];
 

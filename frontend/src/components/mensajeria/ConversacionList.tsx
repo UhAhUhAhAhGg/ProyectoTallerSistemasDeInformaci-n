@@ -1,4 +1,4 @@
-import { Conversacion } from '../../types/mensajeria.types';
+import type { Conversacion } from '../../types/mensajeria.types';
 import './ConversacionList.css';
 
 interface Props {

@@ -1,5 +1,5 @@
 import api from './api';
-import { MetricasRefugio } from '../types/metricas.types';
+import type { MetricasRefugio } from '../types/metricas.types';
 
 export const metricasService = {
   getMetricasRefugio: async (id_refug: number) => {

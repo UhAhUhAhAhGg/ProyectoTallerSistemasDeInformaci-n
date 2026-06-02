@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import StatCard from './StatCard';
 import AdopcionesChart from './AdopcionesChart';
 import { metricasService } from '../../services/metricasService';
-import { MetricasRefugio } from '../../types/metricas.types';
+import type { MetricasRefugio } from '../../types/metricas.types';
 
 type Props = { idRefug: number };
 

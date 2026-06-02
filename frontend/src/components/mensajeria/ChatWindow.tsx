@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Mensaje, Conversacion }       from '../../types/mensajeria.types';
+import type { Mensaje, Conversacion } from '../../types/mensajeria.types';
 import { enviarMensaje }               from '../../services/mensajeriaService';
 import './ChatWindow.css';
 
