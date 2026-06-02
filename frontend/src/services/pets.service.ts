@@ -1,3 +1,5 @@
+import type { PetFilters } from '../types/pet';
+
 const BASE = import.meta.env.VITE_PETS_API_URL || 'http://localhost:3003';
 
 async function parseError(res: Response, fallback: string) {
@@ -5,23 +7,15 @@ async function parseError(res: Response, fallback: string) {
   return err.message || fallback;
 }
 
-export interface PetFilters {
-  busqueda?: string;
-  especie?: string;
-  raza?: string;
-  edad?: string;
-  zonaGeografica?: string;
-  refugioId?: number | string;
-}
+export type { PetFilters };
 
-export async function getPets(filters: PetFilters = {}) {
+export async function getPets(filters: PetFilters & { busqueda?: string } = { especie: '', edad: '', zonaGeografica: '', refugioId: '' }) {
   const params = new URLSearchParams();
-  if (filters.busqueda)      params.append('busqueda', filters.busqueda);
-  if (filters.especie)       params.append('especie', filters.especie);
-  if (filters.raza)          params.append('raza', filters.raza);
-  if (filters.edad)          params.append('edad', filters.edad);
+  if (filters.busqueda)       params.append('busqueda',       filters.busqueda);
+  if (filters.especie)        params.append('especie',        filters.especie);
+  if (filters.edad)           params.append('edad',           filters.edad);
   if (filters.zonaGeografica) params.append('zonaGeografica', filters.zonaGeografica);
-  if (filters.refugioId)     params.append('refugioId', String(filters.refugioId));
+  if (filters.refugioId)      params.append('refugioId',      String(filters.refugioId));
 
   const res = await fetch(`${BASE}/catalogo?${params}`);
   if (!res.ok) throw new Error('Error al obtener mascotas');
@@ -48,7 +42,7 @@ export async function getRecomendaciones(): Promise<{ data: unknown[]; mensaje: 
   if (!res.ok) throw new Error(await parseError(res, 'Error al obtener recomendaciones'));
   const json = await res.json();
   return {
-    data: json.data ?? [],
+    data:    json.data    ?? [],
     mensaje: json.mensaje ?? '',
   };
 }

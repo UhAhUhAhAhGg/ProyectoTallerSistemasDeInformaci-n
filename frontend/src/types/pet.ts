@@ -1,9 +1,8 @@
 export interface Pet {
   id: number;
   nombre: string;
-  especie: 'perro' | 'gato';
-  tamano: 'pequeno' | 'mediano' | 'grande';
-  edad: 'cachorro' | 'adulto' | 'senior';
+  especie: string;
+  edad: 'cachorro' | 'joven' | 'adulto' | 'senior';
   zonaGeografica: string;
   refugioId: number;
   refugioNombre: string;
@@ -13,9 +12,8 @@ export interface Pet {
 
 export interface PetFilters {
   busqueda?: string;
-  especie: string;
-  tamano: string;
-  edad: string;
+  especie:        string;
+  edad:           string;
   zonaGeografica: string;
-  refugioId: string;
+  refugioId:      string;
 }

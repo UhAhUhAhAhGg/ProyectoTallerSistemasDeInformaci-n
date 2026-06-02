@@ -15,48 +15,59 @@ interface Props {
   onClear: () => void;
 }
 
-const FilterSideBar: React.FC<Props> = ({
-  filters,
-  refugios,
-  onChange,
-  onApply,
-  onClear,
-}) => {
+const FilterSideBar: React.FC<Props> = ({ filters, refugios, onChange, onApply, onClear }) => {
+
+  // Toggle: si ya está activo, lo deselecciona; si no, lo selecciona y aplica
+  const toggle = (name: keyof PetFilters, value: string) => {
+    const nuevo = filters[name] === value ? '' : value;
+    onChange(name, nuevo);
+    // auto-apply después del tick para que el estado se actualice
+    setTimeout(onApply, 0);
+  };
+
+  const especieOpciones = [
+    { valor: 'Perro',  label: '🐶 Perros' },
+    { valor: 'Gato',   label: '🐱 Gatos'  },
+    { valor: 'Ave',    label: '🐦 Aves'   },
+    { valor: 'Conejo', label: '🐰 Conejos'},
+    { valor: 'Otro',   label: '🐾 Otro'   },
+  ];
+
+  const edadOpciones = [
+    { valor: 'cachorro', label: 'Cachorro (0-1 año)' },
+    { valor: 'joven',    label: 'Joven (1-3 años)'   },
+    { valor: 'adulto',   label: 'Adulto (3-8 años)'  },
+    { valor: 'senior',   label: 'Senior (8+ años)'   },
+  ];
+
+  const hayFiltros = !!(filters.especie || filters.edad || filters.zonaGeografica || filters.refugioId);
+
   return (
     <aside className="sidebar">
-      <h3>Filtros</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <h3 style={{ margin: 0 }}>Filtros</h3>
+        {hayFiltros && (
+          <button
+            className="clear-btn"
+            onClick={onClear}
+            style={{ fontSize: 12, padding: '4px 10px' }}
+          >
+            Limpiar todo
+          </button>
+        )}
+      </div>
 
       {/* ESPECIE */}
       <div className="filter-group">
         <h4>Especie</h4>
         <div className="filter-options">
-          <button
-            className={`filter-btn ${filters.especie === 'perro' ? 'active' : ''}`}
-            onClick={() => onChange('especie', 'perro')}
-          >
-            🐶 Perros
-          </button>
-
-          <button
-            className={`filter-btn ${filters.especie === 'gato' ? 'active' : ''}`}
-            onClick={() => onChange('especie', 'gato')}
-          >
-            🐱 Gatos
-          </button>
-        </div>
-      </div>
-
-      {/* TAMAÑO */}
-      <div className="filter-group">
-        <h4>Tamaño</h4>
-        <div className="filter-options">
-          {['pequeno', 'mediano', 'grande'].map((t) => (
+          {especieOpciones.map(({ valor, label }) => (
             <button
-              key={t}
-              className={`filter-btn ${filters.tamano === t ? 'active' : ''}`}
-              onClick={() => onChange('tamano', t)}
+              key={valor}
+              className={`filter-btn ${filters.especie === valor ? 'active' : ''}`}
+              onClick={() => toggle('especie', valor)}
             >
-              {t}
+              {label}
             </button>
           ))}
         </div>
@@ -66,33 +77,35 @@ const FilterSideBar: React.FC<Props> = ({
       <div className="filter-group">
         <h4>Edad</h4>
         <div className="filter-options">
-          {['cachorro', 'adulto', 'senior'].map((e) => (
+          {edadOpciones.map(({ valor, label }) => (
             <button
-              key={e}
-              className={`filter-btn ${filters.edad === e ? 'active' : ''}`}
-              onClick={() => onChange('edad', e)}
+              key={valor}
+              className={`filter-btn ${filters.edad === valor ? 'active' : ''}`}
+              onClick={() => toggle('edad', valor)}
             >
-              {e}
+              {label}
             </button>
           ))}
         </div>
       </div>
 
       {/* REFUGIO */}
-      <div className="filter-group">
-        <h4>Refugio</h4>
-        <div className="filter-options">
-          {refugios.map((r) => (
-            <button
-              key={r.id}
-              className={`filter-btn ${filters.refugioId === String(r.id) ? 'active' : ''}`}
-              onClick={() => onChange('refugioId', String(r.id))}
-            >
-              {r.nombre}
-            </button>
-          ))}
+      {refugios.length > 0 && (
+        <div className="filter-group">
+          <h4>Refugio</h4>
+          <div className="filter-options">
+            {refugios.map((r) => (
+              <button
+                key={r.id}
+                className={`filter-btn ${filters.refugioId === String(r.id) ? 'active' : ''}`}
+                onClick={() => toggle('refugioId', String(r.id))}
+              >
+                {r.nombre}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ZONA GEOGRÁFICA */}
       <div className="filter-group">
@@ -102,19 +115,18 @@ const FilterSideBar: React.FC<Props> = ({
           type="search"
           value={filters.zonaGeografica}
           onChange={(e) => onChange('zonaGeografica', e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') onApply(); }}
           placeholder="Ej: Centro, Norte, Sopocachi"
         />
-      </div>
-
-      {/* BOTONES */}
-      <div className="sidebar-actions">
-        <button className="apply-btn" onClick={onApply}>
-          Aplicar filtros
-        </button>
-
-        <button className="clear-btn" onClick={onClear}>
-          Limpiar
-        </button>
+        {filters.zonaGeografica && (
+          <button
+            className="apply-btn"
+            onClick={onApply}
+            style={{ marginTop: 8, width: '100%' }}
+          >
+            Buscar zona
+          </button>
+        )}
       </div>
     </aside>
   );
