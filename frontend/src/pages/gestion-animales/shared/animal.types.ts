@@ -44,4 +44,5 @@ export interface AnimalFormData {
   esterilizado: boolean
   img_mascot: string
   decrip_publi: string
+  tamano_mascot: 'pequeño' | 'mediano' | 'grande' | ''
 }

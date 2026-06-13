@@ -33,11 +33,13 @@ const initialFilters: PetFilters = {
   edad:           '',
   zonaGeografica: '',
   refugioId:      '',
+  tamano:         '',
 };
 
 export default function CatalogPage() {
   const navigate = useNavigate();
-  const [filters, setFilters]         = useState<PetFilters>(initialFilters);
+  const [filters, setFilters] = useState<PetFilters>({
+  especie: '', edad: '', zonaGeografica: '', refugioId: '', tamano: '',});
   const [busqueda, setBusqueda]       = useState('');
   const [pets, setPets]               = useState<CatalogItem[]>([]);
   const [refugios, setRefugios]       = useState<{ id: number; nombre: string }[]>([]);

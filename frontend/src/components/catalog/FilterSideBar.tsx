@@ -40,7 +40,7 @@ const FilterSideBar: React.FC<Props> = ({ filters, refugios, onChange, onApply, 
     { valor: 'senior',   label: 'Senior (8+ años)'   },
   ];
 
-  const hayFiltros = !!(filters.especie || filters.edad || filters.zonaGeografica || filters.refugioId);
+  const hayFiltros = !!(filters.especie || filters.edad || filters.zonaGeografica || filters.refugioId || filters.tamano);
 
   return (
     <aside className="sidebar">
@@ -128,6 +128,25 @@ const FilterSideBar: React.FC<Props> = ({ filters, refugios, onChange, onApply, 
           </button>
         )}
       </div>
+       {/* TAMAÑO */}
+<div className="filter-group">
+  <h4>Tamaño</h4>
+  <div className="filter-options">
+    {[
+      { valor: 'pequeño', label: '🐭 Pequeño' },
+      { valor: 'mediano', label: '🐕 Mediano' },
+      { valor: 'grande',  label: '🦮 Grande'  },
+    ].map(({ valor, label }) => (
+      <button
+        key={valor}
+        className={`filter-btn ${filters.tamano === valor ? 'active' : ''}`}
+        onClick={() => toggle('tamano', valor)}
+      >
+        {label}
+      </button>
+    ))}
+  </div>
+</div>       
     </aside>
   );
 };

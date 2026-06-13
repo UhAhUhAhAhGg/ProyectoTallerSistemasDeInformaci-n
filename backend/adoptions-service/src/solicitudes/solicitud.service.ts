@@ -6,18 +6,19 @@ import { notificarAdoptante, TipoNotificacion } from '../http/notifications.clie
 import { CreateSolicitudDto, CambiarEstadoDto, SolicitudAdopcion } from './solicitud.types';
 import { EstadoId } from '../estados/estado.types';
 
-// Mapa: id_est → tipo de notificación (HU-21)
+// Mapa: id_est → tipo de notificación
 const NOTIF_MAP: Record<number, TipoNotificacion> = {
   [EstadoId.ENVIADA]:     'solicitud_enviada',
   [EstadoId.EN_REVISION]: 'solicitud_en_revision',
   [EstadoId.APROBADA]:    'solicitud_aprobada',
   [EstadoId.RECHAZADA]:   'solicitud_rechazada',
   [EstadoId.EN_ESPERA]:   'solicitud_en_espera',
+  [EstadoId.COMPLETADA]:  'solicitud_completada',
 };
 
-// ─────────────────────────────────────────────
-// HU-17: Adoptante envía solicitud formal
-// ─────────────────────────────────────────────
+
+//Adoptante envía solicitud formal
+
 export const enviarSolicitud = async (
   id_usuario: number,
   dto: CreateSolicitudDto,
@@ -53,9 +54,8 @@ export const enviarSolicitud = async (
   return solicitud;
 };
 
-// ─────────────────────────────────────────────
-// HU-18: Adoptante ve sus solicitudes
-// ─────────────────────────────────────────────
+//Adoptante ve sus solicitudes
+
 export const getMisSolicitudes = async (
   id_usuario: number
 ): Promise<SolicitudAdopcion[]> => {
@@ -78,9 +78,8 @@ export const getMiSolicitudDetalle = async (
   return { solicitud, historial };
 };
 
-// ─────────────────────────────────────────────
-// HU-19: Usuario-refugio gestiona solicitudes
-// ─────────────────────────────────────────────
+//Usuario-refugio gestiona solicitudes
+
 export const getSolicitudesRefugio = async (
   id_refug: number
 ): Promise<SolicitudAdopcion[]> => {
@@ -99,7 +98,6 @@ export const cambiarEstadoSolicitud = async (
   if (!solicitud) throw new Error('Solicitud no encontrada');
 
   // 2. Verificar que la solicitud pertenece a este refugio
-  //    (la publicación tiene id_refug que el repo ya une)
   // @ts-ignore — id_refug viene del JOIN en el repo
   if (solicitud.id_refug !== undefined && solicitud.id_refug !== id_refug_accion) {
     throw new Error('Esta solicitud no pertenece a tu refugio');
@@ -136,7 +134,7 @@ export const cambiarEstadoSolicitud = async (
   return actualizada;
 };
 
-// HU-19: detalle de una solicitud con historial (vista del refugio)
+//Detalle de una solicitud con historial (vista del refugio)
 export const getSolicitudDetalleRefugio = async (
   id_soli:   number,
   id_refug:  number

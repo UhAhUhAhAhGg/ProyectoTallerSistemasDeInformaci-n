@@ -3,15 +3,11 @@ import { Request, Response } from 'express';
 import { pool } from '../config/database';
 import { ok, serverError } from '../utils/response.helper';
 
-/**
- * GET /catalogo
- * Query params: busqueda, especie, edad, refugioId, zonaGeografica
- *   edad: 'cachorro' | 'joven' | 'adulto' | 'senior'
- *   (tamano todavía no soportado: la tabla MASCOTAS no tiene esa columna)
- */
+//GET /catalogo
+
 export const getCatalogo = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { busqueda, especie, edad, refugioId, zonaGeografica } = req.query as Record<string, string>;
+    const { busqueda, especie, edad, refugioId, zonaGeografica, tamano } = req.query as Record<string, string>;
 
     const conditions: string[] = ['p.est_publi = true', 'p.est_adop = false'];
     const values: unknown[] = [];
@@ -56,6 +52,11 @@ export const getCatalogo = async (req: Request, res: Response): Promise<void> =>
         values.push(r[0], r[1]);
       }
     }
+
+    if (tamano) {
+  conditions.push(`m.tamano_mascot = $${i++}`);
+  values.push(tamano);
+}
 
     const where = `WHERE ${conditions.join(' AND ')}`;
 

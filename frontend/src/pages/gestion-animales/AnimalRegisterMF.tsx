@@ -1,4 +1,4 @@
-// HU-07 — Registrar animal con perfil completo
+//Registrar animal con perfil completo
 import { useState } from 'react'
 import AnimalFormFields from './shared/AnimalFormFields'
 import { registrarAnimal } from './shared/animal.service'
@@ -7,7 +7,7 @@ import type { AnimalFormData } from './shared/animal.types'
 const EMPTY: AnimalFormData = {
   nom_mascot: '', id_raza: '', edad_mascot: '', fenac_mascot: '',
   descrip_mascot: '', gen_mascot: false, esterilizado: false,
-  img_mascot: '', decrip_publi: '',
+  img_mascot: '', decrip_publi: '', tamano_mascot: '',
 }
 
 interface Props { onSuccess?: () => void; onCancel?: () => void }
@@ -39,8 +39,9 @@ export default function AnimalRegisterMF({ onSuccess, onCancel }: Props) {
       const id_refug = Number(localStorage.getItem('refugioId') || 0)
       await registrarAnimal(form, id_refug)
       onSuccess?.()
-    } catch (err: any) {
-      setGlobalErr(err.response?.data?.mensaje || 'Error al registrar')
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { mensaje?: string } } }
+      setGlobalErr(e.response?.data?.mensaje || 'Error al registrar')
     } finally { setLoading(false) }
   }
 

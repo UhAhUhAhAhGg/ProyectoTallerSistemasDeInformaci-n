@@ -16,4 +16,5 @@ export interface PetFilters {
   edad:           string;
   zonaGeografica: string;
   refugioId:      string;
+  tamano:         string;
 }

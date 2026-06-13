@@ -10,4 +10,5 @@ export enum EstadoId {
   APROBADA    = 3,
   RECHAZADA   = 4,
   EN_ESPERA   = 5,
+  COMPLETADA  = 6,
 }

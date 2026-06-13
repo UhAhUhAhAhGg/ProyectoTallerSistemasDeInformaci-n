@@ -5,7 +5,8 @@ export type TipoNotificacion =
   | 'solicitud_en_revision'
   | 'solicitud_aprobada'
   | 'solicitud_rechazada'
-  | 'solicitud_en_espera';
+  | 'solicitud_en_espera'
+  | 'solicitud_completada';
 
 interface NotifyPayload {
   id_usuario: number;
@@ -20,6 +21,7 @@ const TITULOS: Record<TipoNotificacion, string> = {
   solicitud_aprobada:    '¡Tu solicitud fue aprobada!',
   solicitud_rechazada:   'Tu solicitud fue rechazada',
   solicitud_en_espera:   'Tu solicitud está en espera',
+  solicitud_completada:  '¡Adopción completada! 🏠',
 };
 
 export const notificarAdoptante = async (p: NotifyPayload): Promise<void> => {

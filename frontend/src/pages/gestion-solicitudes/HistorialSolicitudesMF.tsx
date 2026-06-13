@@ -2,14 +2,13 @@ import { useEffect, useState } from 'react';
 import { solicitudService } from './shared/solicitud.service';
 import type { EstadoSolicitud, Solicitud } from './shared/solicitud.types';
 
-interface Props { id_adop: number }
-
 const BADGE: Record<EstadoSolicitud, { label: string; color: string; bg: string }> = {
   enviada:     { label: 'Enviada',     color: '#1d4ed8', bg: '#dbeafe' },
   en_revision: { label: 'En revisión', color: '#92400e', bg: '#fef3c7' },
   aprobada:    { label: 'Aprobada',    color: '#065f46', bg: '#d1fae5' },
   rechazada:   { label: 'Rechazada',   color: '#991b1b', bg: '#fee2e2' },
   en_espera:   { label: 'En espera',   color: '#6b21a8', bg: '#f3e8ff' },
+  completada:  { label: 'Completada',  color: '#312e81', bg: '#e0e7ff' },
 };
 
 const ESTADOS: Record<number, EstadoSolicitud> = {
@@ -18,19 +17,20 @@ const ESTADOS: Record<number, EstadoSolicitud> = {
   3: 'aprobada',
   4: 'rechazada',
   5: 'en_espera',
+  6: 'completada',
 };
 
-export default function HistorialSolicitudesMF({ id_adop }: Props) {
+export default function HistorialSolicitudesMF() {
   const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    solicitudService.porAdoptante(id_adop)
+    solicitudService.porAdoptante()
       .then(setSolicitudes)
       .catch(() => setError('No se pudo cargar tu historial.'))
       .finally(() => setLoading(false));
-  }, [id_adop]);
+  }, []);
 
   if (loading) return <p style={{ padding: 20 }}>Cargando historial...</p>;
   if (error) return <p style={{ padding: 20, color: 'red' }}>{error}</p>;
@@ -56,12 +56,12 @@ export default function HistorialSolicitudesMF({ id_adop }: Props) {
                 </span>
               </div>
               <p style={{ fontSize: 12, color: '#6b7280', margin: '4px 0' }}>
-                Enviada el {new Date(s.fech_soli).toLocaleDateString('es-BO')}
+                {s.nom_refug} · {new Date(s.fech_soli).toLocaleDateString('es-BO')}
               </p>
               {s.decrip_soli && (
                 <p style={{ fontSize: 13, color: '#374151', marginTop: 6,
                   background: '#f9fafb', padding: '6px 10px', borderRadius: 6 }}>
-                  <em>Descripción: {s.decrip_soli}</em>
+                  <em>{s.decrip_soli}</em>
                 </p>
               )}
             </div>

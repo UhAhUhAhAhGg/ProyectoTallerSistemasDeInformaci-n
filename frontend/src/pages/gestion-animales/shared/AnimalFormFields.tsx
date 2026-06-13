@@ -79,6 +79,25 @@ export default function AnimalFormFields({ data, errors, onChange }: Props) {
             <button key={label} type="button" style={s.chip(data.esterilizado === val)} onClick={() => onChange('esterilizado', val)}>{label}</button>
           ))}
         </div>
+        <div style={s.group}>
+  <label style={s.label}>Tamaño</label>
+  <div style={s.tog}>
+    {[
+      { label: 'Pequeño', val: 'pequeño' as const },
+      { label: 'Mediano', val: 'mediano' as const },
+      { label: 'Grande',  val: 'grande'  as const },
+    ].map(({ label, val }) => (
+      <button
+        key={val}
+        type="button"
+        style={s.chip(data.tamano_mascot === val)}
+        onClick={() => onChange('tamano_mascot', val)}
+      >
+        {label}
+      </button>
+    ))}
+  </div>
+</div>
       </div>
       <div style={s.group}>
         <label style={s.label}>Fecha de nacimiento</label>

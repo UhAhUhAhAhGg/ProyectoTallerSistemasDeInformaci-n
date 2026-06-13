@@ -9,13 +9,14 @@ async function parseError(res: Response, fallback: string) {
 
 export type { PetFilters };
 
-export async function getPets(filters: PetFilters & { busqueda?: string } = { especie: '', edad: '', zonaGeografica: '', refugioId: '' }) {
+export async function getPets(filters: PetFilters & { busqueda?: string } = { especie: '', edad: '', zonaGeografica: '', refugioId: '', tamano: '' }) {
   const params = new URLSearchParams();
   if (filters.busqueda)       params.append('busqueda',       filters.busqueda);
   if (filters.especie)        params.append('especie',        filters.especie);
   if (filters.edad)           params.append('edad',           filters.edad);
   if (filters.zonaGeografica) params.append('zonaGeografica', filters.zonaGeografica);
   if (filters.refugioId)      params.append('refugioId',      String(filters.refugioId));
+  if (filters.tamano)         params.append('tamano',         filters.tamano);
 
   const res = await fetch(`${BASE}/catalogo?${params}`);
   if (!res.ok) throw new Error('Error al obtener mascotas');

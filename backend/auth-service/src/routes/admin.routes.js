@@ -143,4 +143,36 @@ router.get("/reporte", authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
+router.get("/solicitudes", authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+         s.id_soli,
+         s.id_usuario,
+         s.id_publi,
+         s.id_est,
+         s.fech_soli,
+         s.decrip_soli,
+         e.nom_est,
+         p.id_refug,
+         m.nom_mascot,
+         ref.nom_refug,
+         u.nom_usuario,
+         u.apell_usuario,
+         u.corr_usuario
+       FROM SOLI_ADOP s
+       JOIN ESTAD_SOLI e    ON e.id_est    = s.id_est
+       JOIN PUBLICACIONES p ON p.id_publi  = s.id_publi
+       JOIN MASCOTAS m      ON m.id_mascot = p.id_mascot
+       JOIN REFUGIOS ref    ON ref.id_refug = p.id_refug
+       JOIN USUARIOS u      ON u.id_usuario = s.id_usuario
+       ORDER BY s.fech_soli DESC`
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error('[ADMIN solicitudes] Error:', err.message);
+    res.status(500).json({ success: false, mensaje: "Error al obtener solicitudes" });
+  }
+});
+
 module.exports = router;

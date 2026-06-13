@@ -5,6 +5,7 @@ import Navbar from './Navbar';
 import { refugioService } from '../services/api';
 import './RefugioDashboard.css';
 import MetricasRefugioPanel from '../components/metricas/MetricasRefugioPanel';
+import GestionSolicitudesMF from './gestion-solicitudes/GestionSolicitudesMF';
 
 const ADMIN_EMAIL = 'admin@petmatch.com';
 
@@ -185,6 +186,15 @@ export default function RefugioDashboard() {
             <span className="rd-option-arrow">→</span>
           </div>
         </div>
+        <div style={{ marginTop: 32, background: '#fff', borderRadius: 14, padding: '20px 24px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+  <h2 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', marginBottom: 4 }}>
+    Solicitudes recientes
+  </h2>
+  <p style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>
+    Gestiona directamente desde aquí o ve a la sección completa.
+  </p>
+  <GestionSolicitudesMF />
+</div>
       </div>
     </div>
   );

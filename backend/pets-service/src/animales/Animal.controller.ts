@@ -2,13 +2,14 @@ import { Request, Response } from 'express';
 import * as repo from '../animales/Animal.repository';
 import { ok, created, badRequest, notFound, serverError } from '../utils/response.helper';
 
-// HU-07: registrar mascota — fenac_mascot es opcional (default = hoy)
+// Registrar mascota — fenac_mascot es opcional (default = hoy)
 export const registrarAnimal = async (req: Request, res: Response): Promise<void> => {
   try {
     const {
       id_raza, nom_mascot, edad_mascot,
       descrip_mascot, gen_mascot, esterilizado, img_mascot,
       fenac_mascot,   // opcional
+      tamano_mascot, 
     } = req.body;
 
     if (!id_raza || !nom_mascot || edad_mascot === undefined || !descrip_mascot || !img_mascot) {
@@ -25,6 +26,7 @@ export const registrarAnimal = async (req: Request, res: Response): Promise<void
       gen_mascot:     gen_mascot ?? true,
       esterilizado:   esterilizado ?? false,
       img_mascot,
+      tamano_mascot: tamano_mascot ?? null,
     });
     created(res, animal, 'Mascota registrada exitosamente');
   } catch (err) {

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdoptanteDashboard.css';
 import Navbar from './Navbar';
+import HistorialSolicitudesMF from './gestion-solicitudes/HistorialSolicitudesMF';
 
 const ADMIN_EMAIL = 'admin@petmatch.com';
 
@@ -152,6 +153,35 @@ export default function AdoptanteDashboard() {
               <span className="ad-option-arrow">→</span>
             </div>
           )}
+        </div>
+
+        {/* Widget: resumen rápido de solicitudes */}
+        <div style={{
+          marginTop: 32,
+          background: '#fff',
+          borderRadius: 14,
+          padding: '20px 24px',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+          border: '1px solid #f1f5f9',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', margin: 0 }}>
+              Últimas solicitudes
+            </h2>
+            <button
+              onClick={() => navigate('/mis-solicitudes')}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                color: '#6366f1', fontSize: 13, fontWeight: 600,
+              }}
+            >
+              Ver todas →
+            </button>
+          </div>
+          <p style={{ fontSize: 13, color: '#64748b', marginBottom: 0 }}>
+            Resumen rápido de tus solicitudes de adopción.
+          </p>
+          <HistorialSolicitudesMF />
         </div>
       </div>
     </div>

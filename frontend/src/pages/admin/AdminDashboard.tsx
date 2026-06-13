@@ -4,6 +4,7 @@ import ReportesAdminMF from "./ReportesAdminMF";
 import ValidarRefugiosMF from "./ValidarRefugiosMF";
 import ConfigMatchingMF from './ConfigMatchingMF';
 import AnimalesAdminMF from './AnimalesAdminMF';
+import SolicitudesAdminMF from './SolicitudesAdminMF';
 import "./AdminDashboard.css";
 
 type Tab =
@@ -320,13 +321,7 @@ const AdminDashboard: React.FC = () => {
           {tabActiva === "refugios" && <ValidarRefugiosMF />}
           {tabActiva === "animales" && <AnimalesAdminMF />}
           {tabActiva === "perfiles" && <GestionUsuariosMF />}
-          {tabActiva === "solicitudes" && (
-            <AdminPlaceholder
-              titulo="Solicitudes"
-              descripcion="Vista administrativa para auditar solicitudes de adopcion y sus estados."
-              detalles={["Solicitudes pendientes", "Aprobadas y rechazadas", "Historial por adoptante"]}
-            />
-          )}
+          {tabActiva === "solicitudes" && <SolicitudesAdminMF />}
           {tabActiva === "matching" && <ConfigMatchingMF />}
           {tabActiva === "reportes" && <ReportesAdminMF />}
           {tabActiva === "mensajeria" && (

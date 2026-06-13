@@ -44,13 +44,14 @@ export const createAnimal = async (dto: CreateAnimalDto): Promise<Animal> => {
   const { rows } = await pool.query(
     `INSERT INTO MASCOTAS
        (id_raza, nom_mascot, edad_mascot, fenac_mascot,
-        descrip_mascot, gen_mascot, esterilizado, img_mascot)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+        descrip_mascot, gen_mascot, esterilizado, img_mascot, tamano_mascot)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
      RETURNING *`,
     [
       dto.id_raza, dto.nom_mascot, dto.edad_mascot,
       dto.fenac_mascot || new Date().toISOString().slice(0, 10),
-      dto.descrip_mascot, dto.gen_mascot, dto.esterilizado, dto.img_mascot,
+      dto.descrip_mascot, dto.gen_mascot, dto.esterilizado,
+      dto.img_mascot, dto.tamano_mascot ?? null,
     ],
   );
   return rows[0];
@@ -68,6 +69,7 @@ export const updateAnimal = async (id: number, dto: UpdateAnimalDto): Promise<An
   if (dto.esterilizado  !== undefined) { fields.push(`esterilizado = $${i++}`);   values.push(dto.esterilizado); }
   if (dto.img_mascot    !== undefined) { fields.push(`img_mascot = $${i++}`);     values.push(dto.img_mascot); }
   if (dto.id_raza       !== undefined) { fields.push(`id_raza = $${i++}`);        values.push(dto.id_raza); }
+  if (dto.tamano_mascot !== undefined) { fields.push(`tamano_mascot = $${i++}`); values.push(dto.tamano_mascot); }
 
   if (fields.length === 0) return findAnimalById(id);
 

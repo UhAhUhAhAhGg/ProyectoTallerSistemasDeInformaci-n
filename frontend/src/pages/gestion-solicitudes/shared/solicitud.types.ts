@@ -1,4 +1,4 @@
-export type EstadoSolicitud = 'enviada' | 'en_revision' | 'aprobada' | 'rechazada' | 'en_espera';
+export type EstadoSolicitud = 'enviada' | 'en_revision' | 'aprobada' | 'rechazada' | 'en_espera' | 'completada';
 
 export interface NuevaSolicitud {
   id_publi:    number;

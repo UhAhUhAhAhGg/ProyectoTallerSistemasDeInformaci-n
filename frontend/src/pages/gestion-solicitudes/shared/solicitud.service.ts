@@ -12,6 +12,15 @@ async function parseError(res: Response, fallback: string) {
   return body.message || body.mensaje || fallback;
 }
 
+const ESTADO_ID: Record<EstadoSolicitud, number> = {
+  enviada:     1,
+  en_revision: 2,
+  aprobada:    3,
+  rechazada:   4,
+  en_espera:   5,
+  completada:  6,
+};
+
 export const solicitudService = {
   // HU-16: adoptante envía solicitud
   async enviar(data: NuevaSolicitud): Promise<Solicitud> {
@@ -23,28 +32,33 @@ export const solicitudService = {
     return json.data ?? json;
   },
 
-  // HU-17: historial del adoptante
-  async porAdoptante(id_adop: number): Promise<Solicitud[]> {
-    const r = await fetch(`${BASE}/solicitudes/adoptante/${id_adop}`, { headers: headers() });
+  // HU-17: solicitudes del adoptante autenticado (usa JWT, no necesita ID)
+  async porAdoptante(): Promise<Solicitud[]> {
+    const r = await fetch(`${BASE}/solicitudes/mis`, { headers: headers() });
     if (!r.ok) throw new Error('Error al cargar solicitudes');
-    return r.json();
+    const json = await r.json();
+    return json.data ?? json;
   },
 
-  // HU-18: solicitudes recibidas por refugio
-  async porRefugio(id_refu: number): Promise<Solicitud[]> {
-    const r = await fetch(`${BASE}/solicitudes/refugio/${id_refu}`, { headers: headers() });
+  // HU-18: solicitudes recibidas por el refugio autenticado (usa JWT)
+  async porRefugio(): Promise<Solicitud[]> {
+    const r = await fetch(`${BASE}/solicitudes/refugio`, { headers: headers() });
     if (!r.ok) throw new Error('Error al cargar solicitudes');
-    return r.json();
+    const json = await r.json();
+    return json.data ?? json;
   },
 
-  // HU-18: cambiar estado + motivo
+  // HU-19: cambiar estado + motivo (requiere rol refugio)
   async actualizarEstado(
     id_soli: number, est_soli: EstadoSolicitud, mot_soli?: string
   ): Promise<Solicitud> {
-    const r = await fetch(`${BASE}/solicitudes/${id_soli}/estado`, {
-      method: 'PATCH', headers: headers(), body: JSON.stringify({ est_soli, mot_soli }),
+    const r = await fetch(`${BASE}/solicitudes/refugio/${id_soli}/estado`, {
+      method: 'PATCH',
+      headers: headers(),
+      body: JSON.stringify({ id_est: ESTADO_ID[est_soli], motivo: mot_soli ?? '' }),
     });
     if (!r.ok) throw new Error('Error al actualizar solicitud');
-    return r.json();
+    const json = await r.json();
+    return json.data ?? json;
   },
 };
