@@ -64,6 +64,8 @@
   flex-direction: column;
   gap: 0.35rem;
   flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .admin-dashboard__nav-item {

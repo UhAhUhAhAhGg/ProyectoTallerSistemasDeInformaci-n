@@ -8,14 +8,8 @@ import SolicitudesAdminMF from './SolicitudesAdminMF';
 import "./AdminDashboard.css";
 
 type Tab =
-  | "panel"
-  | "refugios"
-  | "animales"
-  | "perfiles"
-  | "solicitudes"
-  | "matching"
-  | "reportes"
-  | "mensajeria";
+  | "panel" | "refugios" | "animales" | "perfiles"
+  | "solicitudes" | "matching" | "reportes" | "mensajeria";
 
 interface Notificacion {
   id_notif: number;
@@ -30,36 +24,22 @@ interface Notificacion {
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
 
 const AdminPlaceholder = ({
-  titulo,
-  descripcion,
-  detalles,
-}: {
-  titulo: string;
-  descripcion: string;
-  detalles: string[];
-}) => (
+  titulo, descripcion, detalles,
+}: { titulo: string; descripcion: string; detalles: string[] }) => (
   <div className="admin-placeholder">
     <div className="admin-placeholder__head">
       <span className="admin-placeholder__icon">+</span>
-      <div>
-        <h2>{titulo}</h2>
-        <p>{descripcion}</p>
-      </div>
+      <div><h2>{titulo}</h2><p>{descripcion}</p></div>
     </div>
     <div className="admin-placeholder__grid">
-      {detalles.map((detalle) => (
-        <div className="admin-placeholder__item" key={detalle}>
-          {detalle}
-        </div>
-      ))}
+      {detalles.map((d) => <div className="admin-placeholder__item" key={d}>{d}</div>)}
     </div>
   </div>
 );
 
 const PanelGeneral = ({ notificaciones }: { notificaciones: Notificacion[] }) => {
   const refugiosPendientes = notificaciones.filter((n) => n.tipo_notif.includes("refugio")).length;
-  const registros = notificaciones.filter((n) => n.tipo_notif.includes("registro")).length;
-
+  const registros          = notificaciones.filter((n) => n.tipo_notif.includes("registro")).length;
   return (
     <div className="admin-overview">
       <div className="admin-overview__grid">
@@ -79,19 +59,18 @@ const PanelGeneral = ({ notificaciones }: { notificaciones: Notificacion[] }) =>
           <small>Total visible para administracion</small>
         </article>
       </div>
-
       <section className="admin-overview__activity">
         <h2>Actividad reciente</h2>
         {notificaciones.length === 0 ? (
           <p>Sin actividad reciente.</p>
         ) : (
-          notificaciones.slice(0, 5).map((notificacion) => (
-            <div className="admin-overview__event" key={notificacion.id_notif}>
+          notificaciones.slice(0, 5).map((n) => (
+            <div className="admin-overview__event" key={n.id_notif}>
               <div>
-                <strong>{notificacion.titulo_notif}</strong>
-                <span>{notificacion.cuerpo_notif}</span>
+                <strong>{n.titulo_notif}</strong>
+                <span>{n.cuerpo_notif}</span>
               </div>
-              <time>{new Date(notificacion.fech_notif).toLocaleDateString("es-BO")}</time>
+              <time>{new Date(n.fech_notif).toLocaleDateString("es-BO")}</time>
             </div>
           ))
         )}
@@ -101,77 +80,31 @@ const PanelGeneral = ({ notificaciones }: { notificaciones: Notificacion[] }) =>
 };
 
 const AdminDashboard: React.FC = () => {
-  const [tabActiva, setTabActiva] = useState<Tab>("panel");
-  const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
+  const [tabActiva, setTabActiva]                     = useState<Tab>("panel");
+  const [notificaciones, setNotificaciones]           = useState<Notificacion[]>([]);
   const [notificacionesAbiertas, setNotificacionesAbiertas] = useState(false);
 
   const token = localStorage.getItem("token");
 
-  const tabs: { id: Tab; label: string; icon: string; descripcion: string }[] = useMemo(
-    () => [
-      {
-        id: "panel",
-        label: "Panel General",
-        icon: "PG",
-        descripcion: "Resumen de actividad y validaciones recientes",
-      },
-      {
-        id: "refugios",
-        label: "Refugios",
-        icon: "RF",
-        descripcion: "Validacion y estado de refugios",
-      },
-      {
-        id: "animales",
-        label: "Animales",
-        icon: "AN",
-        descripcion: "Inventario y publicaciones de mascotas",
-      },
-      {
-        id: "perfiles",
-        label: "Perfiles",
-        icon: "PF",
-        descripcion: "Perfiles de adoptantes, refugios y estado de cuenta",
-      },
-      {
-        id: "solicitudes",
-        label: "Solicitudes",
-        icon: "SO",
-        descripcion: "Seguimiento de solicitudes de adopcion",
-      },
-      {
-        id: "matching",
-        label: "Config. Matching",
-        icon: "IA",
-        descripcion: "Parametros del motor de compatibilidad",
-      },
-      {
-        id: "reportes",
-        label: "Reportes",
-        icon: "R",
-        descripcion: "Resumen general y descarga en PDF",
-      },
-      {
-        id: "mensajeria",
-        label: "Mensajeria",
-        icon: "MS",
-        descripcion: "Comunicaciones y avisos del sistema",
-      },
-    ],
-    []
-  );
+  const tabs: { id: Tab; label: string; icon: string; descripcion: string }[] = useMemo(() => [
+    { id: "panel",       label: "Panel General",   icon: "PG", descripcion: "Resumen de actividad y validaciones recientes" },
+    { id: "refugios",    label: "Refugios",         icon: "RF", descripcion: "Validacion y estado de refugios" },
+    { id: "animales",    label: "Animales",         icon: "AN", descripcion: "Inventario y publicaciones de mascotas" },
+    { id: "perfiles",    label: "Perfiles",         icon: "PF", descripcion: "Perfiles de adoptantes, refugios y estado de cuenta" },
+    { id: "solicitudes", label: "Solicitudes",      icon: "SO", descripcion: "Seguimiento de solicitudes de adopcion" },
+    { id: "matching",    label: "Config. Matching", icon: "IA", descripcion: "Parametros del motor de compatibilidad" },
+    { id: "reportes",    label: "Reportes",         icon: "R",  descripcion: "Resumen general y descarga en PDF" },
+    { id: "mensajeria",  label: "Mensajeria",       icon: "MS", descripcion: "Comunicaciones y avisos del sistema" },
+  ], []);
 
-  const tabActual = tabs.find((tab) => tab.id === tabActiva) ?? tabs[0];
-  const noLeidas = notificaciones.filter((notificacion) => !notificacion.leida).length;
+  const tabActual = tabs.find((t) => t.id === tabActiva) ?? tabs[0];
+  const noLeidas  = notificaciones.filter((n) => !n.leida).length;
 
   const cargarNotificaciones = useCallback(async () => {
     if (!token) return;
-
     try {
-      const res = await fetch(`${API_BASE}/notificaciones`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("No se pudieron cargar las notificaciones");
+      const res  = await fetch(`${API_BASE}/notificaciones`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error();
       const data = await res.json();
       setNotificaciones(Array.isArray(data.data) ? data.data : []);
     } catch {
@@ -181,39 +114,37 @@ const AdminDashboard: React.FC = () => {
 
   useEffect(() => {
     cargarNotificaciones();
-    const intervalId = window.setInterval(cargarNotificaciones, 30000);
-    return () => window.clearInterval(intervalId);
+    const id = window.setInterval(cargarNotificaciones, 30000);
+    return () => window.clearInterval(id);
   }, [cargarNotificaciones]);
 
   const marcarTodasLeidas = async () => {
     if (!token || noLeidas === 0) return;
-
     try {
       const res = await fetch(`${API_BASE}/notificaciones/leer-todas`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${token}` },
+        method: "PATCH", headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("No se pudieron marcar");
-      setNotificaciones((prev) =>
-        prev.map((notificacion) => ({ ...notificacion, leida: true }))
-      );
+      if (!res.ok) throw new Error();
+      setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })));
     } catch {
       await cargarNotificaciones();
     }
   };
 
   const abrirNotificaciones = () => {
-    setNotificacionesAbiertas((abiertas) => !abiertas);
+    setNotificacionesAbiertas((v) => !v);
     if (!notificacionesAbiertas) void marcarTodasLeidas();
   };
 
   const cerrarSesion = () => {
-    localStorage.removeItem("token");
+    localStorage.clear();
     window.location.href = "/login";
   };
 
   return (
     <div className="admin-dashboard">
+
+      {/* ── Sidebar ── */}
       <aside className="admin-dashboard__sidebar">
         <div className="admin-dashboard__brand">
           <span className="admin-dashboard__brand-icon">AM</span>
@@ -227,9 +158,7 @@ const AdminDashboard: React.FC = () => {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              className={`admin-dashboard__nav-item ${
-                tabActiva === tab.id ? "admin-dashboard__nav-item--active" : ""
-              }`}
+              className={`admin-dashboard__nav-item ${tabActiva === tab.id ? "admin-dashboard__nav-item--active" : ""}`}
               onClick={() => setTabActiva(tab.id)}
               type="button"
             >
@@ -241,13 +170,12 @@ const AdminDashboard: React.FC = () => {
             </button>
           ))}
         </nav>
-
-        <button className="admin-dashboard__logout" onClick={cerrarSesion} type="button">
-          <span aria-hidden="true">X</span> Cerrar sesion
-        </button>
       </aside>
 
+      {/* ── Área principal ── */}
       <main className="admin-dashboard__main">
+
+        {/* Header con catálogo + salir integrados */}
         <header className="admin-dashboard__header">
           <div>
             <h1 className="admin-dashboard__header-title">
@@ -258,14 +186,47 @@ const AdminDashboard: React.FC = () => {
           </div>
 
           <div className="admin-dashboard__header-actions">
+            {/* Ver catálogo — abre en pestaña nueva para no perder el panel */}
+            <button
+              type="button"
+              onClick={() => window.open("/catalogo", "_blank")}
+              title="Ver catálogo público de mascotas"
+              style={{
+                height: 38, padding: "0 14px", borderRadius: 8,
+                border: "1px solid #d1d5db", background: "#fff",
+                color: "#374151", fontWeight: 600, cursor: "pointer",
+                fontSize: 13, display: "flex", alignItems: "center", gap: 6,
+                whiteSpace: "nowrap",
+              }}
+            >
+              🌐 Catálogo
+            </button>
+
+            {/* Cerrar sesión */}
+            <button
+              type="button"
+              onClick={cerrarSesion}
+              title="Cerrar sesión"
+              style={{
+                height: 38, padding: "0 14px", borderRadius: 8,
+                border: "1px solid #fca5a5", background: "#fff5f5",
+                color: "#dc2626", fontWeight: 600, cursor: "pointer",
+                fontSize: 13, display: "flex", alignItems: "center", gap: 6,
+                whiteSpace: "nowrap",
+              }}
+            >
+              ← Salir
+            </button>
+
             <button
               className="admin-dashboard__refresh"
               onClick={cargarNotificaciones}
               type="button"
-              title="Actualizar notificaciones"
+              title="Actualizar datos"
             >
               Actualizar
             </button>
+
             <div className="admin-dashboard__notifications">
               <button
                 className="admin-dashboard__bell"
@@ -287,25 +248,20 @@ const AdminDashboard: React.FC = () => {
                     <p className="admin-dashboard__empty">Sin notificaciones nuevas.</p>
                   ) : (
                     <div className="admin-dashboard__notification-list">
-                      {notificaciones.slice(0, 6).map((notificacion) => (
+                      {notificaciones.slice(0, 6).map((n) => (
                         <button
-                          key={notificacion.id_notif}
+                          key={n.id_notif}
                           className="admin-dashboard__notification-item"
                           onClick={() => {
-                            if (notificacion.tipo_notif.includes("refugio")) setTabActiva("refugios");
-                            if (notificacion.tipo_notif.includes("adoptante")) setTabActiva("perfiles");
+                            if (n.tipo_notif.includes("refugio"))   setTabActiva("refugios");
+                            if (n.tipo_notif.includes("adoptante")) setTabActiva("perfiles");
                             setNotificacionesAbiertas(false);
                           }}
                           type="button"
                         >
-                          <span>{notificacion.titulo_notif}</span>
-                          <small>{notificacion.cuerpo_notif}</small>
-                          <time>
-                            {new Date(notificacion.fech_notif).toLocaleString("es-BO", {
-                              dateStyle: "short",
-                              timeStyle: "short",
-                            })}
-                          </time>
+                          <span>{n.titulo_notif}</span>
+                          <small>{n.cuerpo_notif}</small>
+                          <time>{new Date(n.fech_notif).toLocaleString("es-BO", { dateStyle: "short", timeStyle: "short" })}</time>
                         </button>
                       ))}
                     </div>
@@ -317,14 +273,14 @@ const AdminDashboard: React.FC = () => {
         </header>
 
         <section className="admin-dashboard__content">
-          {tabActiva === "panel" && <PanelGeneral notificaciones={notificaciones} />}
-          {tabActiva === "refugios" && <ValidarRefugiosMF />}
-          {tabActiva === "animales" && <AnimalesAdminMF />}
-          {tabActiva === "perfiles" && <GestionUsuariosMF />}
+          {tabActiva === "panel"       && <PanelGeneral notificaciones={notificaciones} />}
+          {tabActiva === "refugios"    && <ValidarRefugiosMF />}
+          {tabActiva === "animales"    && <AnimalesAdminMF />}
+          {tabActiva === "perfiles"    && <GestionUsuariosMF />}
           {tabActiva === "solicitudes" && <SolicitudesAdminMF />}
-          {tabActiva === "matching" && <ConfigMatchingMF />}
-          {tabActiva === "reportes" && <ReportesAdminMF />}
-          {tabActiva === "mensajeria" && (
+          {tabActiva === "matching"    && <ConfigMatchingMF />}
+          {tabActiva === "reportes"    && <ReportesAdminMF />}
+          {tabActiva === "mensajeria"  && (
             <AdminPlaceholder
               titulo="Mensajeria"
               descripcion="Bandeja preparada para comunicaciones entre administracion, refugios y adoptantes."
