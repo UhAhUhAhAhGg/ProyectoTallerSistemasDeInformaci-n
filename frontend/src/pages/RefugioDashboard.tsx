@@ -176,15 +176,6 @@ export default function RefugioDashboard() {
             </div>
             <span className="rd-option-arrow">→</span>
           </div>
-
-          <div className="rd-option" onClick={() => navigate('/mensajeria')}>
-            <div className="rd-option-icon">💬</div>
-            <div className="rd-option-info">
-              <h3>Mensajes</h3>
-              <p>Responde consultas de los adoptantes interesados</p>
-            </div>
-            <span className="rd-option-arrow">→</span>
-          </div>
         </div>
         <div style={{ marginTop: 32, background: '#fff', borderRadius: 14, padding: '20px 24px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
   <h2 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', marginBottom: 4 }}>

@@ -134,15 +134,6 @@ export default function AdoptanteDashboard() {
             <span className="ad-option-arrow">→</span>
           </div>
 
-          <div className="ad-option" onClick={() => navigate('/mensajeria')}>
-            <div className="ad-option-icon">💬</div>
-            <div className="ad-option-info">
-              <h3>Mensajes</h3>
-              <p>Conversa con los refugios sobre sus mascotas</p>
-            </div>
-            <span className="ad-option-arrow">→</span>
-          </div>
-
           {puedeVerSeguimiento && (
             <div className="ad-option" onClick={() => navigate('/adaptacion-seguimiento')}>
               <div className="ad-option-icon">📊</div>

@@ -9,7 +9,6 @@ import GestionMascotasPage from './pages/GestionMascotasPage';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import MatchingPage from './pages/MatchingPage';
-import MensajeriaPage from './pages/MensajeriaPage';
 import MisSolicitudesPage from './pages/MisSolicitudesPage';
 import NormasPoliticasPage from './pages/NormasPoliticasPage';
 import NotificacionesPage from './pages/NotificacionesPage';
@@ -162,16 +161,6 @@ export default function App() {
         element={
           <PrivateRoute>
             <AdaptacionSeguimientoPage />
-          </PrivateRoute>
-        }
-      />
-
-      {/* ── Mensajería ───────────────────────────────────────────────────── */}
-      <Route
-        path="/mensajeria"
-        element={
-          <PrivateRoute>
-            <MensajeriaPage />
           </PrivateRoute>
         }
       />

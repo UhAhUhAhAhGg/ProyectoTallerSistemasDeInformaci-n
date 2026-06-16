@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { refugioService } from '../services/api';
-import { getNoLeidos } from '../services/mensajeriaService';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -10,7 +9,7 @@ export default function Navbar() {
   const [userName, setUserName] = useState<string | null>(() => localStorage.getItem('nombre'));
   const [userRol, setUserRol] = useState<string | null>(() => localStorage.getItem('rol'));
   const [estUsuario, setEstUsuario] = useState<string | null>(() => localStorage.getItem('est_usuario'));
-  const [mensajesNoLeidos, setMensajesNoLeidos] = useState(0);
+
 
   const updateAuthState = () => {
     const nombre = localStorage.getItem('nombre');
@@ -67,21 +66,6 @@ export default function Navbar() {
     return () => clearInterval(interval);
   }, []);
 
-  // Polling de mensajes no leídos cada 30 segundos
-  useEffect(() => {
-    if (!userName) {
-      setMensajesNoLeidos(0);
-      return;
-    }
-    const fetchNoLeidos = () => {
-      getNoLeidos()
-        .then(setMensajesNoLeidos)
-        .catch(() => {});
-    };
-    fetchNoLeidos();
-    const interval = setInterval(fetchNoLeidos, 30_000);
-    return () => clearInterval(interval);
-  }, [userName, location.pathname]);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -142,30 +126,6 @@ export default function Navbar() {
           <>
             <button className={`navbar-link ${isActive('/notificaciones') ? 'active' : ''}`} onClick={() => navigate('/notificaciones')}>
               Notificaciones
-            </button>
-            <button
-              className={`navbar-link ${isActive('/mensajeria') ? 'active' : ''}`}
-              onClick={() => navigate('/mensajeria')}
-              style={{ position: 'relative' }}
-            >
-              Mensajes
-              {mensajesNoLeidos > 0 && (
-                <span style={{
-                  position: 'absolute',
-                  top: '-6px',
-                  right: '-8px',
-                  background: '#e53e3e',
-                  color: '#fff',
-                  borderRadius: '999px',
-                  fontSize: '0.65rem',
-                  fontWeight: 700,
-                  padding: '0.1rem 0.4rem',
-                  minWidth: '16px',
-                  textAlign: 'center',
-                }}>
-                  {mensajesNoLeidos}
-                </span>
-              )}
             </button>
           </>
         )}

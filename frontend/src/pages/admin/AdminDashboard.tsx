@@ -9,7 +9,7 @@ import "./AdminDashboard.css";
 
 type Tab =
   | "panel" | "refugios" | "animales" | "perfiles"
-  | "solicitudes" | "matching" | "reportes" | "mensajeria";
+  | "solicitudes" | "matching" | "reportes";
 
 interface Notificacion {
   id_notif: number;
@@ -94,7 +94,6 @@ const AdminDashboard: React.FC = () => {
     { id: "solicitudes", label: "Solicitudes",      icon: "SO", descripcion: "Seguimiento de solicitudes de adopcion" },
     { id: "matching",    label: "Config. Matching", icon: "IA", descripcion: "Parametros del motor de compatibilidad" },
     { id: "reportes",    label: "Reportes",         icon: "R",  descripcion: "Resumen general y descarga en PDF" },
-    { id: "mensajeria",  label: "Mensajeria",       icon: "MS", descripcion: "Comunicaciones y avisos del sistema" },
   ], []);
 
   const tabActual = tabs.find((t) => t.id === tabActiva) ?? tabs[0];
@@ -280,13 +279,6 @@ const AdminDashboard: React.FC = () => {
           {tabActiva === "solicitudes" && <SolicitudesAdminMF />}
           {tabActiva === "matching"    && <ConfigMatchingMF />}
           {tabActiva === "reportes"    && <ReportesAdminMF />}
-          {tabActiva === "mensajeria"  && (
-            <AdminPlaceholder
-              titulo="Mensajeria"
-              descripcion="Bandeja preparada para comunicaciones entre administracion, refugios y adoptantes."
-              detalles={["Avisos a refugios", "Alertas a adoptantes", "Mensajes del sistema"]}
-            />
-          )}
         </section>
       </main>
     </div>

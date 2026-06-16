@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import './PetCard.css';
 
 interface PetCardProps {
@@ -34,16 +33,8 @@ function scoreColor(score: number): string {
 }
 
 export default function PetCard(props: PetCardProps) {
-  const navigate  = useNavigate();
   const rol       = localStorage.getItem('rol');
   const esAdoptante = rol === 'adoptante';
-
-  const handleContactar = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigate(
-      `/mensajeria?id_refug=${props.id_refug}&id_publi=${props.id_publi}`,
-    );
-  };
 
   return (
     <div className="pet-card">
@@ -100,14 +91,6 @@ export default function PetCard(props: PetCardProps) {
           </ul>
         )}
 
-        {esAdoptante && (
-          <button
-            className="pet-card__btn-contactar"
-            onClick={handleContactar}
-          >
-            💬 Contactar refugio
-          </button>
-        )}
       </div>
     </div>
   );

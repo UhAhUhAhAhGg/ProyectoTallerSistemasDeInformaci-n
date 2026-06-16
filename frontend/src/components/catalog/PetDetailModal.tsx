@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import './PetDetailModal.css';
 
 export interface PetDetailData {
@@ -33,19 +32,9 @@ function edadLabel(edad: number): string {
 }
 
 export default function PetDetailModal({ pet, onClose, onSolicitar }: Props) {
-  const navigate = useNavigate();
   const rol = localStorage.getItem('rol');
   const esAdoptante = rol === 'adoptante';
   const descripcion = pet.decrip_publi || pet.descrip_mascot;
-
-  const handleContactar = () => {
-    if (pet.id_refug && pet.id_publi) {
-      navigate(`/mensajeria?id_refug=${pet.id_refug}&id_publi=${pet.id_publi}`);
-    } else if (pet.id_refug) {
-      navigate(`/mensajeria?id_refug=${pet.id_refug}`);
-    }
-    onClose();
-  };
 
   return (
     <div className="pet-detail-overlay" onClick={onClose}>
@@ -120,14 +109,6 @@ export default function PetDetailModal({ pet, onClose, onSolicitar }: Props) {
                   onClick={() => { onSolicitar(); onClose(); }}
                 >
                   Solicitar adopción
-                </button>
-              )}
-              {pet.id_refug && (
-                <button
-                  className="pet-detail-btn pet-detail-btn--secondary"
-                  onClick={handleContactar}
-                >
-                  💬 Contactar refugio
                 </button>
               )}
             </div>
